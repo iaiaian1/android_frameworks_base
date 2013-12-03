@@ -76,7 +76,10 @@
   <java-symbol type="id" name="pocket_hint_image" />
   <java-symbol type="id" name="pocket_hint_message" />
 
-    <!-- Assist manager -->
-    <java-symbol type="string" name="no_assist_found" />
+  <!-- Assist manager -->
+  <java-symbol type="string" name="no_assist_found" />
   
+  <!-- XPe World Easter Egg -->
+  <java-symbol type="drawable" name="xpe_world_logo" />
+
 </resources>
