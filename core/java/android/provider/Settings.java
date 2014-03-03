@@ -4034,6 +4034,13 @@ public final class Settings {
         public static final String APP_SIDEBAR_HIDE_TIMEOUT = "app_sidebar_hide_timeout";
 
         /**
+         * Toast animations
+         *
+         * @hide
+         */
+        public static final String TOAST_ANIMATION = "toast_animation";
+
+        /**
          * ListView Animations
          * 0 == None
          * 1 == Wave (Left)
