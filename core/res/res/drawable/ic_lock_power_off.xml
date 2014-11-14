@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (C) 2014 The Android Open Source Project
+     Copyright (C) 2016 The XPerience Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,6 +15,25 @@
      limitations under the License.
 -->
 
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/ic_lock_power_off_alpha"
-    android:tint="?attr/colorControlNormal" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+
+    <path
+        android:fillColor="@color/global_actions_item"
+        android:pathData="M14.3333333,6.00399657 C14.3333333,5.08131474 15.073108,4.33333333 16,4.33333333
+C16.9204746,4.33333333 17.6666667,5.08940788 17.6666667,6.00399657
+L17.6666667,13.6626701 C17.6666667,14.5853519 16.926892,15.3333333 16,15.3333333
+C15.0795254,15.3333333 14.3333333,14.5772588 14.3333333,13.6626701
+L14.3333333,6.00399657 Z M19.3333333,6.19783806 C23.5919088,7.59756145
+26.6666667,11.6063733 26.6666667,16.3333333 C26.6666667,22.2243707 21.8910373,27
+16,27 C10.1089627,27 5.33333333,22.2243707 5.33333333,16.3333333
+C5.33333333,11.6063733 8.40809121,7.59756145 12.6666667,6.19783806
+L12.6666667,10.1764136 C10.4827935,11.3612527 9,13.6741305 9,16.3333333
+C9,20.1993266 12.1340068,23.3333333 16,23.3333333 C19.8659932,23.3333333
+23,20.1993266 23,16.3333333 C23,13.6741305 21.5172065,11.3612527
+19.3333333,10.1764136 L19.3333333,6.19783806 L19.3333333,6.19783806 Z" />
+</vector>

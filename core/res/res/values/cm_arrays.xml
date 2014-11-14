@@ -40,7 +40,14 @@
         <item>bootloader</item>
      </string-array>
 
-    <!-- Do not translate. App ops request strings -->
+    <array name="shutdown_reboot_icons">
+        <item>@drawable/ic_lock_power_reboot</item>
+        <item>@string/reboot_soft</item>
+        <item>@drawable/ic_lock_reboot_recovery</item>
+        <item>@drawable/ic_lock_reboot_bootloader</item>
+    </array>
+
+<!-- Do not translate. App ops request strings -->
     <string-array name="app_ops_labels" translatable="false">
         <!-- OP_COARSE_LOCATION -->
         <item>@string/app_ops_access_location</item>

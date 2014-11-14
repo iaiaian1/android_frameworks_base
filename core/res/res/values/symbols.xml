@@ -1473,6 +1473,7 @@
   <java-symbol type="array" name="config_virtualKeyVibePattern" />
   <java-symbol type="array" name="shutdown_reboot_options" />
   <java-symbol type="array" name="shutdown_reboot_actions" />
+  <java-symbol type="array" name="shutdown_reboot_icons" />
   <java-symbol type="attr" name="actionModePopupWindowStyle" />
   <java-symbol type="attr" name="dialogCustomTitleDecorLayout" />
   <java-symbol type="attr" name="dialogTitleDecorLayout" />
@@ -2698,10 +2699,11 @@
   <java-symbol type="drawable" name="ic_lock_settings" />
   <java-symbol type="drawable" name="ic_lock_user" />
 
-  <!-- ADB notification -->
+<!-- ADB notification -->
   <java-symbol type="string" name="adb_net_active_notification_title" />
   <java-symbol type="string" name="adb_both_active_notification_title" />
   <java-symbol type="string" name="adb_active_generic_notification_message" />
 
   <java-symbol type="bool" name="config_useSystemClockforRotationSensor" />
+  
 </resources>

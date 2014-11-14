@@ -6994,10 +6994,8 @@ public final class Settings {
 
         /**
          * String to contain power menu actions
-         * @deprecated Use {@link CMSettings.Secure#POWER_MENU_ACTIONS} instead
          * @hide
          */
-        @Deprecated
         public static final String POWER_MENU_ACTIONS = "power_menu_actions";
 
         /**

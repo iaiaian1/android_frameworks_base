@@ -281,7 +281,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         } else {
             actionsArray = mActions.split("\\|");
         }
-
         // Always add the power off option
         mItems.add(new PowerAction());
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (C) 2014 The Android Open Source Project
+     Copyright (C) 2016 The XPerience Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,6 +15,18 @@
      limitations under the License.
 -->
 
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/ic_lock_airplane_mode_alpha"
-    android:tint="?attr/colorControlActivated" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+
+    <path
+        android:fillColor="@color/global_actions_item"
+        android:pathData="M28,20.8 L28,18.4 L17.8947368,12.4 L17.8947368,5.8 C17.8947368,4.804
+17.0484211,4 16,4 C14.9515789,4 14.1052632,4.804 14.1052632,5.8 L14.1052632,12.4
+L4,18.4 L4,20.8 L14.1052632,17.8 L14.1052632,24.4 L11.5789474,26.2
+L11.5789474,28 L16,26.8 L20.4210526,28 L20.4210526,26.2 L17.8947368,24.4
+L17.8947368,17.8 L28,20.8 L28,20.8 Z"/>
+</vector>
