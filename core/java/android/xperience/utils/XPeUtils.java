@@ -29,38 +29,72 @@ import android.net.NetworkInfo;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
+/**
+* @hide
+*/
+
 public class XPeUtils {
 
-   public static boolean isChineseLanguage() {
-return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(Locale.CHINESE.getLanguage());
-}
-public static boolean isTWLanguage() {
-return Resources.getSystem().getConfiguration().locale.getCountry().equals("TW");
-}
-    
- public static boolean isOnline(Context context) {
-	ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-	NetworkInfo netInfo = cm.getActiveNetworkInfo();
-	if (netInfo != null && netInfo.isConnected()) {
-		return true;
-	}
-		return false;
-	}
+       private static String LIBNAME = "xperienceutils";
 
-     public static String formatFileSize(long size) {
-	
-	DecimalFormat df = new DecimalFormat("#0.00");
-	String fileSizeString = "";
-	
-	if (size < 1024) {
-		fileSizeString = df.format((double) size) + "B";
-	} else if (size < 1048576) {
-		fileSizeString = df.format((double) size / 1024) + "K";
-	} else if (size < 1073741824) {
-		fileSizeString = df.format((double) size / 1048576) + "M";
-	} else {
-		fileSizeString = df.format((double) size / 1073741824) + "G";
-		}
-		return fileSizeString;
-	}
+    static {
+        System.loadLibrary(LIBNAME);
+    }
+
+    public static native boolean isSupportLanguage(boolean excludeTW);
+
+    public static boolean isOnline(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnected()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isApkInstalledAndEnabled(String packagename, Context context) {
+        int state;
+        try {
+            context.getPackageManager().getPackageInfo(packagename, 0);
+            state = context.getPackageManager().getApplicationEnabledSetting(packagename);
+        } catch (NameNotFoundException e) {
+            return false;
+        }
+        return state != PackageManager.COMPONENT_ENABLED_STATE_DISABLED && state != PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER ? true : false;
+    }
+
+    public static boolean isApkInstalled(String packagename, Context context) {
+        try {
+            context.getPackageManager().getPackageInfo(packagename, 0);
+        } catch (NameNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isSystemApp(String packagename, Context context) {
+        PackageInfo packageInfo;
+        try {
+            packageInfo = context.getPackageManager().getPackageInfo(packagename, 0);
+        } catch (NameNotFoundException e) {
+            return false;
+        }
+        return ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
+    }
+
+    public static String formatFileSize(long size) {
+        DecimalFormat df = new DecimalFormat("#0.00");
+        String fileSizeString = "";
+        if (size < 1024) {
+            fileSizeString = df.format((double) size) + "B";
+        } else if (size < 1048576) {
+            fileSizeString = df.format((double) size / 1024) + "K";
+        } else if (size < 1073741824) {
+            fileSizeString = df.format((double) size / 1048576) + "M";
+        } else {
+            fileSizeString = df.format((double) size / 1073741824) + "G";
+        }
+        return fileSizeString;
+    }
+
 }
