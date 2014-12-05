@@ -1713,6 +1713,7 @@ android.widget.ViewAnimator
 android.widget.ViewFlipper
 android.widget.ViewSwitcher
 android.widget.WrapperListAdapter
+android.xperience.utils.XPeUtils
 com.android.dex.Annotation
 com.android.dex.DexFormat
 com.android.dex.EncodedValue

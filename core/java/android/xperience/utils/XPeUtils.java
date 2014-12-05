@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.XPerience.utils;
+package android.xperience.utils;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
