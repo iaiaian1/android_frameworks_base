@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2017 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -559,6 +560,8 @@ public abstract class QSTile<TState extends State> {
     }
 
     public static class State {
+        public boolean visible;
+        public boolean enabled = true;
         public Icon icon;
         public boolean visible;
         public CharSequence label;
@@ -575,6 +578,7 @@ public abstract class QSTile<TState extends State> {
             if (other == null) throw new IllegalArgumentException();
             if (!other.getClass().equals(getClass())) throw new IllegalArgumentException();
             final boolean changed = other.visible != visible
+                    || !Objects.equals(other.enabled, enabled)
                     || !Objects.equals(other.icon, icon)
                     || !Objects.equals(other.label, label)
                     || !Objects.equals(other.contentDescription, contentDescription)
@@ -590,6 +594,7 @@ public abstract class QSTile<TState extends State> {
                     || !Objects.equals(other.disabledByPolicy, disabledByPolicy)
                     || !Objects.equals(other.enforcedAdmin, enforcedAdmin);
             other.visible = visible;
+            other.enabled = enabled;
             other.icon = icon;
             other.label = label;
             other.contentDescription = contentDescription;
@@ -617,6 +622,7 @@ public abstract class QSTile<TState extends State> {
         protected StringBuilder toStringBuilder() {
             final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
             sb.append("visible=").append(visible);
+            sb.append(",enabled=").append(enabled);
             sb.append(",icon=").append(icon);
             sb.append(",label=").append(label);
             sb.append(",contentDescription=").append(contentDescription);
