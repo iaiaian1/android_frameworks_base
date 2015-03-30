@@ -186,6 +186,7 @@ import com.android.systemui.statusbar.policy.KeyguardUserSwitcher;
 import com.android.systemui.statusbar.policy.LocationControllerImpl;
 import com.android.systemui.statusbar.policy.MSimNetworkControllerImpl;
 import com.android.systemui.statusbar.policy.NetworkControllerImpl;
+import com.android.systemui.statusbar.policy.NetworkTraffic;
 import com.android.systemui.statusbar.policy.NextAlarmController;
 import com.android.systemui.statusbar.policy.PreviewInflater;
 import com.android.systemui.statusbar.policy.RotationLockControllerImpl;
@@ -370,6 +371,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private int mStatusBarHeaderHeight;
 
     private boolean mShowCarrierInPanel = false;
+
+    // Status bar Network traffic;
+    private NetworkTraffic mNetworkTraffic;
 
     // Status bar carrier
     private boolean mShowStatusBarCarrier;
@@ -1023,6 +1027,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mMoreIcon = mStatusBarView.findViewById(R.id.moreIcon);
         mNotificationIcons.setOverflowIndicator(mMoreIcon);
         mStatusBarContents = (LinearLayout)mStatusBarView.findViewById(R.id.status_bar_contents);
+
+	mNetworkTraffic = (NetworkTraffic)mStatusBarView.findViewById(R.id.network_traffic);
 
         mClockView = (TextView) mStatusBarView.findViewById(R.id.clock);
         mClockLocation = Settings.System.getIntForUser(mContext.getContentResolver(),
@@ -3834,6 +3840,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         animateCollapsePanels();
         updatePublicMode(); 
         updateNotifications();
+	mNetworkTraffic.updateSettings();
         resetUserSetupObserver();
         setControllerUsers();
 

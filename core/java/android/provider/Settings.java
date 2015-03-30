@@ -3350,6 +3350,12 @@ public final class Settings {
         public static final String INCREASING_RING_RAMP_UP_TIME = "increasing_ring_ramp_up_time";
 
         /**
+         * show traffic in statusbar. The value is
+         * int (0: Hide  or 1: Only Rx 2: RxTx).
+         */
+        public static final String STATUS_BAR_NETWORK_TRAFFIC_STYLE = "STATUS_BAR_NETWORK_TRAFFIC_STYLE";
+
+        /**
          * I am the lolrus.
          * <p>
          * Nonzero values indicate that the user has a bukkit.
