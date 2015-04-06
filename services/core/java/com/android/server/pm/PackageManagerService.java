@@ -75,6 +75,7 @@ import com.android.internal.app.ResolverActivity;
 import com.android.internal.content.NativeLibraryHelper;
 import com.android.internal.content.PackageHelper;
 import com.android.internal.os.IParcelFileDescriptorFactory;
+import com.android.internal.policy.impl.PhoneWindowManager;
 import com.android.internal.util.ArrayUtils;
 import com.android.internal.util.FastPrintWriter;
 import com.android.internal.util.FastXmlSerializer;
@@ -199,6 +200,8 @@ import android.util.Slog;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.Display;
+import android.view.WindowManager;
+import android.view.WindowManagerPolicy;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -662,6 +665,9 @@ public class PackageManagerService extends IPackageManager.Stub {
 
     // Stores a list of users whose package restrictions file needs to be updated
     private ArraySet<Integer> mDirtyUsers = new ArraySet<Integer>();
+
+    WindowManager mWindowManager;
+    private final WindowManagerPolicy mPolicy; // to set packageName
 
     final private DefaultContainerConnection mDefContainerConn =
             new DefaultContainerConnection();
@@ -1454,6 +1460,11 @@ public class PackageManagerService extends IPackageManager.Stub {
             mDefParseFlags = 0;
             mSeparateProcesses = null;
         }
+
+        mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        Display d = mWindowManager.getDefaultDisplay();
+        mPolicy = new PhoneWindowManager();
+        d.getMetrics(mMetrics);
 
         mInstaller = installer;
 
@@ -4777,6 +4788,16 @@ public class PackageManagerService extends IPackageManager.Stub {
                 if (doTrim) {
                     if (!isFirstBoot()) {
                         try {
+
+                // give the packagename to the PhoneWindowManager
+                ApplicationInfo ai;
+                try {
+                    ai = mContext.getPackageManager().getApplicationInfo(pkg.packageName, 0);
+                } catch (Exception e) {
+                    ai = null;
+                }
+                mPolicy.setPackageName((String) (ai != null ? mContext.getPackageManager().getApplicationLabel(ai) : pkg.packageName));
+
                             ActivityManagerNative.getDefault().showBootMessage(
                                     mContext.getResources().getString(
                                             R.string.android_upgrading_fstrim), true);

@@ -268,9 +268,9 @@ public interface WindowManagerPolicy {
         public int getSurfaceLayer();
         
         /**
-         * Return the token for the application (actually activity) that owns 
-         * this window.  May return null for system windows. 
-         * 
+         * Return the token for the application (actually activity) that owns
+         * this window.  May return null for system windows.
+         *
          * @return An IApplicationToken identifying the owning activity.
          */
         public IApplicationToken getAppToken();
@@ -281,12 +281,12 @@ public interface WindowManagerPolicy {
         public boolean isVoiceInteraction();
 
         /**
-         * Return true if, at any point, the application token associated with 
-         * this window has actually displayed any windows.  This is most useful 
-         * with the "starting up" window to determine if any windows were 
-         * displayed when it is closed. 
-         * 
-         * @return Returns true if one or more windows have been displayed, 
+         * Return true if, at any point, the application token associated with
+         * this window has actually displayed any windows.  This is most useful
+         * with the "starting up" window to determine if any windows were
+         * displayed when it is closed.
+         *
+         * @return Returns true if one or more windows have been displayed,
          *         else false.
          */
         public boolean hasAppShownWindows();
@@ -306,8 +306,8 @@ public interface WindowManagerPolicy {
         boolean isVisibleOrBehindKeyguardLw();
         
         /**
-         * Is this window currently visible to the user on-screen?  It is 
-         * displayed either if it is visible or it is currently running an 
+         * Is this window currently visible to the user on-screen?  It is
+         * displayed either if it is visible or it is currently running an
          * animation before no longer being visible.  Must be called with the
          * window manager lock held.
          */
@@ -1116,6 +1116,11 @@ public interface WindowManagerPolicy {
      * user can start interacting with it.
      */
     public void systemBooted();
+
+    /**
+     * name of package being worked on during boot time message
+     */
+    public void setPackageName(String pkgName);
 
     /**
      * Show boot time message to the user.
