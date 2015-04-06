@@ -6588,7 +6588,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     } else {
                         mBootMsgDialog.setTitle(R.string.android_start_title);
                     }
-mBootMsgDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		    mBootMsgDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		    mBootMsgDialog.setIcon(com.android.internal.R.drawable.xperience);
                     mBootMsgDialog.setIndeterminate(true);
                     mBootMsgDialog.getWindow().setType(
@@ -6605,8 +6605,7 @@ mBootMsgDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 }
 //                mBootMsgDialog.setMessage(msg);
 
-		  mBootMsgDialog.setMessage("Powered By XPerience\n\n" + msg
-		  "\n\nPlease do not power off or remove from power source.");
+		  mBootMsgDialog.setMessage("Powered By XPerience\n\n" + msg + "\n\nPlease do not power off or remove from power source.");
             }
         });
     }
