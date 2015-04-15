@@ -71,8 +71,9 @@ import android.service.dreams.DreamManagerInternal;
 import android.service.dreams.DreamService;
 import android.service.dreams.IDreamManager;
 import android.speech.RecognizerIntent;
-import android.telecom.TelecomManager;
+import android.telecom.TelecomManager
 import android.service.gesture.EdgeGestureManager;
+import android.text.Html;
 import com.android.internal.os.DeviceKeyHandler;
 
 import com.android.internal.util.cm.ActionUtils;
@@ -127,9 +128,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.List;
-import java.lang.reflect.Constructor;
+import java.util.Random;
 
 import static android.view.WindowManager.LayoutParams.*;
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.LID_ABSENT;
@@ -6605,9 +6607,21 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     mBootMsgDialog.setCancelable(false);
                     mBootMsgDialog.show();
                 }
-//                mBootMsgDialog.setMessage(msg);
+                //mBootMsgDialog.setMessage(msg);
+		//mBootMsgDialog.setMessage("Powered By XPerience\n\n" + msg + "\n\nPlease do not power off.");
 
-		  mBootMsgDialog.setMessage("Powered By XPerience\n\n" + msg + "\n\nPlease do not power off or remove from power source.");
+
+		// Calculate random text color
+		  Random rand = new Random();
+			
+		  
+		  String randomColor = Integer.toHexString(rand.nextInt(0xFFFFFF) & 0xFCFCFC );
+
+		  mBootMsgDialog.setMessage(Html.fromHtml(
+                                                         "Powered By <b>XPerience</b>\n\n<br><b><font color=\"#" + randomColor + "\">" +
+                                                            msg +
+							 "Please do not power off.</font></b>"));
+
             }
         });
     }
