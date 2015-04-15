@@ -71,7 +71,7 @@ import android.service.dreams.DreamManagerInternal;
 import android.service.dreams.DreamService;
 import android.service.dreams.IDreamManager;
 import android.speech.RecognizerIntent;
-import android.telecom.TelecomManager
+import android.telecom.TelecomManager;
 import android.service.gesture.EdgeGestureManager;
 import android.text.Html;
 import com.android.internal.os.DeviceKeyHandler;
