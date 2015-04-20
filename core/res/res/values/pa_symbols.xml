@@ -28,4 +28,7 @@
     <!-- Safe Headset Volume Dialog -->
     <string name="safe_headset_warning_title">Safe Headset Volume</string>
     <string name="safe_headset_warning_message">Would you like to disable the recommended volume level warning ?</string>
+
+    <!-- Doze Settings -->
+    <java-symbol type="bool" name="config_dozeUseAccelerometer" />
 </resources>
