@@ -7433,5 +7433,11 @@ message MetricsEvent {
     // BEGIN PA CONSTANTS
     // Settings -> Backup & Reset -> Feature Preferences
     FEATURE_PREFERENCES = 9001;
+
+    //XPerience Constants
+    QS_HEADSUP = 9500;
+    QS_CAFFEINE = 9502;
+    RAINBOW_UNICORN = 9501;
+
   }
 }
