@@ -159,13 +159,20 @@ public class CarrierText extends LinearLayout {
         if (mAirplaneModeText != null && mShowAPM) {
             mAirplaneModeText.setText(airplaneMode);
         }
+
             String customCarrierLabel = Settings.System.getStringForUser(getContext().getContentResolver(),
             Settings.System.CUSTOM_CARRIER_LABEL, UserHandle.USER_CURRENT);
             if (!TextUtils.isEmpty(customCarrierLabel)) {
                 updateCarrierView.setText(customCarrierLabel);
             } else {
                 updateCarrierView.setText(text != null ? text.toString() : null);
+
+        for (int i = 0; i < mNumPhones-1; i++) {
+            if (mOperatorSeparator[i] != null) {
+                mOperatorSeparator[i].setText("|");
             }
+        }
+      }
     }
 
     @Override
@@ -199,7 +206,6 @@ public class CarrierText extends LinearLayout {
             if (i < mNumPhones-1) {
                 mOperatorSeparator[i] = (TextView) findViewById(operatorSepId[i]);
                 mOperatorSeparator[i].setVisibility(View.VISIBLE);
-                mOperatorSeparator[i].setText("|");
             }
         }
         mAirplaneModeText = (TextView) findViewById(R.id.airplane_mode);

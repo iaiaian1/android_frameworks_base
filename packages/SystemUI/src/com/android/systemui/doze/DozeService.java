@@ -217,7 +217,7 @@ public class DozeService extends DreamService {
             // Here we need a wakelock to stay awake until the pulse is finished.
             mWakeLock.acquire();
             mPulsing = true;
-            if (!mDozeParameters.getProxCheckBeforePulse()) {
+            if (!mDozeParameters.getProxCheckBeforePulse(reason)) {
                 // skip proximity check
                 continuePulsing(reason);
                 return;
@@ -350,7 +350,7 @@ public class DozeService extends DreamService {
             if (DEBUG) Log.d(mTag, "No more schedule resets remaining");
             return;
         }
-        final long pulseDuration = mDozeParameters.getPulseDuration(false /*pickup*/);
+        final long pulseDuration = mDozeParameters.getPulseDuration(DozeLog.PULSE_REASON_NOTIFICATION);
         if ((notificationTimeMs - mNotificationPulseTime) < pulseDuration) {
             if (DEBUG) Log.d(mTag, "Recently updated, not resetting schedule");
             return;
