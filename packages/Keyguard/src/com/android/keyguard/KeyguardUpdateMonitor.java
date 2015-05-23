@@ -253,9 +253,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
                 case MSG_SUBINFO_CONTENT_CHANGE:
                     handleSubInfoContentChange((SubInfoContent) msg.obj);
                     break;
-                case MSG_SIM_SUBSCRIPTION_INFO_CHANGED:
-                    handleSimSubscriptionInfoChanged();
-                    break;
             }
         }
     };
