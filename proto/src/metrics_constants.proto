@@ -2269,5 +2269,7 @@ message MetricsEvent {
     // Settings -> Backup & Reset -> Feature Preferences
     FEATURE_PREFERENCES = 505;
 
+    // Location detail adapter
+    QS_LOCATION_DETAIL = 504;
   }
 }
