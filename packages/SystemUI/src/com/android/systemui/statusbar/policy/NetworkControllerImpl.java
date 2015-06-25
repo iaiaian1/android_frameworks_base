@@ -1160,8 +1160,6 @@ public class NetworkControllerImpl extends BroadcastReceiver
         int N;
         final boolean emergencyOnly = isEmergencyOnly();
         
-        final String customCarrierLabel = Settings.System.getStringForUser(context.getContentResolver(),
-                Settings.System.CUSTOM_CARRIER_LABEL, UserHandle.USER_CURRENT);
 
             mNetworkToIconLookup.put(TelephonyManager.NETWORK_TYPE_EVDO_0, TelephonyIcons.THREE_G);
             mNetworkToIconLookup.put(TelephonyManager.NETWORK_TYPE_EVDO_A, TelephonyIcons.THREE_G);
@@ -1344,6 +1342,10 @@ public class NetworkControllerImpl extends BroadcastReceiver
                 str.append(spn);
             }
             if (str.length() != 0) {
+                String mCustomCarrierLabel = Settings.System.getStringForUser(mContext.getContentResolver(),
+                        Settings.System.CUSTOM_CARRIER_LABEL, UserHandle.USER_CURRENT);
+                mCurrentState.networkName = !TextUtils.isEmpty(mCustomCarrierLabel) && !mAirplaneMode ? mCustomCarrierLabel : str.toString();
+
                 mCurrentState.networkName = str.toString();
             } else {
                 mCurrentState.networkName = mNetworkNameDefault;
