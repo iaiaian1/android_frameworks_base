@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.xperience.utils.XPeUtils;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -31,7 +30,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.android.internal.telephony.TelephonyIntents;
-import com.android.systemui.utils.SpnOverride;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -41,11 +39,8 @@ import com.android.systemui.R;
 
 public class CarrierLabel extends TextView {
 
-    private boolean mAttached;
-
-    private static boolean isCN;
-
     private Context mContext;
+    private boolean mAttached;
 
     public CarrierLabel(Context context) {
         this(context, null);
@@ -64,7 +59,6 @@ public class CarrierLabel extends TextView {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-
         if (!mAttached) {
             mAttached = true;
             IntentFilter filter = new IntentFilter();
@@ -89,29 +83,22 @@ public class CarrierLabel extends TextView {
             String action = intent.getAction();
             if (TelephonyIntents.SPN_STRINGS_UPDATED_ACTION.equals(action)
                     || Intent.ACTION_CUSTOM_CARRIER_LABEL_CHANGED.equals(action)) {
-                        updateNetworkName(intent.getBooleanExtra(TelephonyIntents.EXTRA_SHOW_SPN, false),
+                        updateNetworkName(intent.getBooleanExtra(TelephonyIntents.EXTRA_SHOW_SPN, true),
                         intent.getStringExtra(TelephonyIntents.EXTRA_SPN),
                         intent.getBooleanExtra(TelephonyIntents.EXTRA_SHOW_PLMN, false),
                         intent.getStringExtra(TelephonyIntents.EXTRA_PLMN));
-                isCN = XPeUtils.isSupportLanguage(false);
             }
         }
     };
 
     void updateNetworkName(boolean showSpn, String spn, boolean showPlmn, String plmn) {
-        if (false) {
-            Log.d("CarrierLabel", "updateNetworkName showSpn=" + showSpn + " spn=" + spn
-                    + " showPlmn=" + showPlmn + " plmn=" + plmn);
-        }
         final String str;
         final boolean plmnValid = showPlmn && !TextUtils.isEmpty(plmn);
         final boolean spnValid = showSpn && !TextUtils.isEmpty(spn);
-        if (plmnValid && spnValid) {
-            str = plmn + "|" + spn;
+        if (spnValid) {
+            str = spn;
         } else if (plmnValid) {
             str = plmn;
-        } else if (spnValid) {
-            str = spn;
         } else {
             str = "";
         }
@@ -125,25 +112,15 @@ public class CarrierLabel extends TextView {
     }
 
     private String getOperatorName() {
-        String operatorName = getContext().getString(R.string.quick_settings_wifi_no_network);
-        TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
-                Context.TELEPHONY_SERVICE);
-        if (isCN) {
-            String operator = telephonyManager.getNetworkOperator();
-            if (TextUtils.isEmpty(operator)) {
-                operator = telephonyManager.getSimOperator();
-            }
-            SpnOverride mSpnOverride = new SpnOverride();
-            operatorName = mSpnOverride.getSpn(operator);
+        TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        String operatorName = telephonyManager.getNetworkOperatorName();
+        if (TextUtils.isEmpty(operatorName)) {
+            operatorName = telephonyManager.getSimOperatorName();
             if (TextUtils.isEmpty(operatorName)) {
-                operatorName = telephonyManager.getSimOperatorName();
-            }
-        } else {
-            operatorName = telephonyManager.getNetworkOperatorName();
-            if (TextUtils.isEmpty(operatorName)) {
-                operatorName = telephonyManager.getSimOperatorName();
+                operatorName = getContext().getString(R.string.quick_settings_wifi_no_network);
             }
         }
         return operatorName.toUpperCase();
     }
+
 }
