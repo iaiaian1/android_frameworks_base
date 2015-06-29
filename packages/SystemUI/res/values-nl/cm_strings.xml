@@ -157,4 +157,8 @@
   <string name="dynamic_qs_tile_next_alarm_label">Volgend alarm</string>
   <string name="dynamic_qs_tile_ime_selector_label">Invoermethode</string>
   <string name="dynamic_qs_tile_su_label">Root-toegang</string>
+  <string name="status_bar_recent_floating_item_title">Floating modes</string>  
+  <string name="quick_settings_slim_floats_on">Slim Floats Ingeschakeld</string>
+  <string name="quick_settings_slim_floats_off">Slim Floats Uitgeschakeld</string>
+
 </resources>

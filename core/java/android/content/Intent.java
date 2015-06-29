@@ -696,6 +696,20 @@ public class Intent implements Parcelable, Cloneable {
     public static final String ACTION_PICK = "android.intent.action.PICK";
 
     /**
+     * Registered and foreground services only
+     * @hide
+     */
+    public static final String ACTION_ACTIVITY_LAUNCH_DETECTOR =
+            "android.intent.action.ACTIVITY_LAUNCH_DETECTOR";
+
+    /**
+     * Registered and foreground services only
+     * @hide
+     */
+    public static final String ACTION_ACTIVITY_END_DETECTOR =
+            "android.intent.action.ACTIVITY_END_DETECTOR";
+
+    /**
      * Activity Action: Creates a shortcut.
      * <p>Input: Nothing.</p>
      * <p>Output: An Intent representing the shortcut. The intent must contain three
@@ -3761,6 +3775,19 @@ public class Intent implements Parcelable, Cloneable {
      * at the top of the history stack.
      */
     public static final int FLAG_ACTIVITY_SINGLE_TOP = 0x20000000;
+    /**
+     * If set, this intent will always match start up as a floating window
+     * in multi window scenarios.
+     * @hide
+     */
+    public static final int FLAG_FLOATING_WINDOW = 0x00003000;
+    /**
+     * If set in an Intent passed to {@link Context#startActivity Context.startActivity()},
+     * this flag will cause a newly launching task to be resized according to the split
+     * view metrics, making it running alongside another app.
+     * @hide
+     */
+    public static final int FLAG_ACTIVITY_SPLIT_VIEW = 0x00001000;
     /**
      * If set, this activity will become the start of a new task on this
      * history stack.  A task (from the activity that started it to the
