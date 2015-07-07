@@ -566,12 +566,10 @@ public class NotificationStackScrollLayout extends ViewGroup
             // We start the swipe and snap back in the same frame, we don't want any animation
             mDragAnimPendingChildren.remove(animView);
         }
-        mPhoneStatusBar.requestVisualizer(true, 300);
     }
 
     @Override
     public boolean updateSwipeProgress(View animView, boolean dismissable, float swipeProgress) {
-        mPhoneStatusBar.requestVisualizer(false, 0);
         return false;
     }
 
@@ -736,6 +734,9 @@ public class NotificationStackScrollLayout extends ViewGroup
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if (ev.getActionMasked() == MotionEvent.ACTION_UP) {
+            mPhoneStatusBar.setVisualizerTouching(false);
+        }
         boolean isCancelOrUp = ev.getActionMasked() == MotionEvent.ACTION_CANCEL
                 || ev.getActionMasked()== MotionEvent.ACTION_UP;
         if (mDelegateToScrollView) {
@@ -1570,7 +1571,6 @@ public class NotificationStackScrollLayout extends ViewGroup
             // drawn when removed
             getOverlay().add(child);
         }
-        mPhoneStatusBar.requestVisualizer(true, 300);
         updateAnimationState(false, child);
 
         // Make sure the clipRect we might have set is removed
@@ -2158,12 +2158,6 @@ public class NotificationStackScrollLayout extends ViewGroup
             mNeedsAnimation =  true;
         }
         requestChildrenUpdate();
-        if (activatedChild != null) {
-            mPhoneStatusBar.requestVisualizer(false, 0);
-        } else {
-            mPhoneStatusBar.requestVisualizer(true, 300);
-        }
-
     }
 
     public ActivatableNotificationView getActivatedChild() {

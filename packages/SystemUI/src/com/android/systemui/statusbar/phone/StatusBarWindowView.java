@@ -197,18 +197,12 @@ public class StatusBarWindowView extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (mService.getBarState() == StatusBarState.KEYGUARD) {
-            switch (ev.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    mService.setVisualizerTouching(true);
-                    break;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    mService.setVisualizerTouching(false);
-                    break;
-            }
+        final int action = ev.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN) {
+            mService.setVisualizerTouching(true);
+        } else if (action == MotionEvent.ACTION_UP) {
+            mService.setVisualizerTouching(false);
         }
-
         boolean intercept = false;
         if (mDoubleTapToSleepEnabled
                 && ev.getY() < mStatusBarHeaderHeight) {
@@ -241,6 +235,10 @@ public class StatusBarWindowView extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        final int action = ev.getActionMasked();
+        if (action == MotionEvent.ACTION_UP) {
+            mService.setVisualizerTouching(false);
+        }
         boolean handled = false;
         if (mService.getBarState() == StatusBarState.KEYGUARD && !mService.isQsExpanded()) {
             handled = mDragDownHelper.onTouchEvent(ev);
@@ -248,14 +246,9 @@ public class StatusBarWindowView extends FrameLayout {
         if (!handled) {
             handled = super.onTouchEvent(ev);
         }
-        final int action = ev.getAction();
-        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-            if (mService.getBarState() == StatusBarState.KEYGUARD) {
-                mService.setVisualizerTouching(false);
-            }
-            if (!handled) {
-                mService.setInteracting(StatusBarManager.WINDOW_STATUS_BAR, false);
-            }
+        if (!handled && (action == MotionEvent.ACTION_UP
+                || action == MotionEvent.ACTION_CANCEL)) {
+            mService.setInteracting(StatusBarManager.WINDOW_STATUS_BAR, false);
         }
         return handled;
     }
