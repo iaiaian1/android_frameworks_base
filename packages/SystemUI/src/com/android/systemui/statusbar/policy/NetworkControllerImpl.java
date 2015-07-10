@@ -385,8 +385,6 @@ public class NetworkControllerImpl extends BroadcastReceiver
                 action.equals(ConnectivityManager.INET_CONDITION_ACTION)) {
             updateConnectivity();
             refreshCarrierLabel();
-	} else if (action.equals(Intent.ACTION_CUSTOM_CARRIER_LABEL_CHANGED)) {
-            refreshViews();
         } else if (action.equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
             mConfig = Config.readConfig(mContext);
             handleConfigurationChanged();

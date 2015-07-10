@@ -80,7 +80,7 @@
                     android:layout_height="fill_parent"
                     android:textAppearance="@style/TextAppearance.StatusBar.CarrierLabel"
                     android:singleLine="true"
-		    android:padingEnd="6dip"
+		    android:paddingEnd="6dip"
 		    android:gravity="center"
                     android:ellipsize="end"
 		    android:visibility="gone"
