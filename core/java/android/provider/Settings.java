@@ -3612,6 +3612,12 @@ public final class Settings {
          */
         public static final String SAFE_HEADSET_VOLUME = "safe_headset_volume";
 
+	/*
+         * Quick settings quick pull down option
+         * @hide
+         */
+        public static final String QUICK_SETTINGS_QUICK_PULL_DOWN = "quick_settings_quick_pull_down";
+
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
@@ -3730,8 +3736,10 @@ public final class Settings {
          * @hide
          */
         public static final String[] SETTINGS_TO_RESET = {
+	    QUICK_SETTINGS_QUICK_PULL_DOWN,
             DISABLE_IMMERSIVE_MESSAGE,
             SAFE_HEADSET_VOLUME
+
         };
 
         // Settings moved to Settings.Secure

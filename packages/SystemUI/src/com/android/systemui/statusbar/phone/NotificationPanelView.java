@@ -33,6 +33,7 @@ import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.MathUtils;
+import android.util.SettingConfirmationHelper;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -749,6 +750,14 @@ public class NotificationPanelView extends PanelView implements
                 && shouldQuickSettingsIntercept(event.getX(), event.getY(), -1, false);
         if ((twoFingerQsEvent || oneFingerQsOverride)
                 && event.getY(event.getActionIndex()) < mStatusBarMinHeight) {
+            SettingConfirmationHelper helper = new SettingConfirmationHelper();
+            helper.showConfirmationDialogForSetting(
+                mContext,
+                mContext.getString(R.string.quick_settings_quick_pull_down_title),
+                mContext.getString(R.string.quick_settings_quick_pull_down_message),
+                mContext.getResources().getDrawable(R.drawable.quick_pull_down),
+                Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN,
+                null);
             mQsExpandImmediate = true;
             requestPanelHeightUpdate();
 
@@ -1389,6 +1398,13 @@ public class NotificationPanelView extends PanelView implements
             return onHeader || (mScrollView.isScrolledToBottom() && yDiff < 0) && isInQsArea(x, y);
         } else {
             return onHeader || showQsOverride;
+            if (Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN, 0) != 2) {
+                    return onHeader || onRightHotRegion || (!mKeyguardShowing
+                            && mNotificationStackScroller.getNotGoneChildCount() == 0);
+            } else {
+                return false;
+            }
         }
     }
 
