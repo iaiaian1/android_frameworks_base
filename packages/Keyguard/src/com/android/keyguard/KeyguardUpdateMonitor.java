@@ -139,6 +139,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
     private boolean mKeyguardIsVisible;
     private boolean mBouncer;
     private boolean mBootCompleted;
+    private boolean mStartFingerAuthOnIdle;
 
     // Device provisioning state
     private boolean mDeviceProvisioned;
@@ -546,6 +547,16 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         @Override
         public void onAcquired(int info) {
             mHandler.obtainMessage(MSG_FINGERPRINT_ACQUIRED, info, 0).sendToTarget();
+        }
+
+        @Override
+        public void onStateChanged(int state) {
+            if (state == FingerprintManager.STATE_IDLE && mStartFingerAuthOnIdle) {
+                mStartFingerAuthOnIdle = false;
+                FingerprintManager fpm =
+                        (FingerprintManager) mContext.getSystemService(Context.FINGERPRINT_SERVICE);
+                fpm.authenticate();
+            }
         }
 
         @Override
@@ -1265,10 +1276,20 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
         return mFailedAttempts;
     }
 
+    public int getFailedFingerprintUnlockAttempts() {
+        return mFailedFingerprintAttempts;
+    }
+
     public void clearFailedUnlockAttempts() {
+        clearFailedUnlockAttempts(false);
+    }
+
+    public void clearFailedUnlockAttempts(boolean clearFingers) {
         mFailedAttempts = 0;
         mFailedBiometricUnlockAttempts = 0;
-        mFailedFingerprintAttempts = 0;
+        if (clearFingers) {
+            mFailedFingerprintAttempts = 0;
+        }
     }
 
     public void startFingerAuthIfUsingFingerprint() {
@@ -1276,7 +1297,16 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
             FingerprintManager fpm =
                     (FingerprintManager) mContext.getSystemService(Context.FINGERPRINT_SERVICE);
             fpm.startListening(mFingerprintManagerReceiver);
-            fpm.authenticate();
+
+            // Lazily authenticate if the state isn't ready yet. This can happen
+            // if another app (like camera) is stopping and keyguard is resuming, but
+            // camera hasn't received its onPause method yet to cleanup its fingerprint connection
+            if (FingerprintManager.STATE_IDLE != fpm.getState()) {
+                mStartFingerAuthOnIdle = true;
+            } else {
+                // Fingerprint service is already idle, ready to authenticate
+                fpm.authenticate();
+            }
         }
     }
 
@@ -1291,6 +1321,10 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
 
     public void clearFingerprintRecognized() {
         mUserFingerprintRecognized.clear();
+    }
+
+    public boolean isFingerprintRecognized() {
+       return (mUserFingerprintRecognized.size() > 0);
     }
 
     public void reportFailedUnlockAttempt() {
