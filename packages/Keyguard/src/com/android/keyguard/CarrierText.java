@@ -20,9 +20,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.TypedArray;
+import android.net.ConnectivityManager;
 import android.os.UserHandle;
 import android.provider.Settings;
-import android.net.ConnectivityManager;
 import android.telephony.ServiceState;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
@@ -205,7 +205,7 @@ public class CarrierText extends TextView {
         StatusMode status = getStatusForIccState(simState);
         switch (status) {
             case Normal:
-               String mCustomCarrierLabel = Settings.System.getStringForUser(getContext().getContentResolver(),
+                String mCustomCarrierLabel = Settings.System.getStringForUser(getContext().getContentResolver(),
                         Settings.System.CUSTOM_CARRIER_LABEL, UserHandle.USER_CURRENT);
                 boolean mAirplaneMode = (Settings.Global.getInt(getContext().getContentResolver(),
                         Settings.Global.AIRPLANE_MODE_ON, 0) == 1);
@@ -214,7 +214,7 @@ public class CarrierText extends TextView {
 
             case SimNotReady:
                 // Null is reserved for denoting missing, in this case we have nothing to display.
-                carrierText = null; // nothing to display yet.
+                carrierText = ""; // nothing to display yet.
                 break;
 
             case PersoLocked:
