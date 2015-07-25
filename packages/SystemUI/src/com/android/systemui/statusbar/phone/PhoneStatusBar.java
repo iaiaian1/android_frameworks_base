@@ -2,6 +2,7 @@
  * Copyright (c) 2012-2014 The Linux Foundation. All rights reserved.
  * Not a Contribution.
  * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2014-2015 The XPerience Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,6 +188,7 @@ import com.android.systemui.statusbar.policy.KeyguardMonitor;
 import com.android.systemui.statusbar.policy.KeyguardUserSwitcher;
 import com.android.systemui.statusbar.policy.LocationControllerImpl;
 import com.android.systemui.statusbar.policy.NetworkControllerImpl;
+import com.android.systemui.statusbar.policy.NetworkTraffic;
 import com.android.systemui.statusbar.policy.NextAlarmController;
 import com.android.systemui.statusbar.policy.PreviewInflater;
 import com.android.systemui.statusbar.policy.RotationLockControllerImpl;
@@ -377,6 +379,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private int mStatusBarHeaderHeight;
 
     private boolean mShowCarrierInPanel = false;
+
+    // Status bar Network traffic;
+    private NetworkTraffic mNetworkTraffic;
 
     // position
     int[] mPositionTmp = new int[2];
@@ -1010,6 +1015,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mMoreIcon = mStatusBarView.findViewById(R.id.moreIcon);
         mNotificationIcons.setOverflowIndicator(mMoreIcon);
         mStatusBarContents = (LinearLayout)mStatusBarView.findViewById(R.id.status_bar_contents);
+
+	//NetworkTrafficMetter
+	mNetworkTraffic = (NetworkTraffic)mStatusBarView.findViewById(R.id.network_traffic);
 
         mClockView = (TextView) mStatusBarView.findViewById(R.id.clock);
         mClockLocation = Settings.System.getIntForUser(mContext.getContentResolver(),
@@ -3859,6 +3867,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (MULTIUSER_DEBUG) mNotificationPanelDebugText.setText("USER " + newUserId);
         animateCollapsePanels();
         updatePublicMode(); 
+	mNetworkTraffic.updateSettings();
         updateNotifications();
         resetUserSetupObserver();
         setControllerUsers();
