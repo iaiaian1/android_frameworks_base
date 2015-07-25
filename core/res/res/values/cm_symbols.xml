@@ -336,7 +336,7 @@
 
     <!-- Quick Settings tile defaults -->
     <java-symbol type="string" name="config_defaultQuickSettingsTiles" />
- 
+
     <java-symbol type="array" name="config_externalCMServices" />
 
     <!-- Fingerprint default name -->
@@ -366,5 +366,8 @@
   <java-symbol type="string" name="setting_confirmation_ask_me_later" />
   <java-symbol type="string" name="setting_confirmation_yes" />
   <java-symbol type="string" name="setting_confirmation_no" />
+
+    <!-- global actions (zen mode buttons) -->
+    <java-symbol type="id" name="option4" />
 
 </resources>

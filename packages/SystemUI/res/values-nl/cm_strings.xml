@@ -161,4 +161,6 @@
   <string name="quick_settings_slim_floats_on">Slim Floats Ingeschakeld</string>
   <string name="quick_settings_slim_floats_off">Slim Floats Uitgeschakeld</string>
 
+  <string name="fingerprint_try_again_hint">Opnieuw scannen a.u.b.</string>
+  <string name="accessibility_dock_battery_level">Dock-accu <xliff:g id="number">%d</xliff:g> procent.</string>
 </resources>

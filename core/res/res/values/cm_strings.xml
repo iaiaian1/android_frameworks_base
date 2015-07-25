@@ -347,7 +347,6 @@
          whether they want to allow the application to do this. -->
     <string name="permdesc_resetBatteryStats">Allows an application to reset the current low-level battery usage data.</string>
 
-
     <!-- Floating Window -->
     <string name="floating_window_snap_top">Snap top</string>
     <string name="floating_window_snap_bottom">Snap bottom</string>
@@ -359,5 +358,9 @@
     <string name="setting_confirmation_ask_me_later">Ask later</string>
     <string name="setting_confirmation_yes">Yes</string>
     <string name="setting_confirmation_no">No</string>
+
+    <!-- Zen mode buttons -->
+    <string name="silent_mode_priority">Priority</string>
+    <string name="silent_mode_none">None</string>
 
 </resources>

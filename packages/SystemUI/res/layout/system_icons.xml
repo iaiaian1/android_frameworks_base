@@ -60,6 +60,7 @@
         android:layout_marginBottom="@dimen/battery_margin_bottom"
         android:layout_marginStart="@dimen/signal_cluster_battery_padding"
         android:visibility="gone" />
+
     <com.android.systemui.BatteryLevelTextView 
 	 android:background="@drawable/somc_sys_battery_percent_am"
 	 android:gravity="center"
