@@ -236,6 +236,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener {
                 case MSG_FACE_UNLOCK_STATE_CHANGED:
                     handleFaceUnlockStateChanged(msg.arg1 != 0, msg.arg2);
                     break;
+                case MSG_SIM_SUBSCRIPTION_INFO_CHANGED:
+                    handleSimSubscriptionInfoChanged();
+                    break;
                 case MSG_SERVICE_STATE_CHANGED:
                     handleServiceStateChange(msg.arg1, (ServiceState) msg.obj);
                     break;
