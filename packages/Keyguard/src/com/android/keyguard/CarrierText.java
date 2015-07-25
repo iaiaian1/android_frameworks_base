@@ -21,8 +21,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.net.ConnectivityManager;
-import android.os.UserHandle;
-import android.provider.Settings;
 import android.telephony.ServiceState;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
@@ -205,11 +203,7 @@ public class CarrierText extends TextView {
         StatusMode status = getStatusForIccState(simState);
         switch (status) {
             case Normal:
-                String mCustomCarrierLabel = Settings.System.getStringForUser(getContext().getContentResolver(),
-                        Settings.System.CUSTOM_CARRIER_LABEL, UserHandle.USER_CURRENT);
-                boolean mAirplaneMode = (Settings.Global.getInt(getContext().getContentResolver(),
-                        Settings.Global.AIRPLANE_MODE_ON, 0) == 1);
-                carrierText = !TextUtils.isEmpty(mCustomCarrierLabel) && !mAirplaneMode ? mCustomCarrierLabel : text;
+                carrierText = text;
                 break;
 
             case SimNotReady:
