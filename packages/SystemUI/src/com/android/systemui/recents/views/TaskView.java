@@ -740,7 +740,8 @@ public class TaskView extends FrameLayout implements Task.TaskCallbacks,
             mCb.onTaskViewLongClicked(this);
             return true;
             }
-        }
         return false;
     }
+
+  }
 
