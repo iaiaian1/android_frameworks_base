@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 ParanoidAndroid Project
+ * Copyright (C) 2014-2015 ParanoidAndroid Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,72 +17,141 @@
 package android.util;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.provider.Settings;
 
 import com.android.internal.R;
 
+/**
+ * Helper for managing OnTheSpot settings.
+ *
+ * @hide
+ */
 public class SettingConfirmationHelper {
 
+    /** Default value of no preference. */
     private static final int NOT_SET = 0;
-    private static final int ENABLED = 1;
-    private static final int DISABLED = 2;
-    private static final int ASK_LATER = 3;
 
-    private int mCurrentStatus;
-    private Context mContext;
+    /** Value of automatic acceptance. */
+    private static final int ALWAYS = 1;
 
-    public SettingConfirmationHelper(Context context) {
-        mContext = context;
+    /** Value of automatic denial. */
+    private static final int NEVER = 2;
+
+    /** No-op listener implementation for fallback use. */
+    private static final OnSelectListener FALLBACK_LISTENER = new OnSelectListener() {
+
+        @Override
+        public void onSelect(boolean enabled) {
+            // no-op
+        }
+
+    };
+
+    /**
+     * Initializes the helper object. Should never be used as all interaction with this class
+     * is supposed to be static only.
+     */
+    private SettingConfirmationHelper() {
+        // no-op
     }
 
-    public void showConfirmationDialogForSetting(String title, String msg, Drawable hint, final String setting) {
-        mCurrentStatus = Settings.System.getInt(mContext.getContentResolver(), setting, NOT_SET);
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-        View dialogLayout = layoutInflater.inflate(R.layout.setting_confirmation_dialog, null);
-        final ImageView visualHint = (ImageView)
-                dialogLayout.findViewById(R.id.setting_confirmation_dialog_visual_hint);
-        visualHint.setImageDrawable(hint);
-        builder.setView(dialogLayout, 10, 10, 10, 20);
-        builder.setTitle(title);
-        builder.setMessage(msg);
-        builder.setPositiveButton(R.string.setting_confirmation_yes,
+    /**
+     * @hide
+     */
+    public static interface OnSelectListener {
+        void onSelect(boolean enabled);
+    }
+
+    /**
+     * @throws IllegalArgumentException when either context or setting is null
+     * @hide
+     */
+    public static void request(final Context context, final String setting,
+            final String dialog_title, final String dialog_message,
+            final OnSelectListener listener) {
+        // check the arguments passed in real quick
+
+        if (context == null) {
+            throw new IllegalArgumentException("context == null");
+        }
+        if (setting == null) {
+            throw new IllegalArgumentException("setting == null");
+        }
+
+        final OnSelectListener callback = listener == null ? FALLBACK_LISTENER : listener;
+        final ContentResolver resolver = context.getContentResolver();
+
+        // check if the status has already been set previously
+
+        final int status = Settings.System.getInt(resolver, setting, NOT_SET);
+        if (status == ALWAYS) {
+            callback.onSelect(true);
+            return;
+        } else if (status == NEVER) {
+            callback.onSelect(false);
+            return;
+        }
+
+        // check if we can actually create a dialog box
+
+        if (dialog_title == null || dialog_message == null) {
+            // default to false here as the safe choice when we can't confirm with the user
+            callback.onSelect(false);
+            return;
+        }
+
+        // create the actual dialog box
+
+        final int currentUserId = ActivityManager.getCurrentUser();
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle(dialog_title);
+        builder.setMessage(dialog_message);
+
+        builder.setPositiveButton(R.string.setting_confirmation_always,
                 new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                mCurrentStatus = ENABLED;
-                Settings.System.putInt(mContext.getContentResolver(), setting, mCurrentStatus);
+
+            @Override
+            public void onClick(final DialogInterface dialog, final int which) {
+                Settings.System.putIntForUser(resolver, setting, ALWAYS, currentUserId);
+                callback.onSelect(true);
             }
+
         });
-        builder.setNeutralButton(R.string.setting_confirmation_ask_me_later,
+        builder.setNeutralButton(R.string.setting_confirmation_just_once,
                 new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                mCurrentStatus = ASK_LATER;
-                Settings.System.putInt(mContext.getContentResolver(), setting, mCurrentStatus);
+
+            @Override
+            public void onClick(final DialogInterface dialog, final int which) {
+                Settings.System.putIntForUser(resolver, setting, NOT_SET, currentUserId);
+                callback.onSelect(true);
             }
+
         });
-        builder.setNegativeButton(R.string.setting_confirmation_no,
+        builder.setNegativeButton(R.string.setting_confirmation_never,
                 new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                mCurrentStatus = DISABLED;
-                Settings.System.putInt(mContext.getContentResolver(), setting, mCurrentStatus);
+
+            @Override
+            public void onClick(final DialogInterface dialog, final int which) {
+                Settings.System.putIntForUser(resolver, setting, NEVER, currentUserId);
+                callback.onSelect(false);
             }
+
         });
+
         builder.setCancelable(false);
         AlertDialog dialog = builder.create();
         Window dialogWindow = dialog.getWindow();
         dialogWindow.setType(WindowManager.LayoutParams.TYPE_STATUS_BAR_PANEL);
 
-        if(mCurrentStatus == NOT_SET || mCurrentStatus == ASK_LATER) {
-            dialog.show();
-        }
+        final AlertDialog dialog = builder.create();
+        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_STATUS_BAR_PANEL);
+        dialog.show();
     }
 
 }
