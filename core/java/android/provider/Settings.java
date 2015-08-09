@@ -3600,11 +3600,17 @@ public final class Settings {
          */
         public static final String STATUS_BAR_CUSTOM_HEADER_PROVIDER = "status_bar_custom_header_provider";
 
-       /**
-        * Disable Immersive Message
-        * @hide
-        */
+        /**
+         * Disable Immersive Message
+         * @hide
+         */
         public static final String DISABLE_IMMERSIVE_MESSAGE = "disable_immersive_message";
+
+        /**
+         * Safe Headset Volume disabler option
+         * @hide
+         */
+        public static final String SAFE_HEADSET_VOLUME = "safe_headset_volume";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -3724,6 +3730,8 @@ public final class Settings {
          * @hide
          */
         public static final String[] SETTINGS_TO_RESET = {
+            DISABLE_IMMERSIVE_MESSAGE,
+            SAFE_HEADSET_VOLUME
         };
 
         // Settings moved to Settings.Secure
