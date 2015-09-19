@@ -160,7 +160,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     private static final Uri SPAM_MESSAGE_URI = new Uri.Builder()
            .scheme(ContentResolver.SCHEME_CONTENT)
             .authority(SpamMessageProvider.AUTHORITY)
-            .appendPath("message")
+            .appendPath("messages")
             .build();
 
     protected CommandQueue mCommandQueue;
@@ -445,7 +445,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         public void onNotificationPosted(final StatusBarNotification sbn,
                 final RankingMap rankingMap) {
             if (DEBUG) Log.d(TAG, "onNotificationPosted: " + sbn);
-            mHandler.post(new Runnable() {
+            final Runnable notificationPost = new Runnable() {
                 @Override
                 public void run() {
                     Notification n = sbn.getNotification();
@@ -475,7 +475,12 @@ public abstract class BaseStatusBar extends SystemUI implements
                         addNotification(sbn, rankingMap);
                     }
                 }
-            });
+            };
+            if (TextUtils.equals(sbn.getNotification().category, Notification.CATEGORY_CALL)) {
+                mHandler.postAtFrontOfQueue(notificationPost);
+            } else {
+                mHandler.post(notificationPost);
+            }
         }
 
         @Override
@@ -902,12 +907,17 @@ public abstract class BaseStatusBar extends SystemUI implements
             filterButton.setVisibility(View.VISIBLE);
             filterButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    ContentValues values = new ContentValues();
-                    String message = SpamFilter.getNotificationContent(
-                    sbn.getNotification());
-                    values.put(NotificationTable.MESSAGE_TEXT, message);
-                    values.put(PackageTable.PACKAGE_NAME, pkg);
-                    mContext.getContentResolver().insert(SPAM_MESSAGE_URI, values);
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            ContentValues values = new ContentValues();
+                            String message = SpamFilter.getNotificationContent(
+                                    sbn.getNotification());
+                            values.put(NotificationTable.MESSAGE_TEXT, message);
+                            values.put(PackageTable.PACKAGE_NAME, pkg);
+                            mContext.getContentResolver().insert(SPAM_MESSAGE_URI, values);
+                        }
+                    });
                     removeNotification(sbn.getKey(), null);
                     onNotificationClear(sbn);
                 }
@@ -1184,7 +1194,7 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     public abstract void resetHeadsUpDecayTimer();
 
-    public abstract void scheduleHeadsUpOpen();
+    public abstract void scheduleHeadsUpOpen(boolean immediate);
 
     public abstract void scheduleHeadsUpClose();
 
@@ -1251,13 +1261,19 @@ public abstract class BaseStatusBar extends SystemUI implements
         public void handleMessage(Message m) {
             switch (m.what) {
              case MSG_SHOW_RECENT_APPS:
-                 showRecents(m.arg1 > 0);
+                 if (mDeviceProvisioned) {
+                     showRecents(m.arg1 > 0);
+                 }
                  break;
              case MSG_HIDE_RECENT_APPS:
-                 hideRecents(m.arg1 > 0, m.arg2 > 0);
+                 if (mDeviceProvisioned) {
+                     hideRecents(m.arg1 > 0, m.arg2 > 0);
+                 }
                  break;
              case MSG_TOGGLE_RECENTS_APPS:
-                 toggleRecents();
+                 if (mDeviceProvisioned) {
+                     toggleRecents();
+                 }
                  break;
              case MSG_PRELOAD_RECENT_APPS:
                   preloadRecents();
