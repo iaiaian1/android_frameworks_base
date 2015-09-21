@@ -3496,6 +3496,14 @@ public final class Settings {
         public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
 
         /**
+         * Whether to use default custom header or poly hd
+         * 0 = default
+         * 1 = poly hd
+         * @hide
+         */
+        public static final String STATUS_BAR_CUSTOM_HEADER_DEFAULT = "status_bar_custom_header_default";
+
+        /**
          * Boolean value on whether to show weather in the statusbar
          * @hide
          */
