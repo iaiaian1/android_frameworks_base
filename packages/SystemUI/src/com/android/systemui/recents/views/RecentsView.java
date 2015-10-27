@@ -32,6 +32,7 @@ import android.graphics.Outline;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.provider.Settings;
 import android.os.UserHandle;
 import android.util.ArraySet;
 import android.util.AttributeSet;
@@ -351,7 +352,6 @@ public class RecentsView extends FrameLayout {
         mClearRecents.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 EventBus.getDefault().send(new DismissAllTaskViewsEvent());
-                updateMemoryStatus();
             }
         });
     }
@@ -404,13 +404,6 @@ public class RecentsView extends FrameLayout {
                     mFloatingButton.getLayoutParams();
             boolean isLandscape = mContext.getResources().getConfiguration().orientation
                     == Configuration.ORIENTATION_LANDSCAPE;
-            if (mMemBar == null || isLandscape) {
-                params.topMargin = mContext.getResources().
-                    getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
-            } else {
-                params.topMargin = 2*(mContext.getResources().
-                    getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height));
-            }
 
             switch (clearRecentsLocation) {
                 case 0:
