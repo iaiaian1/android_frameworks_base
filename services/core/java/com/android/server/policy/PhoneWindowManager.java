@@ -6972,10 +6972,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     // Calculate random text color
                     Random rand = new Random();
                     String randomColor = Integer.toHexString(rand.nextInt(0xFFFFFF) & 0xFCFCFC );
-                    mBootMsgDialog.setMessage(Html.fromHtml(msg +
+                    mBootMsgDialog.setMessage(Html.fromHtml("Powered By <b>XPerience</b>\n\n<br><b>" + msg +
                                                             "<br><b><font color=\"#" + randomColor + "\">" +
                                                             currentPackageName +
-                                                            "</font></b>"));
+                                                            "</font></b>\nPlease do not power off."));
                 }
                 else {
                     mBootMsgDialog.setMessage(msg);
