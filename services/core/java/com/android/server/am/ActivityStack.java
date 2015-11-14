@@ -68,6 +68,10 @@ import android.util.EventLog;
 import android.util.Slog;
 import android.view.Display;
 
+import com.android.server.LocalServices;
+
+import cyanogenmod.power.PerformanceManagerInternal;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
@@ -265,6 +269,8 @@ final class ActivityStack {
         }
     }
 
+    private final PerformanceManagerInternal mPerf;
+
     final Handler mHandler;
 
     final class ActivityStackHandler extends Handler {
@@ -363,6 +369,7 @@ final class ActivityStack {
         mCurrentUser = mService.mCurrentUserId;
         mRecentTasks = recentTasks;
         mOverrideConfig = Configuration.EMPTY;
+        mPerf = LocalServices.getService(PerformanceManagerInternal.class);
     }
 
     boolean okToShowLocked(ActivityRecord r) {
@@ -942,10 +949,13 @@ final class ActivityStack {
                         r.userId, System.identityHashCode(r), r.shortComponentName,
                         mPausingActivity != null
                             ? mPausingActivity.shortComponentName : "(none)");
-                if (r.finishing && r.state == ActivityState.PAUSING) {
-                    if (DEBUG_PAUSE) Slog.v(TAG,
-                            "Executing finish of failed to pause activity: " + r);
-                    finishCurrentActivityLocked(r, FINISH_AFTER_VISIBLE, false);
+                if (r.state == ActivityState.PAUSING) {
+                    r.state = ActivityState.PAUSED;
+                    if (r.finishing) {
+                        if (DEBUG_PAUSE) Slog.v(TAG,
+                                "Executing finish of failed to pause activity: " + r);
+                        finishCurrentActivityLocked(r, FINISH_AFTER_VISIBLE, false);
+                    }
                 }
             }
         }
@@ -1686,8 +1696,10 @@ final class ActivityStack {
         if (DEBUG_SWITCH) Slog.v(TAG_SWITCH, "Resuming " + next);
 
         // Some activities may want to alter the system power management
-        mStackSupervisor.mPm.activityResumed(next.intent);
-
+        if (mStackSupervisor.mPerf != null) {
+            mStackSupervisor.mPerf.activityResumed(next.intent);
+        }
+        
         // If we are currently pausing an activity, then don't do anything
         // until that is done.
         if (!mStackSupervisor.allPausedActivitiesComplete()) {
@@ -1821,7 +1833,9 @@ final class ActivityStack {
                             ? AppTransition.TRANSIT_ACTIVITY_CLOSE
                             : AppTransition.TRANSIT_TASK_CLOSE, false);
                     if (prev.task != next.task) {
-                        mStackSupervisor.mPm.cpuBoost(2000 * 1000);
+                        if (mStackSupervisor.mPerf != null) {
+                            mStackSupervisor.mPerf.cpuBoost(2000 * 1000);
+                        }
                     }
                 }
                 mWindowManager.setAppWillBeHidden(prev.appToken);
@@ -1839,7 +1853,9 @@ final class ActivityStack {
                                     ? AppTransition.TRANSIT_TASK_OPEN_BEHIND
                                     : AppTransition.TRANSIT_TASK_OPEN, false);
                     if (prev.task != next.task) {
-                        mStackSupervisor.mPm.cpuBoost(2000 * 1000);
+                        if (mStackSupervisor.mPerf != null) {
+                            mStackSupervisor.mPerf.cpuBoost(2000 * 1000);
+                        }
                     }
                 }
             }
@@ -2655,7 +2671,23 @@ final class ActivityStack {
             final String myReason = reason + " adjustFocus";
             if (next != r) {
                 final TaskRecord task = r.task;
-                if (r.frontOfTask && task == topTask() && task.isOverHomeStack()) {
+                boolean adjust = false;
+                if ((next == null || next.task != task) && r.frontOfTask) {
+                    if (task.isOverHomeStack() && task == topTask()) {
+                        adjust = true;
+                    } else {
+                        for (int taskNdx = mTaskHistory.size() - 1; taskNdx >= 0; --taskNdx) {
+                            final TaskRecord tr = mTaskHistory.get(taskNdx);
+                            if (tr.getTopActivity() != null) {
+                                break;
+                            } else if (tr.isOverHomeStack()) {
+                                adjust = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (adjust) {
                     // For non-fullscreen stack, we want to move the focus to the next visible
                     // stack to prevent the home screen from moving to the top and obscuring
                     // other visible stacks.

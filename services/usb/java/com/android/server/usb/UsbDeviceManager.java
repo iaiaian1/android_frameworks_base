@@ -19,15 +19,19 @@ package com.android.server.usb;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.hardware.usb.UsbAccessory;
 import android.hardware.usb.UsbManager;
+import android.hardware.usb.UsbPort;
+import android.hardware.usb.UsbPortStatus;
 import android.os.FileUtils;
 import android.os.Handler;
 import android.os.Looper;
@@ -47,6 +51,7 @@ import android.util.Slog;
 import com.android.internal.annotations.GuardedBy;
 import com.android.internal.util.IndentingPrintWriter;
 import com.android.server.FgThread;
+import cyanogenmod.providers.CMSettings;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -105,6 +110,7 @@ public class UsbDeviceManager {
     private static final int MSG_USER_SWITCHED = 5;
     private static final int MSG_SET_USB_DATA_UNLOCKED = 6;
     private static final int MSG_UPDATE_USER_RESTRICTIONS = 7;
+    private static final int MSG_UPDATE_HOST_STATE = 8;
 
     private static final int AUDIO_MODE_SOURCE = 1;
 
@@ -175,6 +181,15 @@ public class UsbDeviceManager {
         }
     };
 
+    private final BroadcastReceiver mHostReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            UsbPort port = intent.getParcelableExtra(UsbManager.EXTRA_PORT);
+            UsbPortStatus status = intent.getParcelableExtra(UsbManager.EXTRA_PORT_STATUS);
+            mHandler.updateHostState(port, status);
+        }
+    };
+
     public UsbDeviceManager(Context context, UsbAlsaManager alsaManager) {
         mContext = context;
         mUsbAlsaManager = alsaManager;
@@ -197,6 +212,8 @@ public class UsbDeviceManager {
         if (secureAdbEnabled && !dataEncrypted) {
             mDebuggingManager = new UsbDebuggingManager(context);
         }
+        mContext.registerReceiver(mHostReceiver,
+                new IntentFilter(UsbManager.ACTION_USB_PORT_CHANGED));
     }
 
     private UsbSettingsManager getCurrentSettings() {
@@ -299,6 +316,7 @@ public class UsbDeviceManager {
 
         // current USB state
         private boolean mConnected;
+        private boolean mHostConnected;
         private boolean mConfigured;
         private boolean mUsbDataUnlocked;
         private String mCurrentFunctions;
@@ -339,10 +357,10 @@ public class UsbDeviceManager {
                 };
 
                 mContentResolver.registerContentObserver(
-                        Settings.Secure.getUriFor(Settings.Secure.ADB_PORT),
+                        CMSettings.Secure.getUriFor(CMSettings.Secure.ADB_PORT),
                                 false, adbNotificationObserver);
                 mContentResolver.registerContentObserver(
-                        Settings.Secure.getUriFor(Settings.Secure.ADB_NOTIFY),
+                        CMSettings.Secure.getUriFor(CMSettings.Secure.ADB_NOTIFY),
                                 false, adbNotificationObserver);
 
                 // Watch for USB configuration changes
@@ -391,6 +409,11 @@ public class UsbDeviceManager {
             sendMessageDelayed(msg, (connected == 0) ? UPDATE_DELAY : 0);
         }
 
+        public void updateHostState(UsbPort port, UsbPortStatus status) {
+            boolean hostConnected = status.getCurrentDataRole() == UsbPort.DATA_ROLE_HOST;
+            obtainMessage(MSG_UPDATE_HOST_STATE, hostConnected ? 1 :0, 0).sendToTarget();
+        }
+
         private boolean waitForState(String state) {
             // wait for the transition to complete.
             // give up after 1 second.
@@ -408,10 +431,9 @@ public class UsbDeviceManager {
         private boolean setUsbConfig(String config) {
             if (DEBUG) Slog.d(TAG, "setUsbConfig(" + config + ")");
             // set the new configuration
-            String oldConfig = SystemProperties.get(USB_CONFIG_PROPERTY);
-            if (!config.equals(oldConfig)) {
-                SystemProperties.set(USB_CONFIG_PROPERTY, config);
-            }
+            // we always set it due to b/23631400, where adbd was getting killed
+            // and not restarted due to property timeouts on some devices
+            SystemProperties.set(USB_CONFIG_PROPERTY, config);
             return waitForState(config);
         }
 
@@ -666,6 +688,10 @@ public class UsbDeviceManager {
                         updateUsbFunctions();
                     }
                     break;
+                case MSG_UPDATE_HOST_STATE:
+                    mHostConnected = (msg.arg1 == 1);
+                    updateUsbNotification();
+                    break;
                 case MSG_ENABLE_ADB:
                     setAdbEnabled(msg.arg1 == 1);
                     break;
@@ -721,7 +747,7 @@ public class UsbDeviceManager {
             if (mNotificationManager == null || !mUseUsbNotification) return;
             int id = 0;
             Resources r = mContext.getResources();
-            if (mConnected) {
+            if (mConnected || mHostConnected) {
                 if (!mUsbDataUnlocked) {
                     id = com.android.internal.R.string.usb_charging_notification_title;
                 } else if (UsbManager.containsFunction(mCurrentFunctions,
@@ -784,10 +810,10 @@ public class UsbDeviceManager {
             final int id;
             boolean usbAdbActive = mAdbEnabled && mConnected;
             boolean netAdbActive = mAdbEnabled &&
-                    Settings.Secure.getInt(mContentResolver, Settings.Secure.ADB_PORT, -1) > 0;
+                    CMSettings.Secure.getInt(mContentResolver, CMSettings.Secure.ADB_PORT, -1) > 0;
             boolean hideNotification = "0".equals(SystemProperties.get("persist.adb.notify"))
-                    || Settings.Secure.getInt(mContext.getContentResolver(),
-                            Settings.Secure.ADB_NOTIFY, 1) == 0;
+                    || CMSettings.Secure.getInt(mContext.getContentResolver(),
+                            CMSettings.Secure.ADB_NOTIFY, 1) == 0;
 
             if (hideNotification) {
                 id = 0;

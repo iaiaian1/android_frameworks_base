@@ -49,6 +49,7 @@ import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.EventLog;
 import android.util.Slog;
+import cyanogenmod.providers.CMSettings;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -60,6 +61,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import cyanogenmod.providers.CMSettings;
 
 
 /**
@@ -130,6 +133,7 @@ public final class BatteryService extends SystemService {
     private int mLastBatteryVoltage;
     private int mLastBatteryTemperature;
     private boolean mLastBatteryLevelCritical;
+    private int mLastMaxChargingCurrent;
 
     private int mInvalidCharger;
     private int mLastInvalidCharger;
@@ -351,6 +355,7 @@ public final class BatteryService extends SystemService {
                     + "chargerAcOnline=" + mBatteryProps.chargerAcOnline
                     + ", chargerUsbOnline=" + mBatteryProps.chargerUsbOnline
                     + ", chargerWirelessOnline=" + mBatteryProps.chargerWirelessOnline
+                    + ", maxChargingCurrent" + mBatteryProps.maxChargingCurrent
                     + ", batteryStatus=" + mBatteryProps.batteryStatus
                     + ", batteryHealth=" + mBatteryProps.batteryHealth
                     + ", batteryPresent=" + mBatteryProps.batteryPresent
@@ -381,6 +386,7 @@ public final class BatteryService extends SystemService {
                 mPlugType != mLastPlugType ||
                 mBatteryProps.batteryVoltage != mLastBatteryVoltage ||
                 mBatteryProps.batteryTemperature != mLastBatteryTemperature ||
+                mBatteryProps.maxChargingCurrent != mLastMaxChargingCurrent ||
                 mInvalidCharger != mLastInvalidCharger)) {
 
             if (mPlugType != mLastPlugType) {
@@ -507,6 +513,7 @@ public final class BatteryService extends SystemService {
             mLastPlugType = mPlugType;
             mLastBatteryVoltage = mBatteryProps.batteryVoltage;
             mLastBatteryTemperature = mBatteryProps.batteryTemperature;
+            mLastMaxChargingCurrent = mBatteryProps.maxChargingCurrent;
             mLastBatteryLevelCritical = mBatteryLevelCritical;
             mLastInvalidCharger = mInvalidCharger;
         }
@@ -531,17 +538,21 @@ public final class BatteryService extends SystemService {
         intent.putExtra(BatteryManager.EXTRA_TEMPERATURE, mBatteryProps.batteryTemperature);
         intent.putExtra(BatteryManager.EXTRA_TECHNOLOGY, mBatteryProps.batteryTechnology);
         intent.putExtra(BatteryManager.EXTRA_INVALID_CHARGER, mInvalidCharger);
+        intent.putExtra(BatteryManager.EXTRA_MAX_CHARGING_CURRENT, mBatteryProps.maxChargingCurrent);
 
         if (DEBUG) {
             Slog.d(TAG, "Sending ACTION_BATTERY_CHANGED.  level:" + mBatteryProps.batteryLevel +
                     ", scale:" + BATTERY_SCALE + ", status:" + mBatteryProps.batteryStatus +
-                    ", health:" + mBatteryProps.batteryHealth +  ", present:" + mBatteryProps.batteryPresent +
+                    ", health:" + mBatteryProps.batteryHealth +
+                    ", present:" + mBatteryProps.batteryPresent +
                     ", voltage: " + mBatteryProps.batteryVoltage +
                     ", temperature: " + mBatteryProps.batteryTemperature +
                     ", technology: " + mBatteryProps.batteryTechnology +
-                    ", AC powered:" + mBatteryProps.chargerAcOnline + ", USB powered:" + mBatteryProps.chargerUsbOnline +
+                    ", AC powered:" + mBatteryProps.chargerAcOnline +
+                    ", USB powered:" + mBatteryProps.chargerUsbOnline +
                     ", Wireless powered:" + mBatteryProps.chargerWirelessOnline +
-                    ", icon:" + icon  + ", invalid charger:" + mInvalidCharger);
+                    ", icon:" + icon  + ", invalid charger:" + mInvalidCharger +
+                    ", maxChargingCurrent:" + mBatteryProps.maxChargingCurrent);
         }
 
         mHandler.post(new Runnable() {
@@ -646,6 +657,7 @@ public final class BatteryService extends SystemService {
                 pw.println("  AC powered: " + mBatteryProps.chargerAcOnline);
                 pw.println("  USB powered: " + mBatteryProps.chargerUsbOnline);
                 pw.println("  Wireless powered: " + mBatteryProps.chargerWirelessOnline);
+                pw.println("  Max charging current: " + mBatteryProps.maxChargingCurrent);
                 pw.println("  status: " + mBatteryProps.batteryStatus);
                 pw.println("  health: " + mBatteryProps.batteryHealth);
                 pw.println("  present: " + mBatteryProps.batteryPresent);
@@ -925,24 +937,24 @@ public final class BatteryService extends SystemService {
             ContentResolver resolver = mContext.getContentResolver();
 
             // Battery light enabled
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.BATTERY_LIGHT_ENABLED), false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(CMSettings.System.getUriFor(
+                    CMSettings.System.BATTERY_LIGHT_ENABLED), false, this, UserHandle.USER_ALL);
 
             // Low battery pulse
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.BATTERY_LIGHT_PULSE), false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(CMSettings.System.getUriFor(
+                    CMSettings.System.BATTERY_LIGHT_PULSE), false, this, UserHandle.USER_ALL);
 
             // Notification LED brightness
             if (mAdjustableNotificationLedBrightness) {
-                resolver.registerContentObserver(Settings.System.getUriFor(
-                        Settings.System.NOTIFICATION_LIGHT_BRIGHTNESS_LEVEL),
+                resolver.registerContentObserver(CMSettings.System.getUriFor(
+                        CMSettings.System.NOTIFICATION_LIGHT_BRIGHTNESS_LEVEL),
                         false, this, UserHandle.USER_ALL);
             }
 
             // Multiple LEDs enabled
             if (mMultipleNotificationLeds) {
-                resolver.registerContentObserver(Settings.System.getUriFor(
-                        Settings.System.NOTIFICATION_LIGHT_MULTIPLE_LEDS_ENABLE),
+                resolver.registerContentObserver(CMSettings.System.getUriFor(
+                        CMSettings.System.NOTIFICATION_LIGHT_MULTIPLE_LEDS_ENABLE),
                         false, this, UserHandle.USER_ALL);
             }
 
@@ -950,13 +962,13 @@ public final class BatteryService extends SystemService {
             if (mMultiColorLed) {
                 // Register observer if we have a multi color led
                 resolver.registerContentObserver(
-                        Settings.System.getUriFor(Settings.System.BATTERY_LIGHT_LOW_COLOR),
+                        CMSettings.System.getUriFor(CMSettings.System.BATTERY_LIGHT_LOW_COLOR),
                         false, this, UserHandle.USER_ALL);
                 resolver.registerContentObserver(
-                        Settings.System.getUriFor(Settings.System.BATTERY_LIGHT_MEDIUM_COLOR),
+                        CMSettings.System.getUriFor(CMSettings.System.BATTERY_LIGHT_MEDIUM_COLOR),
                         false, this, UserHandle.USER_ALL);
                 resolver.registerContentObserver(
-                        Settings.System.getUriFor(Settings.System.BATTERY_LIGHT_FULL_COLOR),
+                        CMSettings.System.getUriFor(CMSettings.System.BATTERY_LIGHT_FULL_COLOR),
                         false, this, UserHandle.USER_ALL);
             }
 
@@ -972,35 +984,35 @@ public final class BatteryService extends SystemService {
             Resources res = mContext.getResources();
 
             // Battery light enabled
-            mLightEnabled = Settings.System.getInt(resolver,
-                    Settings.System.BATTERY_LIGHT_ENABLED, 1) != 0;
+            mLightEnabled = CMSettings.System.getInt(resolver,
+                    CMSettings.System.BATTERY_LIGHT_ENABLED, 1) != 0;
 
             // Low battery pulse
-            mLedPulseEnabled = Settings.System.getInt(resolver,
-                        Settings.System.BATTERY_LIGHT_PULSE, 1) != 0;
+            mLedPulseEnabled = CMSettings.System.getInt(resolver,
+                        CMSettings.System.BATTERY_LIGHT_PULSE, 1) != 0;
 
             // Light colors
-            mBatteryLowARGB = Settings.System.getInt(resolver,
-                    Settings.System.BATTERY_LIGHT_LOW_COLOR, res.getInteger(
+            mBatteryLowARGB = CMSettings.System.getInt(resolver,
+                    CMSettings.System.BATTERY_LIGHT_LOW_COLOR, res.getInteger(
                     com.android.internal.R.integer.config_notificationsBatteryLowARGB));
-            mBatteryMediumARGB = Settings.System.getInt(resolver,
-                    Settings.System.BATTERY_LIGHT_MEDIUM_COLOR, res.getInteger(
+            mBatteryMediumARGB = CMSettings.System.getInt(resolver,
+                    CMSettings.System.BATTERY_LIGHT_MEDIUM_COLOR, res.getInteger(
                     com.android.internal.R.integer.config_notificationsBatteryMediumARGB));
-            mBatteryFullARGB = Settings.System.getInt(resolver,
-                    Settings.System.BATTERY_LIGHT_FULL_COLOR, res.getInteger(
+            mBatteryFullARGB = CMSettings.System.getInt(resolver,
+                    CMSettings.System.BATTERY_LIGHT_FULL_COLOR, res.getInteger(
                     com.android.internal.R.integer.config_notificationsBatteryFullARGB));
 
             // Notification LED brightness
             if (mAdjustableNotificationLedBrightness) {
-                mNotificationLedBrightnessLevel = Settings.System.getInt(resolver,
-                        Settings.System.NOTIFICATION_LIGHT_BRIGHTNESS_LEVEL,
+                mNotificationLedBrightnessLevel = CMSettings.System.getInt(resolver,
+                        CMSettings.System.NOTIFICATION_LIGHT_BRIGHTNESS_LEVEL,
                         LIGHT_BRIGHTNESS_MAXIMUM);
             }
 
             // Multiple LEDs enabled
             if (mMultipleNotificationLeds) {
                 mMultipleLedsEnabled = Settings.System.getInt(resolver,
-                        Settings.System.NOTIFICATION_LIGHT_MULTIPLE_LEDS_ENABLE,
+                        CMSettings.System.NOTIFICATION_LIGHT_MULTIPLE_LEDS_ENABLE,
                         mMultipleNotificationLeds ? 1 : 0) != 0;
             }
 

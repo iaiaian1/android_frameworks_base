@@ -18,16 +18,20 @@ package com.android.server.power;
 
 import android.app.ActivityManager;
 import android.util.SparseIntArray;
+
 import com.android.internal.app.IAppOpsService;
 import com.android.internal.app.IBatteryStats;
 import com.android.internal.os.BackgroundThread;
 import com.android.server.EventLogTags;
+import com.android.server.LocalServices;
 import com.android.server.ServiceThread;
 import com.android.server.SystemService;
 import com.android.server.am.BatteryStatsService;
 import com.android.server.lights.Light;
 import com.android.server.lights.LightsManager;
 import com.android.server.Watchdog;
+
+import cyanogenmod.power.PerformanceManagerInternal;
 
 import android.Manifest;
 import android.app.AppOpsManager;
@@ -78,8 +82,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import cyanogenmod.providers.CMSettings;
 import libcore.util.Objects;
 
+import static android.os.PowerManagerInternal.POWER_HINT_INTERACTION;
 import static android.os.PowerManagerInternal.WAKEFULNESS_ASLEEP;
 import static android.os.PowerManagerInternal.WAKEFULNESS_AWAKE;
 import static android.os.PowerManagerInternal.WAKEFULNESS_DREAMING;
@@ -156,7 +162,6 @@ public final class PowerManagerService extends SystemService
     private static final int SCREEN_BRIGHTNESS_BOOST_TIMEOUT = 5 * 1000;
 
     // Power hints defined in hardware/libhardware/include/hardware/power.h.
-    private static final int POWER_HINT_INTERACTION = 2;
     private static final int POWER_HINT_LOW_POWER = 5;
 
     // Power features defined in hardware/libhardware/include/hardware/power.h.
@@ -500,9 +505,8 @@ public final class PowerManagerService extends SystemService
     private static native void nativeSetAutoSuspend(boolean enable);
     private static native void nativeSendPowerHint(int hintId, int data);
     private static native void nativeSetFeature(int featureId, int data);
-    private static native void nativeCpuBoost(int duration);
-    private static native void nativeLaunchBoost();
-    static native void nativeSetPowerProfile(int profile);
+    private static native int nativeGetFeature(int featureId);
+
     private boolean mKeyboardVisible = false;
 
     private SensorManager mSensorManager;
@@ -513,7 +517,7 @@ public final class PowerManagerService extends SystemService
     android.os.PowerManager.WakeLock mProximityWakeLock;
     SensorEventListener mProximityListener;
 
-    private PerformanceManager mPerformanceManager;
+    private PerformanceManagerInternal mPerf;
 
     public PowerManagerService(Context context) {
         super(context);
@@ -522,7 +526,6 @@ public final class PowerManagerService extends SystemService
                 Process.THREAD_PRIORITY_DISPLAY, false /*allowIo*/);
         mHandlerThread.start();
         mHandler = new PowerManagerHandler(mHandlerThread.getLooper());
-        mPerformanceManager = new PerformanceManager(context);
 
         synchronized (mLock) {
             mWakeLockSuspendBlocker = createSuspendBlockerLocked("PowerManagerService.WakeLocks");
@@ -560,6 +563,7 @@ public final class PowerManagerService extends SystemService
                 userActivityNoUpdateLocked(
                         now, PowerManager.USER_ACTIVITY_EVENT_OTHER, 0, Process.SYSTEM_UID);
                 updatePowerStateLocked();
+                mPerf = LocalServices.getService(PerformanceManagerInternal.class);
             }
         }
     }
@@ -608,26 +612,28 @@ public final class PowerManagerService extends SystemService
             // Initialize proximity sensor
             mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
             mProximitySensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        }
 
-            // Register for broadcasts from other components of the system.
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-            filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-            mContext.registerReceiver(new BatteryReceiver(), filter, null, mHandler);
+        // Register for broadcasts from other components of the system.
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        mContext.registerReceiver(new BatteryReceiver(), filter, null, mHandler);
 
-            filter = new IntentFilter();
-            filter.addAction(Intent.ACTION_DREAMING_STARTED);
-            filter.addAction(Intent.ACTION_DREAMING_STOPPED);
-            mContext.registerReceiver(new DreamReceiver(), filter, null, mHandler);
+        filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_DREAMING_STARTED);
+        filter.addAction(Intent.ACTION_DREAMING_STOPPED);
+        mContext.registerReceiver(new DreamReceiver(), filter, null, mHandler);
 
-            filter = new IntentFilter();
-            filter.addAction(Intent.ACTION_USER_SWITCHED);
-            mContext.registerReceiver(new UserSwitchedReceiver(), filter, null, mHandler);
+        filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_USER_SWITCHED);
+        mContext.registerReceiver(new UserSwitchedReceiver(), filter, null, mHandler);
 
-            filter = new IntentFilter();
-            filter.addAction(Intent.ACTION_DOCK_EVENT);
-            mContext.registerReceiver(new DockReceiver(), filter, null, mHandler);
+        filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_DOCK_EVENT);
+        mContext.registerReceiver(new DockReceiver(), filter, null, mHandler);
 
+        synchronized (mLock) {
             // Register for settings changes.
             final ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.Secure.getUriFor(
@@ -669,23 +675,21 @@ public final class PowerManagerService extends SystemService
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.DOUBLE_TAP_TO_WAKE),
                     false, mSettingsObserver, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.BUTTON_BRIGHTNESS),
+            resolver.registerContentObserver(CMSettings.Secure.getUriFor(
+                    CMSettings.Secure.BUTTON_BRIGHTNESS),
                     false, mSettingsObserver, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.KEYBOARD_BRIGHTNESS),
+            resolver.registerContentObserver(CMSettings.Secure.getUriFor(
+                    CMSettings.Secure.KEYBOARD_BRIGHTNESS),
                     false, mSettingsObserver, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.BUTTON_BACKLIGHT_TIMEOUT),
+            resolver.registerContentObserver(CMSettings.Secure.getUriFor(
+                    CMSettings.Secure.BUTTON_BACKLIGHT_TIMEOUT),
                     false, mSettingsObserver, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.PROXIMITY_ON_WAKE),
+            resolver.registerContentObserver(CMSettings.System.getUriFor(
+                    CMSettings.System.PROXIMITY_ON_WAKE),
                     false, mSettingsObserver, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Global.getUriFor(
-                    Settings.Global.WAKE_WHEN_PLUGGED_OR_UNPLUGGED),
+            resolver.registerContentObserver(CMSettings.Global.getUriFor(
+                    CMSettings.Global.WAKE_WHEN_PLUGGED_OR_UNPLUGGED),
                     false, mSettingsObserver, UserHandle.USER_ALL);
-
-            mPerformanceManager.reset();
 
             // Go.
             readConfigurationLocked();
@@ -735,11 +739,11 @@ public final class PowerManagerService extends SystemService
         mSupportsDoubleTapWakeConfig = resources.getBoolean(
                 com.android.internal.R.bool.config_supportDoubleTapWake);
         mProximityTimeOut = resources.getInteger(
-                com.android.internal.R.integer.config_proximityCheckTimeout);
+                org.cyanogenmod.platform.internal.R.integer.config_proximityCheckTimeout);
         mProximityWakeSupported = resources.getBoolean(
-                com.android.internal.R.bool.config_proximityCheckOnWake);
+                org.cyanogenmod.platform.internal.R.bool.config_proximityCheckOnWake);
         mProximityWakeEnabledByDefaultConfig = resources.getBoolean(
-                com.android.internal.R.bool.config_proximityCheckOnWakeEnabledByDefault);
+                org.cyanogenmod.platform.internal.R.bool.config_proximityCheckOnWakeEnabledByDefault);
         if (mProximityWakeSupported) {
             PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
             mProximityWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
@@ -772,11 +776,11 @@ public final class PowerManagerService extends SystemService
                 Settings.Global.STAY_ON_WHILE_PLUGGED_IN, 0);
         mTheaterModeEnabled = Settings.Global.getInt(mContext.getContentResolver(),
                 Settings.Global.THEATER_MODE_ON, 0) == 1;
-        mWakeUpWhenPluggedOrUnpluggedSetting = Settings.Global.getInt(resolver,
-                Settings.Global.WAKE_WHEN_PLUGGED_OR_UNPLUGGED,
+        mWakeUpWhenPluggedOrUnpluggedSetting = CMSettings.Global.getInt(resolver,
+                CMSettings.Global.WAKE_WHEN_PLUGGED_OR_UNPLUGGED,
                 (mWakeUpWhenPluggedOrUnpluggedConfig ? 1 : 0));
-        mProximityWakeEnabled = Settings.System.getInt(resolver,
-                Settings.System.PROXIMITY_ON_WAKE, mProximityWakeEnabledByDefaultConfig ? 1 : 0) == 1;
+        mProximityWakeEnabled = CMSettings.System.getInt(resolver,
+                CMSettings.System.PROXIMITY_ON_WAKE, mProximityWakeEnabledByDefaultConfig ? 1 : 0) == 1;
 
         if (mSupportsDoubleTapWakeConfig) {
             boolean doubleTapWakeEnabled = Settings.Secure.getIntForUser(resolver,
@@ -820,15 +824,15 @@ public final class PowerManagerService extends SystemService
             updateLowPowerModeLocked();
         }
 
-        mButtonTimeout = Settings.Secure.getIntForUser(resolver,
-                Settings.Secure.BUTTON_BACKLIGHT_TIMEOUT,
+        mButtonTimeout = CMSettings.Secure.getIntForUser(resolver,
+                CMSettings.Secure.BUTTON_BACKLIGHT_TIMEOUT,
                 DEFAULT_BUTTON_ON_DURATION, UserHandle.USER_CURRENT);
 
-        mButtonBrightness = Settings.Secure.getIntForUser(resolver,
-                Settings.Secure.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
+        mButtonBrightness = CMSettings.Secure.getIntForUser(resolver,
+                CMSettings.Secure.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
                 UserHandle.USER_CURRENT);
-        mKeyboardBrightness = Settings.Secure.getIntForUser(resolver,
-                Settings.Secure.KEYBOARD_BRIGHTNESS, mKeyboardBrightnessSettingDefault,
+        mKeyboardBrightness = CMSettings.Secure.getIntForUser(resolver,
+                CMSettings.Secure.KEYBOARD_BRIGHTNESS, mKeyboardBrightnessSettingDefault,
                 UserHandle.USER_CURRENT);
 
         mDirty |= DIRTY_SETTINGS;
@@ -843,7 +847,6 @@ public final class PowerManagerService extends SystemService
             Settings.Global.putInt(mContext.getContentResolver(),
                     Settings.Global.LOW_POWER_MODE, 0);
             // update performance profile
-            mPerformanceManager.setPowerProfile(PowerManager.PROFILE_BALANCED);
             mLowPowerModeSetting = false;
         }
         final boolean autoLowPowerModeEnabled = !mIsPowered && mAutoLowPowerModeConfigured
@@ -3520,32 +3523,10 @@ public final class PowerManagerService extends SystemService
                     android.Manifest.permission.DEVICE_POWER, null);
             final long ident = Binder.clearCallingIdentity();
             try {
-                boolean changed = setLowPowerModeInternal(mode);
-                if (changed) {
-                    mPerformanceManager.setPowerProfile(mLowPowerModeEnabled ?
-                            PowerManager.PROFILE_POWER_SAVE : PowerManager.PROFILE_BALANCED);
-                }
-                return changed;
+                return setLowPowerModeInternal(mode);
             } finally {
                 Binder.restoreCallingIdentity(ident);
             }
-        }
-
-        @Override // Binder call
-        public boolean setPowerProfile(String profile) {
-            mContext.enforceCallingOrSelfPermission(android.Manifest.permission.DEVICE_POWER, null);
-            final long ident = Binder.clearCallingIdentity();
-            try {
-                setLowPowerModeInternal(PowerManager.PROFILE_POWER_SAVE.equals(profile));
-            } finally {
-                Binder.restoreCallingIdentity(ident);
-            }
-            return mPerformanceManager.setPowerProfile(profile);
-        }
-
-        @Override
-        public String getPowerProfile() {
-            return mPerformanceManager.getPowerProfile();
         }
 
         @Override // Binder call
@@ -3556,42 +3537,6 @@ public final class PowerManagerService extends SystemService
             } finally {
                 Binder.restoreCallingIdentity(ident);
             }
-        }
-
-        /**
-         * Boost the CPU
-         * @param duration Duration to boost the CPU for, in milliseconds.
-         * @hide
-         */
-        @Override
-        public void cpuBoost(int duration) {
-            if (duration > 0 && duration <= MAX_CPU_BOOST_TIME) {
-                // Don't send boosts if we're in another power profile
-                String profile = mPerformanceManager.getPowerProfile();
-                if (profile == null || profile.equals(PowerManager.PROFILE_BALANCED)) {
-                    nativeCpuBoost(duration);
-                }
-            } else {
-                Slog.e(TAG, "Invalid boost duration: " + duration);
-            }
-        }
-
-        /**
-         * Boost the CPU for an app launch
-         * @hide
-         */
-        @Override
-        public void launchBoost() {
-            // Don't send boosts if we're in another power profile
-            String profile = mPerformanceManager.getPowerProfile();
-            if (profile == null || profile.equals(PowerManager.PROFILE_BALANCED)) {
-                nativeLaunchBoost();
-            }
-        }
-
-        @Override
-        public void activityResumed(String componentName) {
-            mPerformanceManager.activityResumed(componentName);
         }
 
         /**
@@ -3778,6 +3723,11 @@ public final class PowerManagerService extends SystemService
         }
 
         @Override // Binder call
+        public void cpuBoost(int duration) {
+            mPerf.cpuBoost(duration);
+        }
+
+        @Override // Binder call
         protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
             if (mContext.checkCallingOrSelfPermission(Manifest.permission.DUMP)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -3933,6 +3883,26 @@ public final class PowerManagerService extends SystemService
         @Override
         public void uidGone(int uid) {
             uidGoneInternal(uid);
+        }
+
+        @Override
+        public void powerHint(int hintId, int data) {
+            powerHintInternal(hintId, data);
+        }
+
+        @Override
+        public boolean setPowerSaveMode(boolean mode) {
+            return setLowPowerModeInternal(mode);
+        }
+
+        @Override
+        public int getFeature(int featureId) {
+            return nativeGetFeature(featureId);
+        }
+
+        @Override
+        public void setFeature(int featureId, int data) {
+            nativeSetFeature(featureId, data);
         }
     }
 

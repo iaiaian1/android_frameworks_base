@@ -154,7 +154,9 @@ import java.util.List;
 import static android.view.WindowManager.LayoutParams.FIRST_APPLICATION_WINDOW;
 import static android.view.WindowManager.LayoutParams.FIRST_SUB_WINDOW;
 import static android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
+import static android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND;
 import static android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
@@ -247,7 +249,17 @@ public class WindowManagerService extends IWindowManager.Stub
     /**
      * Dim surface layer is immediately below target window.
      */
-    static final int LAYER_OFFSET_DIM = 1;
+    static final int LAYER_OFFSET_DIM = 1+1;
+
+    /**
+     * Blur surface layer is immediately below dim layer.
+     */
+    static final int LAYER_OFFSET_BLUR = 2+1;
+
+    /**
+      * Blur_with_masking layer is immediately below blur layer.
+      */
+    static final int LAYER_OFFSET_BLUR_WITH_MASKING = 1;
 
     /**
      * FocusedStackFrame layer is immediately above focused window.
@@ -307,6 +319,8 @@ public class WindowManagerService extends IWindowManager.Stub
     private static final String PROPERTY_EMULATOR_CIRCULAR = "ro.emulator.circular";
 
     final private KeyguardDisableHandler mKeyguardDisableHandler;
+
+    private final int mSfHwRotation;
 
     final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -997,6 +1011,9 @@ public class WindowManagerService extends IWindowManager.Stub
         } finally {
             SurfaceControl.closeTransaction();
         }
+
+        // Load hardware rotation from prop
+        mSfHwRotation = android.os.SystemProperties.getInt("ro.sf.hwrotation",0) / 90;
 
         updateCircularDisplayMaskIfNeeded();
         showEmulatorDisplayOverlayIfNeeded();
@@ -2765,7 +2782,7 @@ public class WindowManagerService extends IWindowManager.Stub
         // to hold off on removing the window until the animation is done.
         // If the display is frozen, just remove immediately, since the
         // animation wouldn't be seen.
-        if (win.mHasSurface && okToDisplay()) {
+        if (win.mHasSurface && okToDisplay() && !win.mBinderDied) {
             // If we are not currently running the exit animation, we
             // need to see about starting one.
             wasVisible = win.isWinVisibleLw();
@@ -3831,7 +3848,7 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     public int getOrientationLocked() {
-        if (mDisplayFrozen) {
+        if (mDisplayFrozen || mAppsFreezingScreen > 0) {
             if (mLastWindowForcedOrientation != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
                 if (DEBUG_ORIENTATION) Slog.v(TAG, "Display is frozen, return "
                         + mLastWindowForcedOrientation);
@@ -3856,8 +3873,8 @@ public class WindowManagerService extends IWindowManager.Stub
                     continue;
                 }
                 int req = win.mAttrs.screenOrientation;
-                if((req == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) ||
-                        (req == ActivityInfo.SCREEN_ORIENTATION_BEHIND)){
+                if ((req == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) ||
+                        (req == ActivityInfo.SCREEN_ORIENTATION_BEHIND)) {
                     continue;
                 }
 
@@ -3887,7 +3904,7 @@ public class WindowManagerService extends IWindowManager.Stub
                 }
                 if (DEBUG_ORIENTATION) Slog.v(TAG,
                         "No one is requesting an orientation when the screen is locked");
-                return mLastKeyguardForcedOrientation;
+                return mLastWindowForcedOrientation = mLastKeyguardForcedOrientation;
             }
         }
 
@@ -5653,6 +5670,11 @@ public class WindowManagerService extends IWindowManager.Stub
         mPointerEventDispatcher.unregisterInputEventListener(listener);
     }
 
+    @Override
+    public void addSystemUIVisibilityFlag(int flags) {
+        mLastStatusBarVisibility |= flags;
+    }
+
     // Called by window manager policy. Not exposed externally.
     @Override
     public int getLidState() {
@@ -6234,10 +6256,13 @@ public class WindowManagerService extends IWindowManager.Stub
         int retryCount = 0;
         WindowState appWin = null;
 
-        final boolean appIsImTarget = mInputMethodTarget != null
-                && mInputMethodTarget.mAppToken != null
-                && mInputMethodTarget.mAppToken.appToken != null
-                && mInputMethodTarget.mAppToken.appToken.asBinder() == appToken;
+        boolean appIsImTarget;
+        synchronized(mWindowMap) {
+            appIsImTarget = mInputMethodTarget != null
+                    && mInputMethodTarget.mAppToken != null
+                    && mInputMethodTarget.mAppToken.appToken != null
+                    && mInputMethodTarget.mAppToken.appToken.asBinder() == appToken;
+        }
 
         final int aboveAppLayer = (mPolicy.windowTypeToLayerLw(TYPE_APPLICATION) + 1)
                 * TYPE_LAYER_MULTIPLIER + TYPE_LAYER_OFFSET;
@@ -6391,6 +6416,8 @@ public class WindowManagerService extends IWindowManager.Stub
 
                 // The screenshot API does not apply the current screen rotation.
                 int rot = getDefaultDisplayContentLocked().getDisplay().getRotation();
+                // Allow for abnormal hardware orientation
+                rot = (rot + mSfHwRotation) % 4;
 
                 if (rot == Surface.ROTATION_90 || rot == Surface.ROTATION_270) {
                     rot = (rot == Surface.ROTATION_90) ? Surface.ROTATION_270 : Surface.ROTATION_90;
@@ -8950,7 +8977,7 @@ public class WindowManagerService extends IWindowManager.Stub
                 anyLayerChanged = true;
             }
             final TaskStack stack = w.getStack();
-            if (layerChanged && stack != null && stack.isDimming(winAnimator)) {
+            if (layerChanged && stack != null && (stack.isDimming(winAnimator) || stack.isBlurring(winAnimator))) {
                 // Force an animation pass just to update the mDimLayer layer.
                 scheduleAnimationLocked();
             }
@@ -9852,6 +9879,31 @@ public class WindowManagerService extends IWindowManager.Stub
         }
     }
 
+    private void handleFlagBlurBehind(WindowState w) {
+        final WindowManager.LayoutParams attrs = w.mAttrs;
+        if ((attrs.flags & FLAG_BLUR_BEHIND) != 0
+                && w.isDisplayedLw()
+                && !w.mExiting) {
+            final WindowStateAnimator winAnimator = w.mWinAnimator;
+            final TaskStack stack = w.getStack();
+            if (stack == null) {
+                return;
+            }
+            stack.setBlurringTag();
+            if (!stack.isBlurring(winAnimator)) {
+                if (localLOGV) Slog.v(TAG, "Win " + w + " start blurring");
+                stack.startBlurringIfNeeded(winAnimator);
+            }
+        }
+    }
+
+    private void handlePrivateFlagBlurWithMasking(WindowState w) {
+        final WindowManager.LayoutParams attrs = w.mAttrs;
+        boolean hideForced = !w.isDisplayedLw() || w.mExiting;
+        final WindowStateAnimator winAnimator = w.mWinAnimator;
+        winAnimator.updateBlurWithMaskingState(attrs, hideForced);
+    }
+
     private void updateAllDrawnLocked(DisplayContent displayContent) {
         // See if any windows have been drawn, so they (and others
         // associated with them) can now be shown.
@@ -10027,6 +10079,7 @@ public class WindowManagerService extends IWindowManager.Stub
                 mInnerFields.mObscured = false;
                 mInnerFields.mSyswin = false;
                 displayContent.resetDimming();
+                displayContent.resetBlurring();
 
                 // Only used if default window
                 final boolean someoneLosingFocus = !mLosingFocus.isEmpty();
@@ -10050,6 +10103,11 @@ public class WindowManagerService extends IWindowManager.Stub
                     if (stack != null && !stack.testDimmingTag()) {
                         handleFlagDimBehind(w);
                     }
+
+                    if (stack != null && !stack.testBlurringTag()) {
+                        handleFlagBlurBehind(w);
+                    }
+                    handlePrivateFlagBlurWithMasking(w);
 
                     if (isDefaultDisplay && obscuredChanged && (mWallpaperTarget == w)
                             && w.isVisibleLw()) {
@@ -10190,6 +10248,7 @@ public class WindowManagerService extends IWindowManager.Stub
                         true /* inTraversal, must call performTraversalInTrans... below */);
 
                 getDisplayContentLocked(displayId).stopDimmingIfNeeded();
+                getDisplayContentLocked(displayId).stopBlurringIfNeeded();
 
                 if (updateAllDrawn) {
                     updateAllDrawnLocked(displayContent);
@@ -10469,8 +10528,8 @@ public class WindowManagerService extends IWindowManager.Stub
                     ": removed=" + win.mRemoved + " visible=" + win.isVisibleLw() +
                     " mHasSurface=" + win.mHasSurface +
                     " drawState=" + win.mWinAnimator.mDrawState);
-            if (win.mRemoved || !win.mHasSurface) {
-                // Window has been removed; no draw will now happen, so stop waiting.
+            if (win.mRemoved || !win.mHasSurface || !win.mPolicyVisibility) {
+                // Window has been removed or hidden; no draw will now happen, so stop waiting.
                 if (DEBUG_SCREEN_ON) Slog.w(TAG, "Aborted waiting for drawn: " + win);
                 mWaitingForDrawn.remove(win);
             } else if (win.hasDrawnLw()) {
@@ -12023,12 +12082,18 @@ public class WindowManagerService extends IWindowManager.Stub
                 final WindowList windows = getDefaultWindowListLocked();
                 for (int winNdx = windows.size() - 1; winNdx >= 0; --winNdx) {
                     final WindowState win = windows.get(winNdx);
+                    final boolean isForceHiding = mPolicy.isForceHiding(win.mAttrs);
                     if (win.isVisibleLw()
-                            && (win.mAppToken != null || mPolicy.isForceHiding(win.mAttrs))) {
+                            && (win.mAppToken != null || isForceHiding)) {
                         win.mWinAnimator.mDrawState = WindowStateAnimator.DRAW_PENDING;
                         // Force add to mResizingWindows.
                         win.mLastContentInsets.set(-1, -1, -1, -1);
                         mWaitingForDrawn.add(win);
+
+                        // No need to wait for the windows below Keyguard.
+                        if (isForceHiding) {
+                            break;
+                        }
                     }
                 }
                 requestTraversalLocked();

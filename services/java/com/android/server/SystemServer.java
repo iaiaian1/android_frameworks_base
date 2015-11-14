@@ -102,6 +102,7 @@ import com.android.server.wallpaper.WallpaperManagerService;
 import com.android.server.webkit.WebViewUpdateService;
 import com.android.server.wm.WindowManagerService;
 
+import cyanogenmod.providers.CMSettings;
 import dalvik.system.VMRuntime;
 
 import java.io.File;
@@ -189,8 +190,8 @@ public final class SystemServer {
         }
         @Override
         public void onChange(boolean selfChange) {
-            int adbPort = Settings.Secure.getInt(mContentResolver,
-                Settings.Secure.ADB_PORT, 0);
+            int adbPort = CMSettings.Secure.getInt(mContentResolver,
+                CMSettings.Secure.ADB_PORT, 0);
             // setting this will control whether ADB runs on TCP/IP or USB
             SystemProperties.set("service.adb.tcp.port", Integer.toString(adbPort));
         }
@@ -903,6 +904,11 @@ public final class SystemServer {
                 if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_VOICE_RECOGNIZERS)) {
                     mSystemServiceManager.startService(VOICE_RECOGNITION_MANAGER_SERVICE_CLASS);
                 }
+
+                if (GestureLauncherService.isGestureLauncherEnabled(context.getResources())) {
+                    Slog.i(TAG, "Gesture Launcher Service");
+                    mSystemServiceManager.startService(GestureLauncherService.class);
+                }
             }
 
             try {
@@ -1043,12 +1049,12 @@ public final class SystemServer {
         }
 
         // make sure the ADB_ENABLED setting value matches the secure property value
-        Settings.Secure.putInt(mContentResolver, Settings.Secure.ADB_PORT,
+        CMSettings.Secure.putInt(mContentResolver, CMSettings.Secure.ADB_PORT,
                 Integer.parseInt(SystemProperties.get("service.adb.tcp.port", "-1")));
 
         // register observer to listen for settings changes
         mContentResolver.registerContentObserver(
-            Settings.Secure.getUriFor(Settings.Secure.ADB_PORT),
+            CMSettings.Secure.getUriFor(CMSettings.Secure.ADB_PORT),
             false, new AdbPortObserver());
 
         // Before things start rolling, be sure we have decided whether

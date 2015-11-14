@@ -41,6 +41,7 @@ import android.os.UserHandle;
 import android.provider.Settings;
 import android.provider.Settings.Global;
 import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -1557,12 +1558,6 @@ class DatabaseHelper extends SQLiteOpenHelper {
                             + " VALUES(?,?);");
                     loadStringSetting(stmt, Settings.Global.WIRELESS_CHARGING_STARTED_SOUND,
                             R.string.def_wireless_charging_started_sound);
-                    loadBooleanSetting(stmt, Settings.Global.POWER_NOTIFICATIONS_ENABLED,
-                            R.bool.def_power_notifications_enabled);
-                    loadBooleanSetting(stmt, Settings.Global.POWER_NOTIFICATIONS_VIBRATE,
-                            R.bool.def_power_notifications_vibrate);
-                    loadStringSetting(stmt, Settings.Global.POWER_NOTIFICATIONS_RINGTONE,
-                            R.string.def_power_notifications_ringtone);
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
@@ -2492,9 +2487,6 @@ class DatabaseHelper extends SQLiteOpenHelper {
             loadIntegerSetting(stmt, Settings.Secure.LONG_PRESS_TIMEOUT,
                     R.integer.def_long_press_timeout_millis);
 
-            loadIntegerSetting(stmt, Settings.System.DEV_FORCE_SHOW_NAVBAR,
-                    R.integer.def_force_disable_navkeys);
-
             loadBooleanSetting(stmt, Settings.Secure.TOUCH_EXPLORATION_ENABLED,
                     R.bool.def_touch_exploration_enabled);
 
@@ -2708,13 +2700,37 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
             // Set the preferred network mode to target desired value or Default
             // value defined in RILConstants
-            int type;
-            type = RILConstants.PREFERRED_NETWORK_MODE;
-            loadSetting(stmt, Settings.Global.PREFERRED_NETWORK_MODE, type);
+            int phoneCount = TelephonyManager.getDefault().getPhoneCount();
+            final String defVal = SystemProperties.get("ro.telephony.default_network", "");
+            final String[] defNetworkSettings = defVal.split(",");
+            final String[] networkSettings = new String[phoneCount];
+            boolean error = defNetworkSettings.length != phoneCount;
+
+            for (int i = 0; i < phoneCount; i++) {
+                if (i < defNetworkSettings.length) {
+                    try {
+                        networkSettings[i] = String.valueOf(
+                                Integer.parseInt(defNetworkSettings[i]));
+                    } catch (NumberFormatException ex) {
+                        networkSettings[i] = String.valueOf(RILConstants.PREFERRED_NETWORK_MODE);
+                        error = true;
+                    }
+                } else {
+                    networkSettings[i] = String.valueOf(RILConstants.PREFERRED_NETWORK_MODE);
+                    error = true;
+                }
+            }
+
+            if (error) {
+                Log.w(TAG, "Invalid ro.telephony.default_network: " + defVal);
+            }
+
+            loadSetting(stmt, Settings.Global.PREFERRED_NETWORK_MODE, TextUtils.join(",",
+                    networkSettings));
 
             // Set the preferred cdma subscription source to target desired value or default
             // value defined in CdmaSubscriptionSourceManager
-            type = SystemProperties.getInt("ro.telephony.default_cdma_sub",
+            int type = SystemProperties.getInt("ro.telephony.default_cdma_sub",
                         CdmaSubscriptionSourceManager.PREFERRED_CDMA_SUBSCRIPTION);
             loadSetting(stmt, Settings.Global.CDMA_SUBSCRIPTION_MODE, type);
 
