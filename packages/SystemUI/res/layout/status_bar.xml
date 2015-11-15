@@ -96,6 +96,8 @@
             <include layout="@layout/system_icons" />
 
             <com.android.systemui.BatteryLevelTextView
+	        android:background="@drawable/somc_sys_battery_percent_am"
+                android:gravity="center"
                 android:id="@+id/battery_level_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
