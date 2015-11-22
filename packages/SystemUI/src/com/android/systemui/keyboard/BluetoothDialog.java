@@ -19,6 +19,9 @@ package com.android.systemui.keyboard;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.WindowManager;
+import android.content.res.Resources;
+
+import java.util.Locale;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.SystemUIDialog;
@@ -30,5 +33,10 @@ public class BluetoothDialog extends SystemUIDialog {
 
         getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_DIALOG);
         setShowForAllUsers(true);
+    }
+
+    public static boolean isChineseLanguage() {
+       return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
+               Locale.CHINESE.getLanguage());
     }
 }
