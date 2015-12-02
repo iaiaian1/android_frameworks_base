@@ -83,7 +83,6 @@ static const int   kComposedIconAsset = 128;
 #ifdef HAVE_ANDROID_OS
 static const char* kResourceCache = "resource-cache";
 #endif
-static const char* kResourceCache = "resource-cache";
 
 static const char* kExcludeExtension = ".EXCLUDE";
 
