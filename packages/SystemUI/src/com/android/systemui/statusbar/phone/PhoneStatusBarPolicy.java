@@ -152,8 +152,7 @@ public class PhoneStatusBarPolicy {
         }
     };
 
-    public PhoneStatusBarPolicy(Context context, CastController cast, HotspotController hotspot,
-            SuController su) {
+    public PhoneStatusBarPolicy(Context context, CastController cast, HotspotController hotspot, SuController su) {
         mContext = context;
         mCast = cast;
         mHotspot = hotspot;
