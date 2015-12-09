@@ -136,6 +136,8 @@
   <string name="perf_profile_pwrsv">Varčevanje porabe</string>
   <string name="perf_profile_bal">Uravnoteženo</string>
   <string name="perf_profile_perf">Zmogljivost</string>
+  <string name="perf_profile_bias_power">Učinkovitost</string>
+  <string name="perf_profile_bias_perf">Hitro</string>
   <string name="theme_install_error_title">Namestitev teme je spodletela</string>
   <string name="theme_install_error_message">Namestitev %s je spodletela</string>
   <string name="theme_reset_notification_title">Ponastavitev theme</string>
@@ -211,4 +213,6 @@
   <string name="silent_mode_none">Brez</string>
   <string name="subscription_change_disabled_wifi_ap">Dostopna točka Wi-Fi je bila onemogočena zaradi spremembe naročnine SIM</string>
   <string name="notify_turn_wifi_off_title">Izklopi Wi-Fi</string>
+  <string name="permlab_thirdPartyKeyguard">zaslon za zaklepanje tretjih oseb</string>
+  <string name="permdesc_thirdPartyKeyguard">Omogoča, da se program lahko uporabi kot nezanesljiv zaslon za zaklepanje.</string>
 </resources>

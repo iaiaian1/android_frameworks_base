@@ -134,6 +134,8 @@
   <string name="perf_profile_pwrsv">省电模式</string>
   <string name="perf_profile_bal">平衡模式</string>
   <string name="perf_profile_perf">性能模式</string>
+  <string name="perf_profile_bias_power">效率</string>
+  <string name="perf_profile_bias_perf">快速</string>
   <string name="theme_install_error_title">安装主题失败</string>
   <string name="theme_install_error_message">%s 安装失败</string>
   <string name="theme_reset_notification_title">重置主题</string>
@@ -209,4 +211,6 @@
   <string name="silent_mode_none">无</string>
   <string name="subscription_change_disabled_wifi_ap">由于 SIM 卡订阅改变，已禁用 Wi-Fi 热点。</string>
   <string name="notify_turn_wifi_off_title">关闭 Wi-Fi</string>
+  <string name="permlab_thirdPartyKeyguard">第三方锁屏</string>
+  <string name="permdesc_thirdPartyKeyguard">允许应用用作不安全锁屏。</string>
 </resources>

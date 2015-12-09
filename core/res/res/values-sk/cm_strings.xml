@@ -134,6 +134,8 @@
   <string name="perf_profile_pwrsv">Úsporný</string>
   <string name="perf_profile_bal">Vyvážený</string>
   <string name="perf_profile_perf">Výkonný</string>
+  <string name="perf_profile_bias_power">Účinnosť</string>
+  <string name="perf_profile_bias_perf">Výkon</string>
   <string name="theme_install_error_title">Inštalácia témy zlyhala</string>
   <string name="theme_install_error_message">Nepodarilo sa nainštalovať tému %s</string>
   <string name="theme_reset_notification_title">Obnoviť tému</string>
@@ -207,4 +209,8 @@
   <string name="permdesc_resetBatteryStats">Umožňuje aplikácii obnoviť aktuálne nízkoúrovňové údaje o využití batérie.</string>
   <string name="silent_mode_priority">Priorita</string>
   <string name="silent_mode_none">Žiadna</string>
+  <string name="subscription_change_disabled_wifi_ap">Wi-Fi hotspot bol zakázaný kvôli prepnutiu karty SIM</string>
+  <string name="notify_turn_wifi_off_title">Vypnúť Wi-Fi</string>
+  <string name="permlab_thirdPartyKeyguard">zámok obrazovky tretej strany</string>
+  <string name="permdesc_thirdPartyKeyguard">Umožňuje použiť aplikáciu ako nezabezpečenú zámok obrazovky.</string>
 </resources>

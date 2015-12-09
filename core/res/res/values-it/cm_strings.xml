@@ -134,6 +134,8 @@
   <string name="perf_profile_pwrsv">Risparmio energetico</string>
   <string name="perf_profile_bal">Bilanciato</string>
   <string name="perf_profile_perf">Prestazioni</string>
+  <string name="perf_profile_bias_power">Efficienza</string>
+  <string name="perf_profile_bias_perf">Prestazioni</string>
   <string name="theme_install_error_title">Impossibile installare il tema</string>
   <string name="theme_install_error_message">Impossibile installare %s</string>
   <string name="theme_reset_notification_title">Reimposta tema</string>
@@ -209,4 +211,6 @@
   <string name="silent_mode_none">Nessuno</string>
   <string name="subscription_change_disabled_wifi_ap">Hotspot WiFi disattivato in seguito al cambio di SIM</string>
   <string name="notify_turn_wifi_off_title">Spegni Wi-Fi</string>
+  <string name="permlab_thirdPartyKeyguard">schermata di sblocco di terze parti</string>
+  <string name="permdesc_thirdPartyKeyguard">Consente ad un\'app di essere usata come schermata di sblocco non sicura.</string>
 </resources>

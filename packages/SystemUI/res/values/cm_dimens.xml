@@ -42,4 +42,7 @@
   <!-- Title shown in recents popup for showing app launch in floating mode -->
     <string name="recent_float_mode_title">Floating mode</string>
 
+    <dimen name="queue_row_height">52dp</dimen>
+    <dimen name="queue_top_shadow">3dp</dimen>
+
 </resources>

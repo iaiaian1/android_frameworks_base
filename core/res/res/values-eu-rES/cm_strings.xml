@@ -134,6 +134,8 @@
   <string name="perf_profile_pwrsv">Energia aurreztea</string>
   <string name="perf_profile_bal">Orekatua</string>
   <string name="perf_profile_perf">Errendimendua</string>
+  <string name="perf_profile_bias_power">Eraginkortasina</string>
+  <string name="perf_profile_bias_perf">Azkarra</string>
   <string name="theme_install_error_title">Ezin izan da gaia instalatu</string>
   <string name="theme_install_error_message">%s ez da instalatu</string>
   <string name="theme_reset_notification_title">Gaia leheneratu da</string>
@@ -203,8 +205,12 @@
   <string name="fingerprint_default_name"><xliff:g id="number">%d</xliff:g>. hatz-marka</string>
   <string name="permlab_accessFingerprintService">atzitu hatz-marka zerbitzua</string>
   <string name="permdesc_accessFingerprintService">Hatz-marka zerbitzua atzitzea ahalbidetzen dio aplikazioari. Aplikazioak hatz-markak gehitu, ezabatu edo izenez aldatu ahal izango ditu eta hauek erabilita identifikatu</string>
-  <string name="permlab_resetBatteryStats">leheneratu bateria estatistikak</string>
+  <string name="permlab_resetBatteryStats">ezabatu bateriaren estatistikak</string>
   <string name="permdesc_resetBatteryStats">Bateriaren maila baxuko erabilera datuak leheneratzea ahalbidetzen dio aplikazioari.</string>
   <string name="silent_mode_priority">Lehentasuna</string>
   <string name="silent_mode_none">Bat ere ez</string>
+  <string name="subscription_change_disabled_wifi_ap">Wi-Fi gunea desgaitu da SIM harpidetza aldatu delako</string>
+  <string name="notify_turn_wifi_off_title">Ezgaitu Wi-Fia</string>
+  <string name="permlab_thirdPartyKeyguard">hirugarrengoen blokeo pantaila</string>
+  <string name="permdesc_thirdPartyKeyguard">Aplikazio bat blokeo pantaila ez seguru gisa erabiltzea ahalbidetzen du.</string>
 </resources>
