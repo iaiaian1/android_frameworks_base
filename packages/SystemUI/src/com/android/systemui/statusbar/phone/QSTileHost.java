@@ -188,6 +188,8 @@ public class QSTileHost implements QSTile.Host, Tunable {
             mCustomTileListenerService.removeCustomTile(customTile.getPackage(),
                     customTile.getTag(), customTile.getId());
         }
+    }
+
     @Override	
     public void startActivityDismissingKeyguard(PendingIntent intent) {
         mStatusBar.postStartActivityDismissingKeyguard(intent);
