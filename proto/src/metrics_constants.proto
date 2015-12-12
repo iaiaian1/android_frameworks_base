@@ -3980,7 +3980,8 @@ message MetricsEvent {
     //Initial XPerience Constants
 
     RAINBOW_UNICORN = 2000;
-	CAFFEINE_TILE = 2001;
+    CAFFEINE_TILE = 2001;
+    AMBIENTDISPLAY_TILE = 2002;
 
     //END XPerience Constants
   }
