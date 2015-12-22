@@ -56,6 +56,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.systemui.R;
 
@@ -801,10 +802,12 @@ class GlobalScreenshot {
             }
 
             // Clear the notification
-            final NotificationManager nm =
-                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            final NotificationManager nm = 
+            	  (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             final int id = intent.getIntExtra(CANCEL_ID, 0);
             nm.cancel(id);
+
+            Toast.makeText(context, R.string.delete_screenshot_toast, Toast.LENGTH_SHORT).show();
         }
     }
 
