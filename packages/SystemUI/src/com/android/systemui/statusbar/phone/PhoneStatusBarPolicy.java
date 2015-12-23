@@ -129,6 +129,9 @@ public class PhoneStatusBarPolicy implements Callback {
             else if (action.equals(TelecomManager.ACTION_CURRENT_TTY_MODE_CHANGED)) {
                 updateTTY(intent);
             }
+            else if (action.equals(Intent.ACTION_HEADSET_PLUG)) {
+                updateHeadset(intent);
+            }
         }
     };
 
@@ -166,6 +169,7 @@ public class PhoneStatusBarPolicy implements Callback {
         filter.addAction(AudioManager.INTERNAL_RINGER_MODE_CHANGED_ACTION);
         filter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
         filter.addAction(TelecomManager.ACTION_CURRENT_TTY_MODE_CHANGED);
+        filter.addAction(Intent.ACTION_HEADSET_PLUG);
         mContext.registerReceiver(mIntentReceiver, filter, null, mHandler);
 
         // listen for user / profile change.
@@ -483,6 +487,31 @@ public class PhoneStatusBarPolicy implements Callback {
         @Override
         public void onCastDevicesChanged() {
             updateCast();
+        }
+    };
+
+    private final void updateHeadset(Intent intent) {
+        final String action = intent.getAction();
+        final int state = intent.getIntExtra("state", 4);
+        final int mic = intent.getIntExtra("microphone", 4);
+
+       switch (state) {
+        case 0:
+            try{
+                mService.setIconVisibility("headset", false);
+            } catch (Exception e) {
+                //Log.i("StatusBar Headset", "frist time to run");
+                }
+        break;
+        case 1:
+            if (mic == 1)
+                mService.setIcon("headset", R.drawable.stat_sys_headset_mic, 0,
+                    mContext.getResources().getString(R.string.headset_enabled));
+            else
+                mService.setIcon("headset", R.drawable.stat_sys_headset, 0,
+                    mContext.getResources().getString(R.string.headset_enabled));
+            mService.setIconVisibility("headset", true);
+        break;
         }
     };
 
