@@ -28,4 +28,6 @@
     <!-- Screenshot Delete Toast -->
     <string name="delete_screenshot_toast">Screenshot Deleted</string>
 
+    <!-- Headset enabled title -->
+    <string name="headset_enabled">Headset Enabled.</string>
 </resources>

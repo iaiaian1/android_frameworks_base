@@ -4117,7 +4117,5 @@
     <!-- Used to replace a range of characters in text that is too wide
          for the space allocated to it (two dots). -->
     <string name="ellipsis_two_dots">\u2025</string>
-    
-    <!-- Headset enabled title -->
-    <string name="headset_enabled">Headset Enabled.</string>
+
 </resources>
