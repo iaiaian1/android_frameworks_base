@@ -122,7 +122,6 @@ import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -816,13 +815,8 @@ public final class ActivityThread {
                 // Tell the VMRuntime about the application, unless it is shared
                 // inside a process.
                 if (!sharable) {
-                    final List<String> codePaths = new ArrayList<>();
-                    codePaths.add(appInfo.sourceDir);
-                    if (appInfo.splitSourceDirs != null) {
-                        Collections.addAll(codePaths, appInfo.splitSourceDirs);
-                    }
                     VMRuntime.registerAppInfo(appInfo.packageName, appInfo.dataDir,
-                            codePaths.toArray(new String[codePaths.size()]));
+                                            appInfo.processName);
                 }
             }
 
