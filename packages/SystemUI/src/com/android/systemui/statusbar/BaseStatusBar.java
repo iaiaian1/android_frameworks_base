@@ -2412,7 +2412,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             }
             boolean targetKilled = false;
             final ActivityManager am = (ActivityManager) mContext
-                    .getSystemService(Activity.ACTIVITY_SERVICE);
+                    .getSystemService(mContext.ACTIVITY_SERVICE);
             List<RunningAppProcessInfo> apps = am.getRunningAppProcesses();
             for (RunningAppProcessInfo appInfo : apps) {
                 int uid = appInfo.uid;
@@ -2449,7 +2449,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         String packageName;
         final Intent intent = new Intent(Intent.ACTION_MAIN);
         final ActivityManager am = (ActivityManager) mContext
-                .getSystemService(Activity.ACTIVITY_SERVICE);
+                .getSystemService(mContext.ACTIVITY_SERVICE);
         String defaultHomePackage = "com.android.launcher";
         intent.addCategory(Intent.CATEGORY_HOME);
         final ResolveInfo res = mContext.getPackageManager().resolveActivity(intent, 0);
