@@ -433,4 +433,5 @@
     <string name="enable_bluetooth_title" msgid="5027037706500635269">"BluetoothをONにしますか？"</string>
     <string name="enable_bluetooth_message" msgid="9106595990708985385">"タブレットでキーボードに接続するには、最初にBluetoothをONにする必要があります。"</string>
     <string name="enable_bluetooth_confirmation_ok" msgid="6258074250948309715">"ONにする"</string>
+    <string name="hotspot_apm_message">"機内モードが有効になっている間にモバイルネットワークに接続できません。機内モードを無効にして再試行してください。"</string>
 </resources>
