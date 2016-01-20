@@ -3772,6 +3772,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         mQSPanel.getHost().setCustomTileListenerService(null);
         mQSPanel.setTiles(new ArrayList<QSTile<?>>());
+        mQSPanel.setListening(false);
 
         makeStatusBarView();
         repositionNavigationBar();
