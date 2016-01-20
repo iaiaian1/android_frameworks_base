@@ -271,8 +271,4 @@ public class KeyguardStatusBarView extends RelativeLayout {
                 "status_bar_show_carrier"), false, mObserver);
     }
 
-    @Override
-    public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-    }
 }
