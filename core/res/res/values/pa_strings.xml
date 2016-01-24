@@ -30,7 +30,4 @@
     <!-- [CHAR LIMIT=40] Title of dialog that is shown when performing a system install. -->
     <string name="android_installing_title">Android is installing\u2026</string>
 
-    <!-- label for item that takes On-The-Go in the phone options dialog -->
-    <string name="global_action_onthego">On-The-Go Mode</string>
-
-</resources>
+  </resources>
