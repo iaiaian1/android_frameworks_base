@@ -20,6 +20,6 @@
     <string name="xperience_start_title">XPerience está iniciando\u2026</string>
 
      <!-- [CHAR LIMIT=40] Title of dialog that is shown when performing a system upgrade. -->
-    <string name="android_upgrading_title">XPerience está actualizando\u2026</string>
+    <string name="xperience_upgrading_title">XPerience está actualizando\u2026</string>
 
 </resources>
