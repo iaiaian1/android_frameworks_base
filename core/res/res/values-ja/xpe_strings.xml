@@ -17,9 +17,9 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
      <!-- [CHAR LIMIT=40] Title of dialog that is shown when system is starting. -->
-    <string name="xperience_start_title">XPerience それは開始されています</string>
+    <string name="xperience_start_title">XPerience それは開始されています\u2026</string>
 
      <!-- [CHAR LIMIT=40] Title of dialog that is shown when performing a system upgrade. -->
-    <string name="xperience_upgrading_title">Xperience あなたがアップグレードしています</string>
+    <string name="xperience_upgrading_title">Xperience あなたがアップグレードしています\u2026</string>
 
 </resources>
