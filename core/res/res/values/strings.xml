@@ -3728,6 +3728,12 @@
 
     <!-- [CHAR LIMIT=40] Title of dialog that is shown when system is starting. -->
     <string name="android_start_title">Android is starting\u2026</string>
+    
+         <!-- [CHAR LIMIT=40] Title of dialog that is shown when system is starting. -->
+    <string name="xperience_start_title">XPerience is starting</string>
+
+     <!-- [CHAR LIMIT=40] Title of dialog that is shown when performing a system upgrade. -->
+    <string name="xperience_upgrading_title">XPerience is upgrading</string>
 
     <!-- [CHAR LIMIT=NONE] Message shown in upgrading dialog when doing an fstrim. -->
     <string name="android_upgrading_fstrim">Optimizing storage.</string>
