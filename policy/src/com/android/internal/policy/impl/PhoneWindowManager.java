@@ -6712,7 +6712,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 		  mBootMsgDialog.setMessage(Html.fromHtml(
                                                          "Powered By <b>XPerience</b>\n\n<br><b><font color=\"#" + randomColor + "\">" +
                                                             msg +
-							 "Please do not power off.</font></b>"));
+							 "\n\nPlease do not power off.</font></b>"));
 
             }
         });
