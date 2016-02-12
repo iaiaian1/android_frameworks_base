@@ -16,6 +16,7 @@
 */
 -->
 <resources>
+
   <!-- OnTheSpot settings confirmation dialog -->
   <java-symbol type="string" name="setting_confirmation_always" />
   <java-symbol type="string" name="setting_confirmation_just_once" />
@@ -25,10 +26,7 @@
   <java-symbol type="string" name="immersive_mode_confirmation_title" />
   <java-symbol type="string" name="immersive_mode_confirmation_message" />
 
-    <!-- Safe Headset Volume Dialog -->
-    <string name="safe_headset_warning_title">Safe Headset Volume</string>
-    <string name="safe_headset_warning_message">Would you like to disable the recommended volume level warning ?</string>
-
     <!-- Doze Settings -->
     <java-symbol type="bool" name="config_dozeUseAccelerometer" />
+
 </resources>

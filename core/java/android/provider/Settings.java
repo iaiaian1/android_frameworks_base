@@ -3654,17 +3654,11 @@ public final class Settings {
          */
         public static final String STATUS_BAR_CUSTOM_HEADER_PROVIDER = "status_bar_custom_header_provider";
 
-        /**
-         * Disable Immersive Message
-         * @hide
-         */
+       /**
+        * Disable Immersive Message
+        * @hide
+        */
         public static final String DISABLE_IMMERSIVE_MESSAGE = "disable_immersive_message";
-
-        /**
-         * Safe Headset Volume disabler option
-         * @hide
-         */
-        public static final String SAFE_HEADSET_VOLUME = "safe_headset_volume";
 
 	/*
          * Quick settings quick pull down option
@@ -3791,9 +3785,7 @@ public final class Settings {
          */
         public static final String[] SETTINGS_TO_RESET = {
 	    QUICK_SETTINGS_QUICK_PULL_DOWN,
-            DISABLE_IMMERSIVE_MESSAGE,
-            SAFE_HEADSET_VOLUME
-
+            DISABLE_IMMERSIVE_MESSAGE
         };
 
         // Settings moved to Settings.Secure

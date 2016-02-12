@@ -25,7 +25,6 @@
     <!-- OnTheSpot: Message of the OTS dialog for the Quick Settings quick pull-down feature. [CHAR LIMIT=NONE] -->
     <string name="quick_settings_quick_pull_down_message">Allow the Quick Settings panel to expand automatically when pulling down notifications from the side of the screen.</string>
     <string name="disable_immersive_message" translatable="false">@*android:string/immersive_mode_confirmation_title</string>
-    <string name="safe_headset_volume" translatable="false">@*android:string/safe_headset_warning_title</string>
 
     <!-- Quick pulldown confirmation dialog -->
     <string name="quick_settings_quick_pull_down_title">Quick pull down</string>
