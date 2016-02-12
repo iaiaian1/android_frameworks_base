@@ -1397,11 +1397,9 @@ public class NotificationPanelView extends PanelView implements
         if (mQsExpanded) {
             return onHeader || (mScrollView.isScrolledToBottom() && yDiff < 0) && isInQsArea(x, y);
         } else {
-            return onHeader || showQsOverride;
             if (Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN, 0) != 2) {
-                    return onHeader || onRightHotRegion || (!mKeyguardShowing
-                            && mNotificationStackScroller.getNotGoneChildCount() == 0);
+		    return onHeader || showQsOverride;
             } else {
                 return false;
             }
