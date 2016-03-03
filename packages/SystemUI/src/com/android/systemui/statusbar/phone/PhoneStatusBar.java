@@ -928,7 +928,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     R.id.header_debug_info);
             mNotificationPanelDebugText.setVisibility(View.VISIBLE);
         }
-
+	
+	addAppCircleSidebar();
+	
         try {
             boolean showNav = mWindowManagerService.hasNavigationBar();
             if (DEBUG) Log.v(TAG, "hasNavigationBar=" + showNav);
