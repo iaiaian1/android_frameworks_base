@@ -3685,10 +3685,10 @@ public final class Settings {
          */
         public static final String DOZE_BRIGHTNESS = "doze_brightness";
 
-        /**  
+        /**
          * AOKP Custom System Animations
          * @hide
-         */  
+         */
         public static final String[] ACTIVITY_ANIMATION_CONTROLS = new String[] {
                 "activity_open",
                 "activity_close",
@@ -3701,7 +3701,7 @@ public final class Settings {
                 "wallpaper_intra_open",
                 "wallpaper_intra_close",
                 "task_open_behind",
-        };  
+        };
         public static final String ANIMATION_CONTROLS_DURATION = "animation_controls_duration";
         public static final String ANIMATION_CONTROLS_EXIT_ONLY = "animation_controls_exit_only";
         public static final String ANIMATION_CONTROLS_REVERSE_EXIT = "animation_controls_reverse_exit";
@@ -4012,7 +4012,7 @@ public final class Settings {
          * @hide
          */
         public static final String APP_CIRCLE_BAR_SHOW_TRIGGER = "app_circle_bar_show_trigger";
-        
+
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
@@ -8625,6 +8625,13 @@ public final class Settings {
          * @hide
          */
         public static final String WIFI_AUTO_PRIORITIES_CONFIGURATION = "wifi_auto_priority";
+
+        /**
+         * Whether to ignore the representation of outgoing calls set by the network.
+         *
+         * @hide
+         */
+         public static final String CONNECTED_LINE_IDENTIFICATION = "connected_line_identification";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
