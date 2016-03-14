@@ -120,7 +120,7 @@
     <color name="datepicker_default_view_animator_color_material_dark">#ff303030</color>
 
 <!--XPerienced COLORS-->
-    <color name="primary2">#B71C1C</color>
-    <color name="primary_dark2">#C62828</color>
+    <color name="primary2">#a0294c</color>
+    <color name="primary_dark2">#ae323b</color>
 
 </resources>
