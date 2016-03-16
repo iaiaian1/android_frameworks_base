@@ -219,13 +219,6 @@ public class UsageStatsService extends SystemService implements
                     Context.DISPLAY_SERVICE);
             mPowerManager = getContext().getSystemService(PowerManager.class);
 
-<<<<<<< HEAD
-            mScreenOnSystemTimeSnapshot = System.currentTimeMillis();
-            synchronized (this) {
-                mScreenOnTime = readScreenOnTimeLocked();
-            }
-=======
->>>>>>> android-6.0.1_r22
             mDisplayManager.registerDisplayListener(mDisplayListener, mHandler);
             synchronized (this) {
                 updateDisplayLocked();
@@ -1450,3 +1443,4 @@ public class UsageStatsService extends SystemService implements
         }
     }
 }
+
