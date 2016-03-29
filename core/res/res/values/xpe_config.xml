@@ -44,25 +44,31 @@
         <item>screenshot</item>
     </string-array>
 
-     <!-- The list of vendor package signatures that should also be considered
-          platform signatures, specifically for use on devices with a vendor partition. -->
-      <string-array name="config_vendorPlatformSignatures">
-      </string-array>
+    <!-- The list of vendor package signatures that should also be considered
+        platform signatures, specifically for use on devices with a vendor partition. -->
+    <string-array name="config_vendorPlatformSignatures">
+    </string-array>
 
-  <!-- Does the device supports multicolor LED -->
-  <bool name="config_multiColorNotificationLed">false</bool>
+    <!-- Does the device supports multicolor LED -->
+    <bool name="config_multiColorNotificationLed">false</bool>
 
-  <!-- Can the LED pulse ? -->
+    <!-- Is the battery LED intrusive? Used to decide if there should be a disable option -->
+    <bool name="config_intrusiveBatteryLed">false</bool>
+
     <!-- Does the battery LED support multiple colors? Used to decide if the user can change the colors -->
-  <bool name="config_ledCanPulse">true</bool>
+    <bool name="config_multiColorBatteryLed">false</bool>
+
+    <!-- Can the LED pulse ? -->
+    <!-- Does the battery LED support multiple colors? Used to decide if the user can change the colors -->
+    <bool name="config_ledCanPulse">true</bool>
 
     <!-- Does the device supports fast charging -->
-  <bool name="config_FastChargingLedSupported">false</bool>
+    <bool name="config_FastChargingLedSupported">false</bool>
 
-  <!-- Default value for led color when battery is low on charge -->
-  <integer name="config_notificationsFastBatteryARGB">0xFF0000FF</integer>
+    <!-- Default value for led color when battery is low on charge -->
+    <integer name="config_notificationsFastBatteryARGB">0xFF0000FF</integer>
 
-   <!-- Ambient music -->
-   <bool name="config_canForceDozeNotifications">true</bool>
+    <!-- Ambient music -->
+    <bool name="config_canForceDozeNotifications">true</bool>
   
 </resources>

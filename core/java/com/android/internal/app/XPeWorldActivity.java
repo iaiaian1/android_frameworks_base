@@ -95,7 +95,7 @@ public class XPeWorldActivity extends Activity {
         tv.setGravity(Gravity.CENTER);
         tv.setTransformationMethod(new AllCapsTransformationMethod(this));
         String xpeVersion = SystemProperties.get("ro.xpe.version");
-        paVersion = paVersion.replaceAll("([0-9\\.]+?)-.*", "$1");
+        xpeVersion = xpeVersion.replaceAll("([0-9\\.]+?)-.*", "$1");
         tv.setText("XPerience " + xpeVersion);
         tv.setVisibility(View.INVISIBLE);
 
