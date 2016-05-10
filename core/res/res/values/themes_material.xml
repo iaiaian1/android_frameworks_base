@@ -1236,10 +1236,10 @@ please see themes_device_defaults.xml.
     <!-- Default theme for Settings and activities launched from Settings. -->
     <style name="Theme.Material.Settings" parent="Theme.Material.Light.DarkActionBar">
         <item name="colorBackground">@color/white</item>
-        <item name="colorPrimary">@color/primary2</item>
-        <item name="colorPrimaryDark">@color/primary_dark2</item>
+        <item name="colorPrimary">@color/material_blue_grey_900</item>
+        <item name="colorPrimaryDark">@color/material_blue_grey_950</item>
         <item name="colorAccent">@color/material_deep_teal_500</item>
-	<item name="navigationBarColor">@color/primary_dark2</item>
+	<item name="navigationBarColor">@color/material_blue_grey_950</item>
 
         <item name="dialogTheme">@style/Theme.Material.Settings.Dialog</item>
         <item name="alertDialogTheme">@style/Theme.Material.Settings.Dialog.Alert</item>
