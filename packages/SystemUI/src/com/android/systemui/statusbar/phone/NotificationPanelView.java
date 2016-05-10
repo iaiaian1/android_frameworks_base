@@ -750,14 +750,24 @@ public class NotificationPanelView extends PanelView implements
                 && shouldQuickSettingsIntercept(event.getX(), event.getY(), -1, false);
         if ((twoFingerQsEvent || oneFingerQsOverride)
                 && event.getY(event.getActionIndex()) < mStatusBarMinHeight) {
-            SettingConfirmationHelper helper = new SettingConfirmationHelper();
-            helper.showConfirmationDialogForSetting(
-                mContext,
-                mContext.getString(R.string.quick_settings_quick_pull_down_title),
-                mContext.getString(R.string.quick_settings_quick_pull_down_message),
-                mContext.getResources().getDrawable(R.drawable.quick_pull_down),
+            // This will run even when OTS is NOT_SET. See shouldQuickSettingsIntercept.
+            SettingConfirmationHelper.request(
+                getContext(),
                 Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN,
-                null);
+                getContext().getString(R.string.quick_settings_quick_pull_down_title),
+                getContext().getString(R.string.quick_settings_quick_pull_down_message),
+                new SettingConfirmationHelper.OnSelectListener() {
+
+                    @Override
+                    public void onSelect(final boolean enabled) {
+                        if (!enabled) {
+                            closeQs();
+                        }
+                    }
+
+                }
+            );
+
             mQsExpandImmediate = true;
             requestPanelHeightUpdate();
 
@@ -1397,12 +1407,13 @@ public class NotificationPanelView extends PanelView implements
         if (mQsExpanded) {
             return onHeader || (mScrollView.isScrolledToBottom() && yDiff < 0) && isInQsArea(x, y);
         } else {
-            if (Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN, 0) != 2) {
-		    return onHeader || showQsOverride;
-            } else {
-                return false;
-            }
+            // The OTS setting will take effect if, and only if, the value of it is set to NEVER.
+            // Otherwise, even in the case of NOT_SET, we assume the user is okay with this.
+            final boolean userOkay = Settings.System.getInt(getContext().getContentResolver(),
+                    Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN,
+                    SettingConfirmationHelper.NOT_SET) != SettingConfirmationHelper.NEVER;
+            return userOkay && (onHeader || showQsOverride);
+
         }
     }
 
