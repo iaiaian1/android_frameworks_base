@@ -56,7 +56,7 @@ public class SettingConfirmationHelper {
      * Initializes the helper object. Should never be used as all interaction with this class
      * is supposed to be static only.
      */
-    private SettingConfirmationHelper() {
+    public SettingConfirmationHelper() {
         // no-op
     }
     
