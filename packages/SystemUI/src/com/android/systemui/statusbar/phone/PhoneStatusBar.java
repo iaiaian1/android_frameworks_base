@@ -1342,6 +1342,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             BatteryMeterView bmv = (BatteryMeterView) mStatusBarView.findViewById(R.id.battery);
             bmv.setVisibility(View.VISIBLE);
         }
+        mNotificationPanel.setWeatherController(mWeatherController);
 
         PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         mBroadcastReceiver.onReceive(mContext,
