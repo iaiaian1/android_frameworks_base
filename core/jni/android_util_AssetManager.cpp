@@ -131,6 +131,7 @@ jint copyValue(JNIEnv* env, jobject outValue, const ResTable* table,
     return block;
 }
 
+/*
 // This is called by zygote (running as user root) as part of preloadResources.
 static void verifySystemIdmaps(const char* overlay_dir)
 {
@@ -215,7 +216,7 @@ static void verifySystemIdmaps(const char* overlay_dir)
             waitpid(pid, NULL, 0);
             break;
     }
-}
+}*/
 
 // ----------------------------------------------------------------------------
 
@@ -2087,6 +2088,7 @@ static jintArray android_content_AssetManager_getStyleAttributes(JNIEnv* env, jo
 
 static void android_content_AssetManager_init(JNIEnv* env, jobject clazz, jboolean isSystem)
 {
+<<<<<<< HEAD
     if (isSystem) {
         // Load frameworks-res.apk's overlay through regionalization environment
         if (Environment::isSupported()) {
@@ -2103,6 +2105,8 @@ static void android_content_AssetManager_init(JNIEnv* env, jobject clazz, jboole
 
         verifySystemIdmaps(AssetManager::OVERLAY_DIR);
     }
+=======
+>>>>>>> ca41a03... OMS7-N: Integrate OverlayManagerService into framework [3/11]
     AssetManager* am = new AssetManager();
     if (am == NULL) {
         jniThrowException(env, "java/lang/OutOfMemoryError", "");
