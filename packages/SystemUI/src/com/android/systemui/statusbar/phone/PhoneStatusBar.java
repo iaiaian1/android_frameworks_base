@@ -5047,6 +5047,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mWakeUpTouchLocation = null;
         mStackScroller.setAnimationsEnabled(false);
         updateVisibleToUser();
+        if (mStatusBarView != null && mStatusBarView.shouldEnableSwift())
+            mStatusBarView.clearSwiftHandlerCallbacks();
         if (mLaunchCameraOnFinishedGoingToSleep) {
             mLaunchCameraOnFinishedGoingToSleep = false;
 
@@ -5066,6 +5068,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mStackScroller.setAnimationsEnabled(true);
         mNotificationPanel.setTouchDisabled(false);
         updateVisibleToUser();
+        if (mStatusBarView != null && mStatusBarView.shouldEnableSwift())
+            mStatusBarView.initSwiftHandlerCallbacks();
     }
 
     public void onScreenTurningOn() {
