@@ -104,7 +104,8 @@
             android:background="@drawable/somc_sys_battery_percent_am"
             android:paddingStart="@dimen/header_battery_somc_expanded"
             android:gravity="center|start"
-            android:importantForAccessibility="noHideDescendants"/>
+            android:importantForAccessibility="noHideDescendants"
+            android:visibility="gone"/>
         <com.android.systemui.DockBatteryLevelTextView android:id="@+id/dock_battery_level_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
