@@ -50,4 +50,11 @@
     <dimen name="app_sidebar_listview_width">160dp</dimen>
     <dimen name="app_sidebar_icon_width">72dp</dimen>
     <dimen name="app_sidebar_icon_height">72dp</dimen>
+    
+    <!-- Margin on the left side of the battery somc in the header. -->
+    <dimen name="header_battery_somc_expanded">4dp</dimen>
+
+    <!-- Margin on the left side of the battery somc when on Keyguard. -->
+    <dimen name="header_battery_somc_keyguard">4dp</dimen>
+
 </resources>
