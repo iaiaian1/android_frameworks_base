@@ -44,4 +44,6 @@
         <item>screenshot</item>
     </string-array>
 
+    <bool name="config_allowNotificationIconTextTinting">true</bool>
+
 </resources>
