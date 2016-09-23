@@ -300,6 +300,8 @@ class FileDescriptorInfo {
         && path.find("/../") == std::string::npos) {
       return true;
     }
+    return false;
+  }
 
     // All regular files that are placed under this path are whitelisted automatically.
     static const std::string kZygoteWhitelistPath = "/vendor/zygote_whitelist/";
