@@ -240,7 +240,7 @@ public final class ShutdownThread extends Thread {
                 confirmDialogBuilder.setMessage(resourceId);
             } else {
                 confirmDialogBuilder
-                      .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_icons,
+                      .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options,
                               0, null);
             }
 
