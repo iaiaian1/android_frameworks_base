@@ -109,7 +109,7 @@ wifi,cell,battery,dnd,flashlight,rotation,bt,airplane,nfc,location,hotspot,inver
 
     <!-- The default tiles to display in QuickSettings -->
     <string name="quick_settings_tiles_extra" translatable="false">        
-        screenshot,sync,reboot,usb_tether,music,ime,caffeine,compass
+        screenshot,sync,reboot,usb_tether,music,ime,caffeine,compass,pie
     </string>
 
     <!-- The tiles to display in QuickSettings -->

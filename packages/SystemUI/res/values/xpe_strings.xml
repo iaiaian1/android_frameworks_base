@@ -89,4 +89,15 @@ C42.897,4,44,5.103,44,6.464v49.072C44,56.897,42.897,58,41.536,58z M 24 0 H 34 V 
     <string name="disable_immersive_message" translatable="false">@*android:string/immersive_mode_confirmation_title</string>
     <string name="safe_headset_volume" translatable="false">@*android:string/safe_headset_warning_title</string>
 
+
+    <!-- Pie controls -->
+    <string name="pie_date_format">EEEE, dd MMMM yyyy</string>
+    <string name="pie_hour_format_12">hh:mm</string>
+    <string name="pie_hour_format_24">HH:mm</string>
+    <string name="pie_am_pm">a</string>
+    <string name="pie_state_name">Pie controls</string>
+    <string name="pie_state_summary">Use pie controls while in immersive mode</string>
+    <string name="pie_battery_level">"BATTERY LEVEL "</string>
+    <string name="quick_settings_pie">Pie</string>
+
 </resources>
