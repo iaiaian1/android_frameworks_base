@@ -43,4 +43,9 @@
     <!-- app sidebar item text shadow color -->
 <color name="sidebar_item_text_shadow_color">#ff000000</color>
 
+    <!-- Floating action button -->
+    <color name="fab_color">#ffffffff</color>
+    <color name="fab_color_ripple">#ff7a7a7a</color>
+    <color name="floating_action_button_icon_color">@*android:color/accent_material_dark</color>
+
 </resources>
