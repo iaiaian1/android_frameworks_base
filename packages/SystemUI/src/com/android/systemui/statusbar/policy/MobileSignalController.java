@@ -663,12 +663,6 @@ public class MobileSignalController extends SignalController<
             mCurrentState.networkName = mServiceState.getOperatorAlphaShort();
         }
 
-        if (!showLongOperatorName() && mServiceState != null && !TextUtils.isEmpty(
-                mServiceState.getOperatorAlphaShort())) {
-            mCurrentState.networkNameData = mServiceState.getOperatorAlphaShort()
-                            + " " + getNetworkClassString(mServiceState);
-        }
-
         if (mConfig.readIconsFromXml) {
             mCurrentState.voiceLevel = getVoiceSignalLevel();
         }
