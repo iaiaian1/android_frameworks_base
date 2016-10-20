@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2006 The Android Open Source Project
+     Copyright 2011-2018 The XPerience Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -27,6 +27,13 @@
     <!-- Pure Tuner Theme-->
     <style name="ExTunerSettings" parent="@android:style/Theme.Material.Settings">
         <item name="preferenceTheme">@style/TunerPreferenceTheme</item>
+    </style>
+
+    <!-- Custom Carrier Label -->
+    <style name="TextAppearance.StatusBar.CarrierLabel" parent="@*android:style/TextAppearance.StatusBar.Icon">
+        <item name="android:textSize">@dimen/status_bar_carrier_height</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/status_bar_carrier_color</item>
     </style>
 
 </resources>

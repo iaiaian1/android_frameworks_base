@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.hardware.input.InputManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -37,6 +39,7 @@ import android.view.KeyEvent;
 
 import com.android.internal.statusbar.IStatusBarService;
 
+import java.util.Locale;
 import java.util.List;
 
 /**
@@ -141,6 +144,11 @@ public class XPerienceUtils {
     // Check to see if device supports an alterative ambient display package
     public static boolean hasAltAmbientDisplay(Context context) {
         return context.getResources().getBoolean(com.android.internal.R.bool.config_alt_ambient_display);
+    }
+
+    public static boolean isChineseLanguage() {
+       return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
+               Locale.CHINESE.getLanguage());
     }
 
 }
