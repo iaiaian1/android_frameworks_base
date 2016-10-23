@@ -4448,6 +4448,15 @@ public final class Settings {
          */
         public static final String FLASHLIGHT_ON_CALL = "flashlight_on_call";
 
+         /*
+         * Whether allowing pocket service to register sensors and dispatch informations.
+         *   0 = disabled
+         *   1 = enabled
+         * @author Carlo Savignano
+         * @hide
+         */
+        public static final String POCKET_JUDGE = "pocket_judge";
+
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
@@ -4636,6 +4645,8 @@ public final class Settings {
             PRIVATE_SETTINGS.add(SMART_PIXELS_ON_POWER_SAVE);
             PRIVATE_SETTINGS.add(WEATHER_LOCKSCREEN_UNIT);
             PRIVATE_SETTINGS.add(ONE_HAND_MODE_ENABLED);
+            // Pocket mode handler.
+            PRIVATE_SETTINGS.add(POCKET_JUDGE);
         }
 
         /**
