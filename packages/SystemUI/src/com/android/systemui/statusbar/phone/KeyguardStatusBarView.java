@@ -62,6 +62,7 @@ public class KeyguardStatusBarView extends RelativeLayout
 
     private BatteryController mBatteryController;
     private KeyguardUserSwitcher mKeyguardUserSwitcher;
+    private UserSwitcherController mUserSwitcherController;
 
     private int mSystemIconsSwitcherHiddenExpandedMargin;
     private View mSystemIconsContainer;
@@ -156,17 +157,6 @@ public class KeyguardStatusBarView extends RelativeLayout
             addView(mMultiUserSwitch, 0);
         } else if (mMultiUserSwitch.getParent() == this && mKeyguardUserSwitcherShowing) {
             removeView(mMultiUserSwitch);
-        }
-
-        if (mKeyguardUserSwitcher == null) {
-            // If we have no keyguard switcher, the screen width is under 600dp. In this case,
-            // we don't show the multi-user avatar unless there is more than 1 user on the device.
-            if (mUserSwitcherController != null
-                    && mUserSwitcherController.getSwitchableUserCount() > 1) {
-                mMultiUserSwitch.setVisibility(View.VISIBLE);
-            } else {
-                mMultiUserSwitch.setVisibility(View.GONE);
-            }
         }
         mBatteryLevel.setVisibility(
                 mBatteryCharging || mShowBatteryText ? View.VISIBLE : View.GONE);
