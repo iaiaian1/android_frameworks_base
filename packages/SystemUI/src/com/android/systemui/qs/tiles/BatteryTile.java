@@ -46,6 +46,9 @@ import com.android.systemui.statusbar.policy.BatteryController;
 
 import java.text.NumberFormat;
 
+import cyanogenmod.providers.CMSettings;
+import com.android.systemui.BatteryMeterView;
+
 public class BatteryTile extends QSTile<QSTile.State> implements BatteryController.BatteryStateChangeCallback {
 
     private final BatteryController mBatteryController;
@@ -64,8 +67,8 @@ public class BatteryTile extends QSTile<QSTile.State> implements BatteryControll
     public BatteryTile(Host host) {
         super(host);
         mBatteryController = host.getBatteryController();
-        mBatteryStyle = Settings.Secure.getInt(host.getContext().getContentResolver(),
-                Settings.Secure.STATUS_BAR_BATTERY_STYLE, 0);
+        mBatteryStyle = CMSettings.System.getInt(host.getContext().getContentResolver(),
+                CMSettings.System.STATUS_BAR_BATTERY_STYLE, 0);
         if (mBatteryStyle == BATTERY_STYLE_HIDDEN || mBatteryStyle == BATTERY_STYLE_TEXT) {
             mBatteryStyle = 0;
         }
@@ -126,8 +129,8 @@ public class BatteryTile extends QSTile<QSTile.State> implements BatteryControll
         state.icon = new Icon() {
             @Override
             public Drawable getDrawable(Context context) {
-                mBatteryStyle = Settings.Secure.getInt(context.getContentResolver(),
-                        Settings.Secure.STATUS_BAR_BATTERY_STYLE, 0);
+                mBatteryStyle = CMSettings.System.getInt(context.getContentResolver(),
+                        CMSettings.System.STATUS_BAR_BATTERY_STYLE, 0);
                 if (mBatteryStyle == BATTERY_STYLE_HIDDEN || mBatteryStyle == BATTERY_STYLE_TEXT) {
                     mBatteryStyle = 0;
                 }
