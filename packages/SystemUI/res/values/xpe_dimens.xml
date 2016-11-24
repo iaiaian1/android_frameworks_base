@@ -33,4 +33,8 @@
 
     <!-- carrier label text height -->
     <dimen name="status_bar_carrier_height">14dp</dimen>
+
+    <!-- single handed mode threshold -->
+    <dimen name="navbar_single_hand_mode_horizontal_threshhold">90dp</dimen>
+    <dimen name="navbar_single_hand_mode_vertical_threshhold">48dp</dimen>
 </resources>
