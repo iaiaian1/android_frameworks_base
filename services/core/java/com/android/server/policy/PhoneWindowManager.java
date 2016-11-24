@@ -903,6 +903,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private CMHardwareManager mCMHardware;
     private boolean mClearedBecauseOfForceShow;
     private boolean mTopWindowIsKeyguard;
+    int mDesiredRotation = -1;
 
     private boolean mVolumeAnswerCall;
 
@@ -9279,6 +9280,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mTorchEnabled = false;
         }
     }
+<<<<<<< HEAD
 
     public void freezeOrThawRotation(int rotation) {
         mDesiredRotation = rotation;
@@ -9290,4 +9292,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.Global.SINGLE_HAND_MODE).isEmpty() ?
                     isLeft ? "left" : "right" : "");
     }
+=======
+    public void freezeOrThawRotation(int rotation) {
+        mDesiredRotation = rotation;
+    }
+>>>>>>> 467ecdf... Add new feature of One-hand UI Mode
 }

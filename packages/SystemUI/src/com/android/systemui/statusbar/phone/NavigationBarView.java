@@ -53,6 +53,7 @@ import com.android.systemui.singlehandmode.SlideTouchEvent;
 import com.android.systemui.statusbar.policy.BackButtonDrawable;
 import com.android.systemui.statusbar.policy.DeadZone;
 import com.android.systemui.tuner.TunerService;
+import com.android.systemui.singlehandmode.SlideTouchEvent;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;

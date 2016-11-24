@@ -46,7 +46,10 @@ import android.renderscript.ScriptIntrinsicBlur;
 import android.os.Handler;
 import android.graphics.PixelFormat;
 import android.widget.RelativeLayout;
+<<<<<<< HEAD
 import android.view.KeyCharacterMap;
+=======
+>>>>>>> 467ecdf... Add new feature of One-hand UI Mode
 import android.view.ViewGroup;
 import android.provider.Settings;
 import android.widget.ImageView;
@@ -107,6 +110,10 @@ final class SingleHandWindow {
     private boolean mPointDownOuter = false;
     private ImageView mImageView;
     private TextView overlay_display_window = null;
+<<<<<<< HEAD
+=======
+    private TextView singlehandmode_slide_hint = null;
+>>>>>>> 467ecdf... Add new feature of One-hand UI Mode
     private boolean mAttachedToWindow=false;
     private boolean mIsNeedRelayout=false;
     private boolean mIsBlurTopWindow = false;
@@ -136,10 +143,14 @@ final class SingleHandWindow {
     public void show() {
         if (!mWindowVisible) {
             if (!mIsBlurTopWindow) {
+<<<<<<< HEAD
                 int currentRotation = mDefaultDisplay.getRotation();
 
                 mService.freezeOrThawRotation(currentRotation == Surface.ROTATION_180 ?
                         Surface.ROTATION_180 : Surface.ROTATION_0);
+=======
+                mService.freezeOrThawRotation(Surface.ROTATION_0);
+>>>>>>> 467ecdf... Add new feature of One-hand UI Mode
                 mService.setSingleHandMode(mLeft ? 1 : 2);
                 mService.requestTraversal();
             }
@@ -241,6 +252,12 @@ final class SingleHandWindow {
         if (null != overlay_display_window) {
             overlay_display_window.setText(mContext.getResources().getString(com.android.internal.R.string.singlehandmode_click_hint_message));
         }
+<<<<<<< HEAD
+=======
+        if (null != singlehandmode_slide_hint) {
+            singlehandmode_slide_hint.setText(mContext.getResources().getString(com.android.internal.R.string.singlehandmode_slide_hint_message));
+        }
+>>>>>>> 467ecdf... Add new feature of One-hand UI Mode
     }
 
     void updateConfiguration() {
@@ -455,6 +472,37 @@ final class SingleHandWindow {
 
         show(imageView, visible);
 
+<<<<<<< HEAD
+=======
+        /* put slide_hint in correct place */
+        LinearLayout viewSlideHint = (LinearLayout)mWindowContent.findViewById(com.android.internal.R.id.slide_hint_area);
+        if (null != viewSlideHint) {
+            if (visible) {
+                ViewGroup.LayoutParams layoutParams = viewSlideHint.getLayoutParams();
+                if (mLeft)
+                    ((android.widget.RelativeLayout.LayoutParams)layoutParams).addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                else
+                    ((android.widget.RelativeLayout.LayoutParams)layoutParams).addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                viewSlideHint.setLayoutParams(layoutParams);
+                viewSlideHint.setVisibility(View.VISIBLE);
+            } else {
+                viewSlideHint.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        /* show/hide slide hint */
+        singlehandmode_slide_hint = (TextView)mWindowContent.findViewById(com.android.internal.R.id.singlehandmode_slide_hint_text);
+        show(singlehandmode_slide_hint, visible);
+        imageView = (ImageView) mWindowContent.findViewById(com.android.internal.R.id.slide_hint);
+        if (null != imageView) {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) imageView.getLayoutParams();
+            params.width = (int)(mDefaultDisplayInfo.logicalWidth * INITIAL_SCALE);
+            params.height = (int)(mContext.getResources().getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_height) * INITIAL_SCALE);
+            imageView.setLayoutParams(params);
+        }
+        show(imageView, visible);
+
+>>>>>>> 467ecdf... Add new feature of One-hand UI Mode
         /* update title, InputFlinger filter click_event depending on title */
         if (visible) {
             mWindowParams.setTitle("SingleMode_windowbg_hint");
