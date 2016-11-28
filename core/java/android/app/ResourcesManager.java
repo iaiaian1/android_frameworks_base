@@ -996,24 +996,6 @@ public class ResourcesManager {
                     r.setImpl(findOrCreateResourcesImplForKeyLocked(key));
                 }
             }
-        }
-
-        // Update any references to ResourcesImpl that require reloading for each Activity.
-        for (final ActivityResources activityResources : mActivityResourceReferences.values()) {
-            final int resCount = activityResources.activityResources.size();
-            for (int i = 0; i < resCount; i++) {
-                final Resources r = activityResources.activityResources.get(i).get();
-                if (r != null) {
-                    final ResourcesKey key = updatedResourceKeys.get(r.getImpl());
-                    if (key != null) {
-                        final ResourcesImpl impl = findOrCreateResourcesImplForKeyLocked(key);
-                        if (impl == null) {
-                            throw new Resources.NotFoundException("failed to load " + libAsset);
-                        }
-                        r.setImpl(impl);
-                    }
-                }
-            }
 
         }
     }
