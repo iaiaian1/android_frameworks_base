@@ -300,10 +300,7 @@ bool AssetManager::createIdmap(const char* targetApkPath, const char* overlayApk
                 ALOGW("failed to find resources.arsc in %s\n", ap.path.string());
                 goto exit;
             }
-            if (tables[i].add(assets[i]) != NO_ERROR) {
-                ALOGW("failed to add %s to resource table", paths[i].string());
-                goto exit;
-            }
+            tables[i].add(assets[i]);
         }
         ret = tables[0].createIdmap(tables[1], targetCrc, overlayCrc,
                 targetApkPath, overlayApkPath, (void**)outData, outSize) == NO_ERROR;
