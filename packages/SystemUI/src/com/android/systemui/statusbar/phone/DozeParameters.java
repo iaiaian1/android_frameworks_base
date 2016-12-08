@@ -18,8 +18,6 @@ package com.android.systemui.statusbar.phone;
 
 import android.content.Context;
 import android.os.SystemProperties;
-import android.os.UserHandle;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.MathUtils;
@@ -74,13 +72,6 @@ public class DozeParameters {
         }
     }
 
-    public boolean getOverwriteValue() {
-        final int values = Settings.System.getIntForUser(mContext.getContentResolver(),
-               Settings.System.DOZE_OVERWRITE_VALUE, 0,
-                    UserHandle.USER_CURRENT);
-        return values != 0;
-    }
-
     public boolean getDisplayStateSupported() {
         return getBoolean("doze.display.supported", R.bool.doze_display_state_supported);
     }
@@ -96,20 +87,10 @@ public class DozeParameters {
     }
 
     public int getPulseVisibleDuration() {
-        if (getOverwriteValue()) {
-            return Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.DOZE_PULSE_DURATION_VISIBLE, 3000,
-                    UserHandle.USER_CURRENT);
-        }
         return getInt("doze.pulse.duration.visible", R.integer.doze_pulse_duration_visible);
     }
 
     public int getPulseOutDuration() {
-        if (getOverwriteValue()) {
-            return Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.DOZE_PULSE_DURATION_OUT, 500,
-                    UserHandle.USER_CURRENT);
-        }
         return getInt("doze.pulse.duration.out", R.integer.doze_pulse_duration_out);
     }
 
@@ -121,12 +102,20 @@ public class DozeParameters {
         return SystemProperties.getBoolean("doze.vibrate.sigmotion", false);
     }
 
+    public boolean getPulseOnPickup() {
+        return getBoolean("doze.pulse.pickup", R.bool.doze_pulse_on_pick_up);
+    }
+
     public boolean getVibrateOnPickup() {
         return SystemProperties.getBoolean("doze.vibrate.pickup", false);
     }
 
     public boolean getProxCheckBeforePulse() {
         return getBoolean("doze.pulse.proxcheck", R.bool.doze_proximity_check_before_pulse);
+    }
+
+    public boolean getPulseOnNotifications() {
+        return getBoolean("doze.pulse.notifications", R.bool.doze_pulse_on_notifications);
     }
 
     public int getPickupVibrationThreshold() {
@@ -144,17 +133,6 @@ public class DozeParameters {
 
     private String getString(String propName, int resId) {
         return SystemProperties.get(propName, mContext.getString(resId));
-    }
-
-    public int getDozeBrightness() {
-	final int dozeBrightnessDefault = mContext.getResources().getInteger(
-                    com.android.internal.R.integer.config_screenBrightnessDoze);
-        if (getOverwriteValue()) {
-            return Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.DOZE_SCREEN_BRIGHTNESS, dozeBrightnessDefault,
-                    UserHandle.USER_CURRENT);
-        }
-        return dozeBrightnessDefault;
     }
 
     public boolean getPickupSubtypePerformsProxCheck(int subType) {
