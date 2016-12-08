@@ -73,7 +73,7 @@ public class KeyguardStatusBarView extends RelativeLayout
     private View mSystemIconsContainer;
 
     private boolean mShowBatteryText;
-    private boolean mForceBatteryText;
+    private Boolean mForceBatteryText;
 
     public KeyguardStatusBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -177,7 +177,6 @@ public class KeyguardStatusBarView extends RelativeLayout
                 mMultiUserSwitch.setVisibility(View.GONE);
             }
         }
-
         if (mForceBatteryText != null) {
             mBatteryLevel.setVisibility(mForceBatteryText ? View.VISIBLE : View.GONE);
         } else {
