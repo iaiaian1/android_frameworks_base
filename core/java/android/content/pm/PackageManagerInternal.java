@@ -185,4 +185,11 @@ public abstract class PackageManagerInternal {
      */
     public abstract void setResourceDirs(int userId, String packageName, String[] resourceDirs);
 
+    /**
+     * Gets whether the package was ever launched.
+     * @param packageName The package name.
+     * @param userId The user for which to check.
+     * @return Whether was launched.
+     */
+    public abstract boolean wasPackageEverLaunched(String packageName, int userId);
 }

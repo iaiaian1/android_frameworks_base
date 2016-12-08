@@ -82,6 +82,9 @@ interface IDevicePolicyManager {
     long getMaximumTimeToLock(in ComponentName who, int userHandle, boolean parent);
     long getMaximumTimeToLockForUserAndProfiles(int userHandle);
 
+    void setRequiredStrongAuthTimeout(in ComponentName who, long timeMs, boolean parent);
+    long getRequiredStrongAuthTimeout(in ComponentName who, int userId, boolean parent);
+
     void lockNow(boolean parent);
 
     void wipeData(int flags);
@@ -307,4 +310,7 @@ interface IDevicePolicyManager {
     void setDeviceProvisioningConfigApplied();
 
     boolean requireSecureKeyguard(int userHandle);
+
+    void setBackupServiceEnabled(in ComponentName admin, boolean enabled);
+    boolean isBackupServiceEnabled(in ComponentName admin);
 }

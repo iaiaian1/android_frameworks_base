@@ -52,7 +52,6 @@ static const char* kPathWhitelist[] = {
   "/dev/null",
   "/dev/socket/zygote",
   "/dev/socket/zygote_secondary",
-  "/system/etc/event-log-tags",
   "/sys/kernel/debug/tracing/trace_marker",
   "/system/framework/framework-res.apk",
   "/dev/urandom",
@@ -62,6 +61,7 @@ static const char* kPathWhitelist[] = {
 #ifdef PATH_WHITELIST_EXTRA_H
 PATH_WHITELIST_EXTRA_H
 #endif
+
 };
 
 static const char* kFdPath = "/proc/self/fd";
@@ -262,6 +262,7 @@ class FileDescriptorInfo {
         path.compare(path.size() - kJarSuffix.size(), kJarSuffix.size(), kJarSuffix) == 0) {
       return true;
     }
+<<<<<<< HEAD
 
     static const std::string kResourceCachePrefix = "/data/resource-cache/";
     static const std::string kIdmapSuffix = "idmap";
@@ -282,6 +283,8 @@ class FileDescriptorInfo {
         path.compare(path.size() - kApkSuffix.size(), kApkSuffix.size(), kApkSuffix) == 0) {
         return true;
     }
+=======
+>>>>>>> android-7.1.1_r4
     return false;
   }
 
