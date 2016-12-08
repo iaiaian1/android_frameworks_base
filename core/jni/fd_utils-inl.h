@@ -262,7 +262,6 @@ class FileDescriptorInfo {
         path.compare(path.size() - kJarSuffix.size(), kJarSuffix.size(), kJarSuffix) == 0) {
       return true;
     }
-<<<<<<< HEAD
 
     static const std::string kResourceCachePrefix = "/data/resource-cache/";
     static const std::string kIdmapSuffix = "idmap";
@@ -283,8 +282,7 @@ class FileDescriptorInfo {
         path.compare(path.size() - kApkSuffix.size(), kApkSuffix.size(), kApkSuffix) == 0) {
         return true;
     }
-=======
->>>>>>> android-7.1.1_r4
+
     return false;
   }
 
