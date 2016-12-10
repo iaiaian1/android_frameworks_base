@@ -33,6 +33,7 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
         try {
+			ContentResolver res = context.getContentResolver();
             // Start the cpu info overlay, if activated
             if (Settings.Global.getInt(res, Settings.Global.SHOW_CPU, 0) != 0) {
                 Intent cpuinfo = new Intent(context, com.android.systemui.CPUInfoService.class);
