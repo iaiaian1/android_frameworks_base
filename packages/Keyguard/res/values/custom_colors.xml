@@ -20,4 +20,6 @@
     <color name="keyguard_default_primary_text_color">#ffffffff</color>
     <color name="keyguard_default_icon_color">#ffffffff</color>
 
+    <!-- Largest size an avatar might need to be drawn in the power menu user picker -->
+    <dimen name="global_actions_avatar_size">32dp</dimen>
 </resources>
