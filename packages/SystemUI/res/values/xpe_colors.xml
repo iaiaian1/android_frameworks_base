@@ -21,4 +21,5 @@
     <color name="icon_color_split_screen">@android:color/white</color>
     <color name="icon_color_home">@android:color/white</color>
     <color name="icon_color_overview">@android:color/white</color>
+	<color name="status_bar_carrier_color">#FFFFFFFF</color>
 </resources>
