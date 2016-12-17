@@ -1286,10 +1286,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             return true;
         }
 
-        public void setStatus(CharSequence status) {
-            mStatusMessage = status;
-        }
-
         void willCreate() {
         }
 
