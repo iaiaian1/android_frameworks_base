@@ -63,9 +63,6 @@
     <!-- Automatic brightness enhancements -->
     <java-symbol type="integer" name="config_autoBrightnessBrighteningLightFastDebounce"/>
 
-    <!-- Screenshot action status message -->
-    <java-symbol type="string" name="global_actions_screenshot_status" />
-
     <!-- Support Samsung docks -->
     <java-symbol type="bool" name="config_forceAnalogCarDock" />
     <java-symbol type="bool" name="config_forceAnalogDeskDock" />
