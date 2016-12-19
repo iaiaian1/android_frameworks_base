@@ -31,7 +31,7 @@
   <string name="accessibility_quick_settings_usb_tether_changed_off">El anclaje USB ha sido deshabilitado</string>
   <string name="accessibility_quick_settings_usb_tether_changed_on">El anclaje USB ha sido habilitado</string>
   <string name="quick_settings_usb_tether_label">Anclaje a internet vía USB</string>
-  <string name="quick_settings_music_label">Music</string>
+  <string name="quick_settings_music_label">Música</string>
   <string name="quick_settings_music_play">Play</string>
   <string name="quick_settings_music_pause">Pause</string>
   <string name="quick_settings_ime_tile_label">Input method</string>
