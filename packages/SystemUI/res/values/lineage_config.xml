@@ -14,6 +14,10 @@
      limitations under the License.
 -->
 <resources>
+    <!-- Switch bar text appearance -->
+    <style name="TextAppearance.SwitchBar" parent="@android:style/TextAppearance.Material.Title">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
 
     <!-- Max visible notification icons -->
     <integer name="config_maxVisibleNotificationIcons">4</integer>
