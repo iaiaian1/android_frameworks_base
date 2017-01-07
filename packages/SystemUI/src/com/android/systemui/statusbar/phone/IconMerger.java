@@ -79,6 +79,7 @@ public class IconMerger extends LinearLayout {
                 width -= label.getWidth();
             }
         }
+
         setMeasuredDimension(width - (width % getFullIconWidth()), getMeasuredHeight());
     }
 
