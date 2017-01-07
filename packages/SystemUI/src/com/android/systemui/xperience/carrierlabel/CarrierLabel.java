@@ -94,6 +94,7 @@ public class CarrierLabel extends TextView {
                         intent.getStringExtra(TelephonyIntents.EXTRA_SPN),
                         intent.getBooleanExtra(TelephonyIntents.EXTRA_SHOW_PLMN, false),
                         intent.getStringExtra(TelephonyIntents.EXTRA_PLMN));
+                isCN = xpeUtils.isChineseLanguage();
             }
         }
     };
@@ -122,12 +123,19 @@ public class CarrierLabel extends TextView {
         String operatorName = getContext().getString(R.string.quick_settings_wifi_no_network);
         TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
                 Context.TELEPHONY_SERVICE);
+        if (isCN) {
+            String operator = telephonyManager.getNetworkOperator();
+            if (TextUtils.isEmpty(operator)) {
+                operator = telephonyManager.getSimOperator();
+            }
+            SpnOverride mSpnOverride = new SpnOverride();
+            operatorName = mSpnOverride.getSpn(operator);
+        } else {
             operatorName = telephonyManager.getNetworkOperatorName();
+        }
         if (TextUtils.isEmpty(operatorName)) {
             operatorName = telephonyManager.getSimOperatorName();
-        } else {
-			operatorName = "XPerience™";		
-	}
+        }
         return operatorName;
     }
 }
