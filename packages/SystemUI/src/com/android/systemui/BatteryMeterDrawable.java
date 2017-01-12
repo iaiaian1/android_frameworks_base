@@ -37,6 +37,7 @@ import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.StopMotionVectorDrawable;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
