@@ -41,4 +41,10 @@
   <!-- Path data for portrait battery -->
   <!-- Path data for landscape battery -->
   <!-- Path data for circle battery -->
+  <!-- QuickSettings: NFC tile [CHAR LIMIT=NONE] -->
+  <string name="quick_settings_nfc_label">NFC</string>
+  <!-- QuickSettings: NFC (off) [CHAR LIMIT=NONE] -->
+  <string name="quick_settings_nfc_off">NFC is disabled</string>
+  <!-- QuickSettings: NFC (on) [CHAR LIMIT=NONE] -->
+  <string name="quick_settings_nfc_on">NFC is enabled</string>
 </resources>
