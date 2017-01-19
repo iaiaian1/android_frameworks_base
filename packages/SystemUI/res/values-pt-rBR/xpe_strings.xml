@@ -44,7 +44,7 @@
   <!-- QuickSettings: NFC tile [CHAR LIMIT=NONE] -->
   <string name="quick_settings_nfc_label">NFC</string>
   <!-- QuickSettings: NFC (off) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_off">NFC is disabled</string>
+  <string name="quick_settings_nfc_off">NFC está desabilitado</string>
   <!-- QuickSettings: NFC (on) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_on">NFC is enabled</string>
+  <string name="quick_settings_nfc_on">NFC está habilitado</string>
 </resources>
