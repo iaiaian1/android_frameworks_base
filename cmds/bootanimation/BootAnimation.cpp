@@ -62,7 +62,6 @@
 #include "audioplay.h"
 
 #include <private/regionalization/Environment.h>
-#define THEME_BOOTANIMATION_FILE "/data/system/theme/bootanimation.zip"
 
 namespace android {
 
