@@ -48,6 +48,6 @@
   <!-- QuickSettings: NFC (on) [CHAR LIMIT=NONE] -->
   <string name="quick_settings_nfc_on">NFC está habilitado</string>
   <!-- Single handed mode -->
-  <string name="singlehandmode_click_hint_message">Touch outside the screen to exit mini screen view</string>
-  <string name="singlehandmode_slide_hint_message">Slide your finger across the navigation bar to switch between the standard and mini screen views</string>
+  <string name="singlehandmode_click_hint_message">Toque fora da tela para sair da mini tela</string>
+  <string name="singlehandmode_slide_hint_message">Deslize seu dedo através da barra de navegação para alternar entre os modos de exibição de tela padrão e pequeno</string>
 </resources>
