@@ -44,10 +44,10 @@
   <!-- QuickSettings: NFC tile [CHAR LIMIT=NONE] -->
   <string name="quick_settings_nfc_label">NFC</string>
   <!-- QuickSettings: NFC (off) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_off">NFC is disabled</string>
+  <string name="quick_settings_nfc_off">NFC está desactivado</string>
   <!-- QuickSettings: NFC (on) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_on">NFC is enabled</string>
+  <string name="quick_settings_nfc_on">NFC está activado</string>
   <!-- Single handed mode -->
-  <string name="singlehandmode_click_hint_message">Touch outside the screen to exit mini screen view</string>
+  <string name="singlehandmode_click_hint_message">Toca afuera de la pantalla para salir de la mini pantalla</string>
   <string name="singlehandmode_slide_hint_message">Slide your finger across the navigation bar to switch between the standard and mini screen views</string>
 </resources>
