@@ -19,4 +19,37 @@
   <!-- Whether notify fingerprint client of successful cancelled authentication -->
   <java-symbol type="bool" name="config_notifyClientOnFingerprintCancelSuccess" />
 
+  <!-- Shutdown/reboot screen -->
+  <java-symbol type="layout" name="shutdown_layout" />
+  <java-symbol type="color" name="shutdown_background" />
+  <java-symbol type="color" name="shutdown_primary_text" />
+  <java-symbol type="color" name="shutdown_progress_tint" />
+  <java-symbol type="dimen" name="shutdown_margin" />
+  <java-symbol type="dimen" name="shutdown_logo_margin_top" />
+  <java-symbol type="dimen" name="shutdown_primary_text_margin_top" />
+  <java-symbol type="id" name="shutdown_logo" />
+  <java-symbol type="id" name="shutdown_message" />
+  <java-symbol type="id" name="shutdown_progress" />
+
+  <!-- Pocket Lock -->
+  <java-symbol type="layout" name="pocket_lock_view_layout" />
+  <java-symbol type="id" name="pocket_hint_container" />
+  <java-symbol type="id" name="pocket_hint_image" />
+  <java-symbol type="id" name="pocket_hint_message" />
+
+
+  <!-- Single handed mode -->
+  <java-symbol type="id" name="relative_top" />
+  <java-symbol type="id" name="hint_info" />
+  <java-symbol type="id" name="single_hand_window_title" />
+  <java-symbol type="id" name="click_hint" />
+  <java-symbol type="id" name="hint_section" />
+  <java-symbol type="id" name="relative_bottom" />
+  <java-symbol type="id" name="singlehandmode_slide_hint_text" />
+  <java-symbol type="id" name="slide_hint" />
+  <java-symbol type="id" name="slide_hint_area" />
+  <java-symbol type="bool" name="single_hand_mode" />
+  <java-symbol type="string" name="singlehandmode_click_hint_message" />
+  <java-symbol type="string" name="singlehandmode_slide_hint_message" />
+  <java-symbol type="layout" name="single_hand_window" />
 </resources>

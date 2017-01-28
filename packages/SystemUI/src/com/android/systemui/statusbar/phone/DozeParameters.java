@@ -18,6 +18,7 @@ package com.android.systemui.statusbar.phone;
 
 import android.content.Context;
 import android.os.SystemProperties;
+import android.os.UserHandle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.MathUtils;
@@ -102,20 +103,12 @@ public class DozeParameters {
         return SystemProperties.getBoolean("doze.vibrate.sigmotion", false);
     }
 
-    public boolean getPulseOnPickup() {
-        return getBoolean("doze.pulse.pickup", R.bool.doze_pulse_on_pick_up);
-    }
-
     public boolean getVibrateOnPickup() {
         return SystemProperties.getBoolean("doze.vibrate.pickup", false);
     }
 
     public boolean getProxCheckBeforePulse() {
         return getBoolean("doze.pulse.proxcheck", R.bool.doze_proximity_check_before_pulse);
-    }
-
-    public boolean getPulseOnNotifications() {
-        return getBoolean("doze.pulse.notifications", R.bool.doze_pulse_on_notifications);
     }
 
     public int getPickupVibrationThreshold() {
