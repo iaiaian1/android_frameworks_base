@@ -23,4 +23,7 @@
     <string name="accessibility_quick_settings_caffeine_off">Caffeine off.</string>
     <string name="accessibility_quick_settings_caffeine_on">Caffeine on.</string>
 
+   <!--Free Mem Bar-->
+   <string name="recents_free_ram"> Free RAM: %1$d MB </string>
+
 </resources>
