@@ -50,4 +50,5 @@
   <!-- Single handed mode -->
   <string name="singlehandmode_click_hint_message">Toca afuera de la pantalla para salir de la mini pantalla</string>
   <string name="singlehandmode_slide_hint_message">Desliza tu dedo a través de la barra de navegación para cambiar entre la vista estándar y mini pantalla</string>
+  <!--Free Mem Bar-->
 </resources>
