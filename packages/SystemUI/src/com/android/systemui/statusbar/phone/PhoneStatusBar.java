@@ -1028,6 +1028,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mKeyguardBottomArea.getLockIcon());
         mKeyguardBottomArea.setKeyguardIndicationController(mKeyguardIndicationController);
 
+		addSidebarView();
+
         // set the initial view visibility
         setAreThereNotifications();
 
