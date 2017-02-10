@@ -34,6 +34,7 @@ import com.android.systemui.qs.tiles.DataSaverTile;
 import com.android.systemui.qs.tiles.DndTile;
 import com.android.systemui.qs.tiles.FlashlightTile;
 import com.android.systemui.qs.tiles.HeadsUpTile;
+import com.android.systemui.qs.tiles.HighBrightnessTile;
 import com.android.systemui.qs.tiles.HotspotTile;
 import com.android.systemui.qs.tiles.IntentTile;
 import com.android.systemui.qs.tiles.LocationTile;
@@ -75,6 +76,7 @@ public class QSFactoryImpl implements QSFactory {
         else if (tileSpec.equals("caffeine")) return new CaffeineTile(mHost);
         else if (tileSpec.equals("ambient_display")) return new AmbientDisplayTile(mHost);
         else if (tileSpec.equals("heads_up")) return new HeadsUpTile(mHost);
+        else if (tileSpec.equals("high_brightness")) return new HighBrightnessTile(mHost);
         // Intent tiles.
         else if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(mHost, tileSpec);
         else if (tileSpec.startsWith(CustomTile.PREFIX)) return CustomTile.create(mHost, tileSpec);
