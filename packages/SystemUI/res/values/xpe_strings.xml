@@ -100,4 +100,7 @@ C42.897,4,44,5.103,44,6.464v49.072C44,56.897,42.897,58,41.536,58z M 24 0 H 34 V 
     <string name="pie_battery_level">"BATTERY LEVEL "</string>
     <string name="quick_settings_pie">Pie</string>
 
+    <!-- volte icon switch -->
+    <string name="status_bar_volte">VoLTE</string>
+
 </resources>
