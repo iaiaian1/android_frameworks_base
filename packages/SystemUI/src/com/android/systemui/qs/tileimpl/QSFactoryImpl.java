@@ -43,6 +43,7 @@ import com.android.systemui.qs.tiles.RotationLockTile;
 import com.android.systemui.qs.tiles.CaffeineTile;
 import com.android.systemui.qs.tiles.UsbTetherTile;
 import com.android.systemui.qs.tiles.UserTile;
+import com.android.systemui.qs.tiles.WeatherTile;
 import com.android.systemui.qs.tiles.WifiTile;
 import com.android.systemui.qs.tiles.WorkModeTile;
 import com.android.systemui.qs.QSTileHost;
@@ -109,6 +110,8 @@ public class QSFactoryImpl implements QSFactory {
                 return new UsbTetherTile(mHost);
             case "heads_up":
                 return new HeadsUpTile(mHost);
+            case "weather":
+                return new WeatherTile(mHost);
         }
 
         // Intent tiles.
