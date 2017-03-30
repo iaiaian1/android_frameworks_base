@@ -61,4 +61,7 @@
         <item name="android:shadowDx">2.0</item>
         <item name="android:shadowDy">2.0</item>
     </style>
+
+    <!-- Phyisical Keyboard Dialog style -->
+    <style name="KeyboardShortcutsDialog" parent="@*android:style/Theme.DeviceDefault.Light" />
 </resources>
