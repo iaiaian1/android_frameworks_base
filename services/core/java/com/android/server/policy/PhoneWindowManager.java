@@ -4376,6 +4376,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             startActivityAsUser(intent, UserHandle.CURRENT);
         } catch (ActivityNotFoundException e) {
             Slog.w(TAG, "No activity to handle assist long press action.", e);
+            Toast.makeText(mContext, R.string.no_assist_found, Toast.LENGTH_SHORT).show();
         }
     }
 

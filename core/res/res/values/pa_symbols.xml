@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-/* //device/apps/common/assets/res/any/strings.xml
-**
-** Copyright (C) 2014, ParanoidAndroid Project
+** Copyright (C) 2014-2017, ParanoidAndroid Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -17,11 +15,7 @@
 ** limitations under the License.
 */
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-    <!-- Pocket Lock -->
-    <string name="pocket_lock_message_long_press">Long press power button to interact</string>
-
-    <!-- Assist manager -->
-    <string name="no_assist_found">No assist manager found</string>
+<resources>
+  <!-- Assist manager -->
+  <java-symbol type="string" name="no_assist_found" />
 </resources>
