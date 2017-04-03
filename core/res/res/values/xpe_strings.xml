@@ -32,4 +32,7 @@
     <!-- Pocket Lock -->
     <string name="pocket_lock_message_long_press">Long press power button to interact</string>
 
+    <!-- Assist manager -->
+    <string name="no_assist_found">No assist manager found</string>
+
 </resources>

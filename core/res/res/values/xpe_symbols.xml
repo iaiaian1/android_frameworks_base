@@ -76,4 +76,7 @@
   <java-symbol type="id" name="pocket_hint_image" />
   <java-symbol type="id" name="pocket_hint_message" />
 
+    <!-- Assist manager -->
+    <java-symbol type="string" name="no_assist_found" />
+  
 </resources>
