@@ -38,15 +38,6 @@
   <string name="quick_settings_caffeine_label">Cafeína</string>
   <string name="accessibility_quick_settings_caffeine_off">Cafeína desactivada</string>
   <string name="accessibility_quick_settings_caffeine_on">Cafeína activada</string>
-  <!-- Path data for portrait battery -->
-  <!-- Path data for landscape battery -->
-  <!-- Path data for circle battery -->
-  <!-- QuickSettings: NFC tile [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_label">NFC</string>
-  <!-- QuickSettings: NFC (off) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_off">NFC está desactivado</string>
-  <!-- QuickSettings: NFC (on) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_on">NFC está activado</string>
   <!-- Single handed mode -->
   <string name="singlehandmode_click_hint_message">Toca afuera de la pantalla para salir de la mini pantalla</string>
   <string name="singlehandmode_slide_hint_message">Desliza tu dedo a través de la barra de navegación para cambiar entre la vista estándar y mini pantalla</string>
@@ -60,4 +51,5 @@
   <string name="content_setup_instructions">Añadir elementos a la barra presionando de forma prolongada en la derecha de cualquier elemento y arrastrándolo a la barra.\n\nCombinar elementos en carpetas soltándolos sobre un elemento existente en la barra.\n\nPara borrar un elemento arrástrelo fuera de la \@appbar.</string>
   <string name="content_setup_dismiss">Siguiente</string>
   <string name="toast_not_installed">La aplicación no está instalada</string>
+  <!-- Compass QS Tile -->
 </resources>
