@@ -2259,10 +2259,10 @@ message MetricsEvent {
     XPERIENCE_SETTINGS = 500;
 
     // Extensions
-    EXTENSIONS = 411;
+    EXTENSIONS = 501;
 
     // Quick setting tiles
-    QUICK_SETTINGS = 412;
+    QUICK_SETTINGS = 502;
 
   }
 }
