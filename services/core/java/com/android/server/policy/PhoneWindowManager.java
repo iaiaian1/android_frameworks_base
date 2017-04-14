@@ -912,8 +912,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private boolean mTorchLongPressPowerEnabled;
     private boolean mTorchEnabled;
 
-    int mDesiredRotation = -1;
-
     private class PolicyHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -9280,11 +9278,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mTorchEnabled = false;
         }
     }
-<<<<<<< HEAD
-
-    public void freezeOrThawRotation(int rotation) {
-        mDesiredRotation = rotation;
-    }
 
     private void toggleSingleHand(Context context, boolean isLeft) {
         Settings.Global.putString(context.getContentResolver(), Settings.Global.SINGLE_HAND_MODE,
@@ -9292,9 +9285,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.Global.SINGLE_HAND_MODE).isEmpty() ?
                     isLeft ? "left" : "right" : "");
     }
-=======
+
     public void freezeOrThawRotation(int rotation) {
         mDesiredRotation = rotation;
     }
->>>>>>> 467ecdf... Add new feature of One-hand UI Mode
 }
