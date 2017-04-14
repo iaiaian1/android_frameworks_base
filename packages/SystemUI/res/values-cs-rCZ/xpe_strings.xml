@@ -38,15 +38,6 @@
   <string name="quick_settings_caffeine_label">Caffeine</string>
   <string name="accessibility_quick_settings_caffeine_off">Vypnutí caffeine</string>
   <string name="accessibility_quick_settings_caffeine_on">Zapnutí caffeine</string>
-  <!-- Path data for portrait battery -->
-  <!-- Path data for landscape battery -->
-  <!-- Path data for circle battery -->
-  <!-- QuickSettings: NFC tile [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_label">NFC</string>
-  <!-- QuickSettings: NFC (off) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_off">NFC je zakázáno</string>
-  <!-- QuickSettings: NFC (on) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_on">NFC je povoleno</string>
   <!-- Single handed mode -->
   <string name="singlehandmode_click_hint_message">Pro odchod z mini zobrazení klepněte mimo obrazovku</string>
   <string name="singlehandmode_slide_hint_message">Přejetím prstu přes navigační panel je možné přepínat mezi standardním a mini zobrazením</string>
@@ -60,4 +51,5 @@
   <string name="content_setup_instructions">Položku lze přidat do panelu aplikací na pravé straně dlouhým stiskem a přetáhnutím.\n\nKombinovat položky do složek lze položením na libovolnou existující položku v panelu aplikací.\n\nOdebrat ji lze přetáhnutím z \@appbar.</string>
   <string name="content_setup_dismiss">Pokračovat</string>
   <string name="toast_not_installed">Aplikace není nainstalována</string>
+  <!-- Compass QS Tile -->
 </resources>
