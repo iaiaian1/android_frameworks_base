@@ -60,12 +60,9 @@ static const char* kPathWhitelist[] = {
   "/dev/ion",
   "/dev/dri/renderD129", // Fixes b/31172436
   "/system/framework/org.cyanogenmod.platform-res.apk",
-  "/dev/rpmsg-omx0",
-  "/dev/rpmsg-omx1"
 #ifdef PATH_WHITELIST_EXTRA_H
 PATH_WHITELIST_EXTRA_H
 #endif
-
 };
 
 static const char* kFdPath = "/proc/self/fd";
@@ -247,7 +244,7 @@ class FileDescriptorInfo {
   }
 
   FileDescriptorInfo(struct stat file_stat, const std::string& file_path, int fd, int open_flags,
-                     int fd_flags, int fs_flags, off_t offset) :
+                       int fd_flags, int fs_flags, off_t offset) :
     fd(fd),
     file_stat(file_stat),
     file_path(file_path),
@@ -287,26 +284,6 @@ class FileDescriptorInfo {
       return true;
     }
 
-    static const std::string kResourceCachePrefix = "/data/resource-cache/";
-    static const std::string kIdmapSuffix = "idmap";
-    if (path.compare(0, kResourceCachePrefix.size(), kResourceCachePrefix) == 0 &&
-        path.compare(path.size() - kIdmapSuffix.size(), kIdmapSuffix.size(), kIdmapSuffix) == 0) {
-        return true;
-    }
-
-    static const std::string kSystemVendorOverlayPrefix = "/system/vendor/overlay/";
-    static const std::string kApkSuffix = ".apk";
-    if (path.compare(0, kSystemVendorOverlayPrefix.size(), kSystemVendorOverlayPrefix) == 0 &&
-        path.compare(path.size() - kApkSuffix.size(), kApkSuffix.size(), kApkSuffix) == 0) {
-        return true;
-    }
-
-    static const std::string kVendorOverlayPrefix = "/vendor/overlay/";
-    if (path.compare(0, kVendorOverlayPrefix.size(), kVendorOverlayPrefix) == 0 &&
-        path.compare(path.size() - kApkSuffix.size(), kApkSuffix.size(), kApkSuffix) == 0) {
-        return true;
-	}
-
     // Whitelist files needed for Runtime Resource Overlay, like these:
     // /system/vendor/overlay/framework-res.apk
     // /system/vendor/overlay-subdir/pg/framework-res.apk
@@ -316,6 +293,7 @@ class FileDescriptorInfo {
     static const std::string kOverlayDir = "/system/vendor/overlay/";
     static const std::string kVendorOverlayDir = "/vendor/overlay";
     static const std::string kOverlaySubdir = "/system/vendor/overlay-subdir/";
+    static const std::string kApkSuffix = ".apk";
 
     if ((StartsWith(path, kOverlayDir) || StartsWith(path, kOverlaySubdir)
          || StartsWith(path, kVendorOverlayDir))
@@ -328,14 +306,6 @@ class FileDescriptorInfo {
     static const std::string kOverlayIdmapSuffix = ".apk@idmap";
     if (StartsWith(path, kOverlayIdmapPrefix) && EndsWith(path, kOverlayIdmapSuffix)
         && path.find("/../") == std::string::npos) {
-      return true;
-    }
-    return false;
-  }
-
-    // All regular files that are placed under this path are whitelisted automatically.
-    static const std::string kZygoteWhitelistPath = "/vendor/zygote_whitelist/";
-    if (StartsWith(path, kZygoteWhitelistPath) && path.find("/../") == std::string::npos) {
       return true;
     }
 
@@ -446,7 +416,7 @@ class FileDescriptorTable {
   // Creates a new FileDescriptorTable. This function scans
   // /proc/self/fd for the list of open file descriptors and collects
   // information about them. Returns NULL if an error occurs.
-  static FileDescriptorTable* Create(bool permissive = false) {
+  static FileDescriptorTable* Create() {
     DIR* d = opendir(kFdPath);
     if (d == NULL) {
       ALOGE("Unable to open directory %s: %s", kFdPath, strerror(errno));
@@ -464,15 +434,12 @@ class FileDescriptorTable {
 
       FileDescriptorInfo* info = FileDescriptorInfo::createFromFd(fd);
       if (info == NULL) {
-        if (!permissive) {
-          if (closedir(d) == -1) {
-            ALOGE("Unable to close directory : %s", strerror(errno));
-          }
-          return NULL;
+        if (closedir(d) == -1) {
+          ALOGE("Unable to close directory : %s", strerror(errno));
         }
-      } else {
-        open_fd_map[fd] = info;
+        return NULL;
       }
+      open_fd_map[fd] = info;
     }
 
     if (closedir(d) == -1) {
