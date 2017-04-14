@@ -18,13 +18,8 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!-- Quick Settings tiles -->
   <!-- Reboot/Recovery QS Tile -->
-  <!-- Path data for portrait battery -->
-  <!-- Path data for landscape battery -->
-  <!-- Path data for circle battery -->
-  <!-- QuickSettings: NFC tile [CHAR LIMIT=NONE] -->
-  <!-- QuickSettings: NFC (off) [CHAR LIMIT=NONE] -->
-  <!-- QuickSettings: NFC (on) [CHAR LIMIT=NONE] -->
   <!-- Single handed mode -->
   <!--Free Mem Bar-->
   <!-- App sidebar -->
+  <!-- Compass QS Tile -->
 </resources>
