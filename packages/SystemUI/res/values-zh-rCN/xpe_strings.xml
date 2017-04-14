@@ -38,15 +38,6 @@
   <string name="quick_settings_caffeine_label">Caffeine</string>
   <string name="accessibility_quick_settings_caffeine_off">Caffeine 关闭</string>
   <string name="accessibility_quick_settings_caffeine_on">Caffeine 开启</string>
-  <!-- Path data for portrait battery -->
-  <!-- Path data for landscape battery -->
-  <!-- Path data for circle battery -->
-  <!-- QuickSettings: NFC tile [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_label">NFC</string>
-  <!-- QuickSettings: NFC (off) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_off">NFC 已禁用</string>
-  <!-- QuickSettings: NFC (on) [CHAR LIMIT=NONE] -->
-  <string name="quick_settings_nfc_on">NFC 已启用</string>
   <!-- Single handed mode -->
   <string name="singlehandmode_click_hint_message">点击窗口外部退出窗口模式</string>
   <string name="singlehandmode_slide_hint_message">滑动导航栏切换标准模式及窗口模式</string>
@@ -60,4 +51,5 @@
   <string name="content_setup_instructions">通过长按右侧任何项目将项目添加到Appbar中，然后将其拖到Appbar。\n\n将项目拖放到Appbar中的任何现有项目上，将项目合并到文件夹中。\n\n要删除项目，只需将其拖动 出来的\ @appbar。</string>
   <string name="content_setup_dismiss">继续</string>
   <string name="toast_not_installed">应用程序未安装</string>
+  <!-- Compass QS Tile -->
 </resources>
