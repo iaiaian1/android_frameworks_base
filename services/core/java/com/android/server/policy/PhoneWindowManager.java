@@ -3790,7 +3790,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     mHomeDoubleTapPending = false;
                     mHandler.removeCallbacks(mHomeDoubleTapTimeoutRunnable);
                     performKeyAction(mDoubleTapOnHomeBehavior, event);
-                    mHomeConsumed = true;
+                    if (mDoubleTapOnHomeBehavior != KEY_ACTION_SLEEP) {
+                        mHomeConsumed = true;
+                    }
                 } else if (mLongPressOnHomeBehavior == KEY_ACTION_APP_SWITCH
                         || mDoubleTapOnHomeBehavior == KEY_ACTION_APP_SWITCH) {
                     preloadRecentApps();
@@ -3804,7 +3806,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     mHomePressed = true;
                     performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, false);
                     performKeyAction(mLongPressOnHomeBehavior, event);
-                    mHomeConsumed = true;
+                    if (mLongPressOnHomeBehavior != KEY_ACTION_SLEEP) {
+                        mHomeConsumed = true;
+                    }
                 }
             }
             return -1;
