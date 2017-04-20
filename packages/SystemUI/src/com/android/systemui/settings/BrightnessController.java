@@ -35,6 +35,7 @@ import android.view.View;
 import android.service.vr.IVrManager;
 import android.service.vr.IVrStateCallbacks;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.android.internal.logging.MetricsLogger;
@@ -310,6 +311,16 @@ public class BrightnessController implements ToggleSlider.Listener {
             }
         }
         mVrManager = IVrManager.Stub.asInterface(ServiceManager.getService("vrmanager"));
+
+        mIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Settings.System.putInt(mContext.getContentResolver(),
+                    Settings.System.SCREEN_BRIGHTNESS_MODE,
+                    !mAutomatic ? Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+                    : Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+            }
+        });
     }
 
     public void setBackgroundLooper(Looper backgroundLooper) {
@@ -446,7 +457,7 @@ public class BrightnessController implements ToggleSlider.Listener {
 
     private void updateIcon(boolean automatic) {
         if (mIcon != null) {
-            mIcon.setImageResource(automatic ?
+            mIcon.setImageResource(mAutomatic ?
                     com.android.systemui.R.drawable.ic_qs_brightness_auto_on :
                     com.android.systemui.R.drawable.ic_qs_brightness_auto_off);
         }
