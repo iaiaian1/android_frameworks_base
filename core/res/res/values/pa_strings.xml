@@ -24,4 +24,9 @@
 
     <!-- Assist manager -->
     <string name="no_assist_found">No assist manager found</string>
+
+    <!-- Defines the sysfs attribute path used by pocket bridge
+        to communicate pocket state to the pocket judge kernel driver. -->
+    <string name="config_pocketBridgeSysfsInpocket"></string>
+
 </resources>

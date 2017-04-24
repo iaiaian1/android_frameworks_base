@@ -18,4 +18,8 @@
 <resources>
   <!-- Assist manager -->
   <java-symbol type="string" name="no_assist_found" />
+
+  <!-- Pocket bridge -->
+  <java-symbol type="string" name="config_pocketBridgeSysfsInpocket" />
+
 </resources>
