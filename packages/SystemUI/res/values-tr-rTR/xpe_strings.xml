@@ -52,4 +52,18 @@
   <string name="content_setup_dismiss">Devam et</string>
   <string name="toast_not_installed">Uygulama yüklenmedi</string>
   <!-- Compass QS Tile -->
+  <string name="quick_settings_compass_label">Pusula</string>
+  <string name="quick_settings_compass_init">Başlatılıyor\u2026</string>
+  <string name="accessibility_quick_settings_compass_off">Pusula kapalı.</string>
+  <string name="accessibility_quick_settings_compass_on">Pusula açık.</string>
+  <string name="accessibility_quick_settings_compass_changed_off">Pusula kapatıldı.</string>
+  <string name="accessibility_quick_settings_compass_changed_on">Pusula açıldı.</string>
+  <string name="quick_settings_compass_N">K</string>
+  <string name="quick_settings_compass_NE">KD</string>
+  <string name="quick_settings_compass_E">D</string>
+  <string name="quick_settings_compass_SE">GD</string>
+  <string name="quick_settings_compass_S">G</string>
+  <string name="quick_settings_compass_SW">GB</string>
+  <string name="quick_settings_compass_W">Ç</string>
+  <string name="quick_settings_compass_NW">KB</string>
 </resources>
