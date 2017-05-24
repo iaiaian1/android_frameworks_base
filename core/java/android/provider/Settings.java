@@ -1973,7 +1973,7 @@ public final class Settings {
 
         /**
          * Look up a boolean in the database.
-         * @param resolver to access the database with
+         * @param cr to access the database with
          * @param name to look up in the table
          * @param def Value to return if the setting is not defined.
          * @return The setting's current value, or 'def' if it is not defined
@@ -1991,7 +1991,7 @@ public final class Settings {
             }
         }
 
-    /**
+        /**
          * Convenience function for updating a single settings value as a
          * boolean. This will either create a new entry in the table if the
          * given name does not exist, or modify the value of the existing row

@@ -33,7 +33,7 @@ import android.util.Slog;
  * // define a final callback
  * private final IPocketCallback mCallback = new IPocketCallback.Stub() {
  *
- *     @Override
+ *     //@Override
  *     public void onStateChanged(boolean isDeviceInPocket, int reason) {
  *         // Your method to handle logic outside of this callback, ideally with a handler
  *         // posting on UI Thread for view hierarchy operations or with its own background thread.
