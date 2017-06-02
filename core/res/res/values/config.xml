@@ -2947,4 +2947,5 @@
     <bool name="config_useWakeLockForFlashlight">false</bool>
 
     <bool name="single_hand_mode">true</bool>
+
 </resources>
