@@ -48,4 +48,5 @@
     <color name="fab_color_ripple">#ff7a7a7a</color>
     <color name="floating_action_button_icon_color">@*android:color/accent_material_dark</color>
 
+    <color name="background_ui">#3F3F45</color>
 </resources>

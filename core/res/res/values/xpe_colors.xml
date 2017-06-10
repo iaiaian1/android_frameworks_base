@@ -56,4 +56,5 @@
     <color name="shutdown_primary_text">@color/material_pixel_blue_bright</color>
     <color name="shutdown_progress_tint">@color/material_pixel_blue_bright</color><!--wine color-->
 
+    <color name="background">#232329</color>
 </resources>
