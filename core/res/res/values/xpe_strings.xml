@@ -41,5 +41,8 @@
     <!-- Immersive Mode Confirmation Dialog -->
     <string name="immersive_mode_confirmation_title">Immersive Mode Confirmation</string>
     <string name="immersive_mode_confirmation_message">Would you like to enable the immersive mode confirmation dialog?</string>
+    <!-- Safe Headset Volume Dialog -->
+    <string name="safe_headset_warning_title">Safe Headset Volume</string>
+    <string name="safe_headset_warning_message">Would you like to disable the recommended volume level warning ?</string>
 
 </resources>

@@ -3554,6 +3554,12 @@ public final class Settings {
          */
         public static final String DISABLE_IMMERSIVE_MESSAGE = "disable_immersive_message";
 
+       /**
+         * Safe Headset Volume disabler option
+         * @hide
+         */
+        public static final String SAFE_HEADSET_VOLUME = "safe_headset_volume";
+
         /**
          * @deprecated Use {@link android.provider.Settings.Global#POWER_SOUNDS_ENABLED}
          * instead
@@ -4401,6 +4407,16 @@ public final class Settings {
          * @hide
          */
         public static final String WHEN_TO_MAKE_WIFI_CALLS = "when_to_make_wifi_calls";
+
+	/**
+         * Settings to reset on user request. They will fall back to their default value (0).
+         *
+         * @hide
+         */
+        public static final String[] SETTINGS_TO_RESET = {
+            DISABLE_IMMERSIVE_MESSAGE,
+            SAFE_HEADSET_VOLUME
+        };
 
         // Settings moved to Settings.Secure
 
@@ -6971,14 +6987,6 @@ public final class Settings {
          */
         public static final String MANAGED_PROFILE_CONTACT_REMOTE_SEARCH =
                 "managed_profile_contact_remote_search";
-
-	/**
-         * Settings to reset on user request. They will fall back to their default value (0).
-         *
-         * @hide
-         */
-        public static final String[] SETTINGS_TO_RESET = {
-        };
 
         /**
          * Whether or not the automatic storage manager is enabled and should run on the device.
@@ -9705,12 +9713,6 @@ public final class Settings {
          * @hide
          */
         public static final String FP_UNLOCK_KEYSTORE = "fp_unlock_keystore";
-
-       /**
-        * Disable Immersive Message
-        * @hide
-        */
-        public static final String DISABLE_IMMERSIVE_MESSAGE = "disable_immersive_message";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings

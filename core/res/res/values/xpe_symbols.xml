@@ -115,4 +115,8 @@
   <java-symbol type="string" name="immersive_mode_confirmation_title" />
   <java-symbol type="string" name="immersive_mode_confirmation_message" />
 
+  <!-- Safe Headset Volume Dialog -->
+  <java-symbol type="string" name="safe_headset_warning_title" />
+  <java-symbol type="string" name="safe_headset_warning_message" />
+
 </resources>
