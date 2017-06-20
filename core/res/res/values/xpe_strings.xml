@@ -38,6 +38,10 @@
     <string name="animation_grow_shrink_right">Grow in (Right)</string>
     <string name="action_null">Blank</string>
 
+    <!-- OnTheSpot settings confirmation dialog. When user interactions with the system can modify the user experience. -->
+    <string name="setting_confirmation_always">Always</string>
+    <string name="setting_confirmation_just_once">Just once</string>
+    <string name="setting_confirmation_never">Never</string>
     <!-- Immersive Mode Confirmation Dialog -->
     <string name="immersive_mode_confirmation_title">Immersive Mode Confirmation</string>
     <string name="immersive_mode_confirmation_message">Would you like to enable the immersive mode confirmation dialog?</string>
