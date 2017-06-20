@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2017 The OmniROM Project
+ * Copyright (C) 2017 The XPerience Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +21,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -46,7 +48,7 @@ public class CPUInfoService extends Service {
     private int mNumCpus = 1;
     private String[] mCurrFreq=null;
     private String[] mCurrGov=null;
-    
+
     private static final String NUM_OF_CPUS_PATH = "/sys/devices/system/cpu/present";
 
     private class CPUView extends View {
@@ -62,7 +64,7 @@ public class CPUInfoService extends Service {
 
         private boolean mLpMode;
         private String mCPUTemp;
-        private boolean mDataAvail; 
+        private boolean mDataAvail;
 
         private Handler mCurCPUHandler = new Handler() {
             public void handleMessage(Message msg) {
@@ -70,71 +72,63 @@ public class CPUInfoService extends Service {
                     return;
                 }
                 if(msg.what==1){
-                    String[] parts=((String) msg.obj).split(";");
-                    if(parts.length!=3){
-                        return;
-                    }
-                    mCPUTemp=parts[0];
-                    mLpMode = parts[1].equals("1");
+                    String msgData = (String) msg.obj;
+                    try {
+                        String[] parts=msgData.split(";");
+                        mCPUTemp=parts[0];
+                        mLpMode = parts[1].equals("1");
 
-                    String[] cpuParts=parts[2].split("\\|");
-                    for(int i=0; i<cpuParts.length; i++){
-                        String cpuInfo=cpuParts[i];
-                        String cpuInfoParts[]=cpuInfo.split(":");
-                        if(cpuInfoParts.length==2){
-                            mCurrFreq[i]=cpuInfoParts[0];
-                            mCurrGov[i]=cpuInfoParts[1];
-                        } else {
-                            mCurrFreq[i]="0";
-                            mCurrGov[i]="";
+                        String[] cpuParts=parts[2].split("\\|");
+                        for(int i=0; i<cpuParts.length; i++){
+                            String cpuInfo=cpuParts[i];
+                            String cpuInfoParts[]=cpuInfo.split(":");
+                            if(cpuInfoParts.length==2){
+                                mCurrFreq[i]=cpuInfoParts[0];
+                                mCurrGov[i]=cpuInfoParts[1];
+                            } else {
+                                mCurrFreq[i]="0";
+                                mCurrGov[i]="";
+                            }
                         }
+                        mDataAvail = true;
+                        updateDisplay();
+                    } catch(ArrayIndexOutOfBoundsException e) {
+                        Log.e(TAG, "illegal data " + msgData);
                     }
-                    mDataAvail = true;
-                    updateDisplay();
                 }
             }
         };
 
         CPUView(Context c) {
             super(c);
-
-            setPadding(4, 4, 4, 4);
-            //setBackgroundResource(com.android.internal.R.drawable.load_average_background);
-
-            // Need to scale text size by density...  but we won't do it
-            // linearly, because with higher dps it is nice to squeeze the
-            // text a bit to fit more of it.  And with lower dps, trying to
-            // go much smaller will result in unreadable text.
-            int textSize = 10;
             float density = c.getResources().getDisplayMetrics().density;
-            if (density < 1) {
-                textSize = 9;
-            } else {
-                textSize = (int)(12*density);
-                if (textSize < 10) {
-                    textSize = 10;
-                }
-            }
+            int paddingPx = Math.round(5 * density);
+            setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+            setBackgroundColor(Color.argb(0x60, 0, 0, 0));
+
+            final int textSize = Math.round(12 * density);
+
             mOnlinePaint = new Paint();
             mOnlinePaint.setAntiAlias(true);
             mOnlinePaint.setTextSize(textSize);
-            mOnlinePaint.setARGB(255, 0, 255, 0);
+            mOnlinePaint.setColor(Color.WHITE);
+            mOnlinePaint.setShadowLayer(5.0f, 0.0f, 0.0f, Color.BLACK);
 
             mOfflinePaint = new Paint();
             mOfflinePaint.setAntiAlias(true);
             mOfflinePaint.setTextSize(textSize);
-            mOfflinePaint.setARGB(255, 255, 0, 0);
+            mOfflinePaint.setColor(Color.RED);
 
             mLpPaint = new Paint();
             mLpPaint.setAntiAlias(true);
             mLpPaint.setTextSize(textSize);
-            mLpPaint.setARGB(255, 0, 255, 0);
+            mLpPaint.setColor(Color.GREEN);
 
             mAscent = mOnlinePaint.ascent();
             float descent = mOnlinePaint.descent();
             mFH = (int)(descent - mAscent + .5f);
 
-            final String maxWidthStr="cpuX xxxxxxxxxxxxxx 1700000";
+            final String maxWidthStr="cpuX interactive 0000000";
             mMaxWidth = (int)mOnlinePaint.measureText(maxWidthStr);
 
             updateDisplay();
@@ -166,10 +160,10 @@ public class CPUInfoService extends Service {
         @Override
         public void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-            if (!mDataAvail){
-            	return;
+            if (!mDataAvail) {
+                return;
             }
-            
+
             final int W = mNeededWidth;
             final int RIGHT = getWidth()-1;
 
@@ -179,9 +173,11 @@ public class CPUInfoService extends Service {
 
             int y = mPaddingTop - (int)mAscent;
 
-            canvas.drawText("Temp:"+mCPUTemp, RIGHT-mPaddingRight-mMaxWidth,
-                y-1, mOnlinePaint);
-            y += mFH;
+            if (false) {
+                canvas.drawText("Temp:"+mCPUTemp, RIGHT-mPaddingRight-mMaxWidth,
+                    y-1, mOnlinePaint);
+                y += mFH;
+            }
 
             for(int i=0; i<mCurrFreq.length; i++){
                 String s=getCPUInfoString(i);
@@ -206,10 +202,10 @@ public class CPUInfoService extends Service {
             if (!mDataAvail) {
                 return;
             }
-            final int NW = 4;
+            final int NW = mNumCpus;
 
             int neededWidth = mPaddingLeft + mPaddingRight + mMaxWidth;
-            int neededHeight = mPaddingTop + mPaddingBottom + (mFH*(1+NW));
+            int neededHeight = mPaddingTop + mPaddingBottom + mFH * NW;
             if (neededWidth != mNeededWidth || neededHeight != mNeededHeight) {
                 mNeededWidth = neededWidth;
                 mNeededHeight = neededHeight;
@@ -255,7 +251,6 @@ public class CPUInfoService extends Service {
                 while (!mInterrupt) {
                     sleep(500);
                     StringBuffer sb=new StringBuffer();
-
                     String cpuTemp = CPUInfoService.readOneLine(CPU_TEMP_HTC);
                     if (cpuTemp == null){
                         cpuTemp = CPUInfoService.readOneLine(CPU_TEMP_OPPO);
@@ -297,7 +292,7 @@ public class CPUInfoService extends Service {
 
         mView = new CPUView(this);
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_SECURE_SYSTEM_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|
