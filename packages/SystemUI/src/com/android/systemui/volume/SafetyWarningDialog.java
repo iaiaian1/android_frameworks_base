@@ -84,12 +84,6 @@ abstract public class SafetyWarningDialog extends SystemUIDialog
     @Override
     public void onClick(DialogInterface dialog, int which) {
         mAudioManager.disableSafeMediaVolume();
-                SettingConfirmationHelper.request(
-                mContext,
-                Settings.System.SAFE_HEADSET_VOLUME,
-                mContext.getString(R.string.safe_headset_warning_title),
-                mContext.getString(R.string.safe_headset_warning_message),
-                null);
     }
 
     @Override
