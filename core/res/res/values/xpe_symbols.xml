@@ -111,4 +111,8 @@
   <java-symbol type="anim" name="slide_in_left_no_fade" />
   <java-symbol type="anim" name="slide_out_right_no_fade" />
 
+  <!-- Immersive mode confirmation dialog -->
+  <java-symbol type="string" name="immersive_mode_confirmation_title" />
+  <java-symbol type="string" name="immersive_mode_confirmation_message" />
+
 </resources>
