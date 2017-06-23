@@ -84,4 +84,9 @@ C42.897,4,44,5.103,44,6.464v49.072C44,56.897,42.897,58,41.536,58z M 24 0 H 34 V 
     <string name="quick_settings_compass_SW">SW</string>
     <string name="quick_settings_compass_W">W</string>
     <string name="quick_settings_compass_NW">NW</string>
+    
+    <!-- OnTheSpot: Message of the OTS dialog. [CHAR LIMIT=NONE] -->
+    <string name="disable_immersive_message" translatable="false">@*android:string/immersive_mode_confirmation_title</string>
+    <string name="safe_headset_volume" translatable="false">@*android:string/safe_headset_warning_title</string>
+
 </resources>

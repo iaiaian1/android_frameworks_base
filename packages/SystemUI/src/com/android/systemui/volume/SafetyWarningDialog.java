@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.util.Log;
+import android.util.SettingConfirmationHelper;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 

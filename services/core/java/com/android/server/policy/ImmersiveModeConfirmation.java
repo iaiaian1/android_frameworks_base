@@ -37,6 +37,7 @@ import android.provider.Settings;
 import android.service.vr.IVrManager;
 import android.service.vr.IVrStateCallbacks;
 import android.util.DisplayMetrics;
+import android.util.SettingConfirmationHelper;
 import android.util.Slog;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -379,6 +380,12 @@ public class ImmersiveModeConfirmation {
 
         @Override
         public void handleMessage(Message msg) {
+           SettingConfirmationHelper.request(
+               mContext,
+               Settings.System.DISABLE_IMMERSIVE_MESSAGE,
+                mContext.getString(R.string.immersive_mode_confirmation_title),
+                mContext.getString(R.string.immersive_mode_confirmation_message),
+                null);
             if (Settings.System.getInt(mContext.getContentResolver(),
                      Settings.System.DISABLE_IMMERSIVE_MESSAGE, 0) != 1) {
             switch(msg.what) {
