@@ -481,7 +481,7 @@ static pid_t ForkAndSpecializeCommon(JNIEnv* env, uid_t uid, gid_t gid, jintArra
 
   // Close any logging related FDs before we start evaluating the list of
   // file descriptors.
-  __android_log_close();
+  //__android_log_close();
 
   // If this is the first fork for this zygote, create the open FD table.
   // If it isn't, we just need to check whether the list of open files has
