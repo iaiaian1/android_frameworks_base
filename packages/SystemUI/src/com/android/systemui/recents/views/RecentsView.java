@@ -351,9 +351,10 @@ public class RecentsView extends FrameLayout {
         mClearRecents.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 EventBus.getDefault().send(new DismissAllTaskViewsEvent());
-		super.onAttachedToWindow();
+
             }
         });
+		super.onAttachedToWindow();
     }
 
     @Override
