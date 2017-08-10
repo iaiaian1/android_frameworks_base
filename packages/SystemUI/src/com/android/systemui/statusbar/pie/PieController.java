@@ -144,7 +144,7 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
             }
             mPieAttached = false;
         }
-        if (enabled) attachPie(gravity)
+        if (enabled) attachPie(gravity);
     }
 
     private boolean showPie() {
