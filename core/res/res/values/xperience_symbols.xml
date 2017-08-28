@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright 2020 Paranoid Android
+<<<<<<< HEAD
+=======
+    Copyright (C) 2018-2020 The XPerience Project
+>>>>>>> e7e8db6916e2... [statix-11] base: Global Actions with Advanced Reboot [1/2]
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,5 +26,15 @@
     <!-- The list of vendor package signatures that should also be considered
          platform signatures, specifically for use on devices with a vendor partition. -->
     <java-symbol type="array" name="config_vendorPlatformSignatures" />
+
+    <!-- Power Menu Reboot -->
+    <java-symbol name="reboot_to_bootloader_title" type="string" />
+    <java-symbol name="reboot_to_bootloader_message" type="string" />
+    <java-symbol name="reboot_to_recovery_title" type="string" />
+    <java-symbol name="reboot_to_recovery_message" type="string" />
+    <java-symbol name="reboot_system_title" type="string" />
+    <java-symbol name="reboot_system_message" type="string" />
+    <java-symbol type="array" name="config_rebootActionsList" />
+    <java-symbol type="array" name="values_globalActionsList" />
 
 </resources>
