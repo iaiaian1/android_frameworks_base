@@ -1708,5 +1708,14 @@ public final class PowerManager {
         try {
             mService.powerHint(hintId, data.length > 0 ? data[0] : 0);
         } catch (RemoteException dummy) {}
+     }
+
+     /*
+     * Gets the default button brightness value.
+     * @hide
+     */
+    public int getDefaultButtonBrightness() {
+        return mContext.getResources().getInteger(
+                com.android.internal.R.integer.config_buttonBrightnessSettingDefault);
     }
 }
