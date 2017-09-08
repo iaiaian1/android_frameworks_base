@@ -34,4 +34,5 @@
     <!-- Reboot actions -->
     <string name="global_action_restart_advanced">Advanced reboot</string>
 
+    <string name="statusbar_items_title">Statusbar icon</string>
 </resources>
