@@ -24,4 +24,9 @@
         <item name="android:layout_centerVertical">true</item>
     </style>
 
+    <!-- Pure Tuner Theme-->
+    <style name="ExTunerSettings" parent="@android:style/Theme.Material.Settings">
+        <item name="preferenceTheme">@style/TunerPreferenceTheme</item>
+    </style>
+
 </resources>
