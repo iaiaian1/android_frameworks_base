@@ -26,5 +26,7 @@
     <!-- Name of that key handler class -->
     <string name="config_deviceKeyHandlerClass" translatable="false"></string>
 
+    <!-- Wheter to enable doze always on -->
+    <bool name="config_enableDozeAlwaysOn">false</bool>
 
 </resources>

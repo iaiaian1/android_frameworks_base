@@ -24,4 +24,8 @@
 
     <!-- Name of that key handler class -->
     <string name="config_deviceKeyHandlerClass" translatable="false"></string>
+
+  <!-- Wheter to enable doze always on -->
+  <java-symbol type="bool" name="config_enableDozeAlwaysOn"/>
+
 </resources>
