@@ -49,4 +49,7 @@
       <string-array name="config_vendorPlatformSignatures">
       </string-array>
 
+  <!-- Does the device supports multicolor LED -->
+  <bool name="config_multiColorNotificationLed">false</bool>
+
 </resources>
