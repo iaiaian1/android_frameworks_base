@@ -28,8 +28,4 @@
   <java-symbol name="reboot_to_recovery_message" type="string" />
   <java-symbol name="reboot_system_title" type="string" />
   <java-symbol name="reboot_system_message" type="string" />
-
-  <!-- Vendor mismatched fingerprint warning -->
-  <java-symbol type="string" name="system_error_vendorprint" />
-
 </resources>
