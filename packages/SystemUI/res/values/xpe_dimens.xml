@@ -25,11 +25,4 @@
     <!-- Network traffic monitor -->
     <dimen name="net_traffic_multi_text_size">8dp</dimen>
     <dimen name="net_traffic_txt_img_padding">2dp</dimen>
-
-	<!-- Whether to enable doze always on -->
-	<java-symbol type="bool" name="config_enableDozeAlwaysOn"/>
-
-	<!-- Vendor mismatched fingerprint warning [CHAR LIMIT=NONE] -->
-	<string name="system_error_vendorprint">Your vendor image does not match the system. Please flash the <xliff:g id="string">%s</xliff:g> vendor image for your device</string>
-
 </resources>
