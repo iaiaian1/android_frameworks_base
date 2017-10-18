@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2017 OmniRom
+     Copyright (C) 2017 Benzo Rom
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,10 +15,5 @@
      limitations under the License.
 -->
 <resources>
-
     <dimen name="recents_task_view_header_lock_button_padding">48dp</dimen>
-
-  <!-- Whether to enable doze always on -->
-  <java-symbol type="bool" name="config_enableDozeAlwaysOn"/>
-
 </resources>
