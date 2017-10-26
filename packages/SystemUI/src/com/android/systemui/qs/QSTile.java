@@ -560,7 +560,6 @@ public abstract class QSTile<TState extends State> {
     }
 
     public static class State {
-        public boolean visible;
         public boolean enabled = true;
         public Icon icon;
         public boolean visible;
