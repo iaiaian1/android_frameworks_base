@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  Copyright (C) 2017 The Android Open Source Project
+      Copyright 2017, The XPerience Project
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- Caffeine QS tile -->
+    <string name="quick_settings_caffeine_label">Cofeină</string>
+    <string name="accessibility_quick_settings_caffeine_off">Cofeină oprită.</string>
+    <string name="accessibility_quick_settings_caffeine_on">Cofeină pornită.</string>
+
+    <!-- Ambient display QS tile -->
+    <string name="quick_settings_ambient_display_label">Afişare Ambient</string>
+    <string name="accessibility_quick_settings_ambient_display_off">Afişare Ambient oprită.</string>
+    <string name="accessibility_quick_settings_ambient_display_on">Afişare Ambient pornită.</string>
+    <string name="accessibility_quick_settings_ambient_display_changed_off">Afişare Ambient oprită.</string>
+    <string name="accessibility_quick_settings_ambient_display_changed_on">Afişare Ambient pornită.</string>
+
+    <!-- Heads up QS tile -->
+    <string name="quick_settings_heads_up_label">Heads up</string>
+    <string name="accessibility_quick_settings_heads_up_off">Heads up oprit.</string>
+    <string name="accessibility_quick_settings_heads_up_on">Heads up pornit.</string>
+    <string name="accessibility_quick_settings_heads_up_changed_off">Heads up oprit.</string>
+    <string name="accessibility_quick_settings_heads_up_changed_on">Heads up pornit.</string>
+
+</resources>
