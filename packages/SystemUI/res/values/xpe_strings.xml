@@ -30,10 +30,7 @@
     <string name="accessibility_quick_settings_heads_up_on">Heads up on.</string>
     <string name="accessibility_quick_settings_heads_up_changed_off">Heads up turned off.</string>
     <string name="accessibility_quick_settings_heads_up_changed_on">Heads up turned on.</string>
-<<<<<<< HEAD:packages/SystemUI/res/values/xperience_strings.xml
 
-    <!-- Reboot actions -->
-    <string name="global_action_restart_advanced">Advanced reboot</string>
 
     <string name="statusbar_items_title">Statusbar icon</string>
 
@@ -49,6 +46,4 @@
     <string name="tuner_keyguard_show_battery_bar_always_title">Always show battery bar</string>
     <string name="tuner_keyguard_show_battery_bar_always_summary">Always show battery bar on charging</string>
 
-=======
->>>>>>> parent of f8330eb4ed5... PowerMenu: add a toggleable recovery/bootloader action:packages/SystemUI/res/values/xpe_strings.xml
 </resources>
