@@ -1116,7 +1116,9 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
         if (r != null) {
             final TaskRecord task = r.getTask();
             mRecentTasks.addLocked(task);
-            task.touchActiveTime();
+            if (task != null) {
+                task.touchActiveTime();
+            }
         }
     }
 
