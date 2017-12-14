@@ -123,7 +123,7 @@ public class AmbientDisplayTile extends QSTileImpl<BooleanState> {
     }
 
     @Override
-    public void HandleSetListening(boolean listening) {
+    public void handleSetListening(boolean listening) {
         // Do nothing
     }
 }
