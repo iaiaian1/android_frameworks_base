@@ -2242,9 +2242,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         final Resources res = mContext.getResources();
         final String[] deviceKeyHandlerLibs = res.getStringArray(
-                com.android.internal.R.array.config_deviceKeyHandlerLibs);
+                org.lineageos.platform.internal.R.array.config_deviceKeyHandlerLibs);
         final String[] deviceKeyHandlerClasses = res.getStringArray(
-                com.android.internal.R.array.config_deviceKeyHandlerClasses);
+                org.lineageos.platform.internal.R.array.config_deviceKeyHandlerClasses);
 
         for (int i = 0;
                 i < deviceKeyHandlerLibs.length && i < deviceKeyHandlerClasses.length; i++) {
