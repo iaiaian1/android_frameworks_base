@@ -473,7 +473,6 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
            aBoostParamVal = mService.mContext.getResources().getIntArray(
                    com.android.internal.R.array.animationboost_param_value);
         }
-        final ActivityStackSupervisor.ActivityDisplay display = mActivityContainer.mActivityDisplay;
 
         mTmpRect2.setEmpty();
         mWindowContainerController = createStackWindowController(display.mDisplayId, onTop,
