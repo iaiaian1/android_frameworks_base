@@ -56,6 +56,7 @@ import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -890,6 +891,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         createAndAddWindows();
 
         mSettingsObserver.onChange(false); // set up
+        mSbSettingsObserver.observe();
+        mSbSettingsObserver.update();
         mNosSettingsObserver.observe();
         mNosSettingsObserver.update();
         mCommandQueue.disable(switches[0], switches[6], false /* animate */);
@@ -4674,11 +4677,18 @@ public class StatusBar extends SystemUI implements DemoMode,
     protected void updateTheme() {
         final boolean inflated = mStackScroller != null;
 
-        // The system wallpaper defines if QS should be light or dark.
-        WallpaperColors systemColors = mColorExtractor
-                .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
-        final boolean useDarkTheme = systemColors != null
-                && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
+        int userThemeSetting = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.SYSTEM_THEME_STYLE, 0, mCurrentUserId);
+        boolean useDarkTheme = false;
+        if (userThemeSetting == 0) {
+            // The system wallpaper defines if QS should be light or dark.
+            WallpaperColors systemColors = mColorExtractor
+                    .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
+            useDarkTheme = systemColors != null
+                    && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
+        } else {
+            useDarkTheme = userThemeSetting == 2;
+        }
         if (isUsingDarkTheme() != useDarkTheme) {
             try {
                 mOverlayManager.setEnabled("com.android.systemui.theme.dark",
@@ -5867,6 +5877,29 @@ public class StatusBar extends SystemUI implements DemoMode,
     private void setLockscreenDoubleTapToSleep() {
         if (mStatusBarWindow != null) {
             mStatusBarWindow.setLockscreenDoubleTapToSleep();
+        }
+    }
+
+    private SbSettingsObserver mSbSettingsObserver = new SbSettingsObserver(mHandler);
+    private class SbSettingsObserver extends ContentObserver {
+        SbSettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SYSTEM_THEME_STYLE),
+                    false, this, UserHandle.USER_ALL);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            update();
+        }
+
+        public void update() {
+            updateTheme();
         }
     }
 
