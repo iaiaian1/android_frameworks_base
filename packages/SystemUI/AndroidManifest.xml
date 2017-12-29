@@ -199,6 +199,20 @@
     <!-- to change themes - light or dark -->
     <uses-permission android:name="android.permission.CHANGE_OVERLAY_PACKAGES" />
 
+    <!-- Screenshots -->
+    <uses-permission android:name="android.permission.ACCESS_SURFACE_FLINGER" />
+
+    <!-- Locale QS -->
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+
+    <!-- Reboot -->
+    <uses-permission android:name="android.permission.REBOOT" />
+    <uses-permission android:name="android.permission.RECOVERY" />
+
+    <!-- Global actions permissions -->
+    <uses-permission android:name="android.permission.SET_ACTIVITY_WATCHER" />
+    <uses-permission android:name="android.permission.SHUTDOWN" />
+
     <application
         android:name=".SystemUIApplication"
         android:persistent="true"
