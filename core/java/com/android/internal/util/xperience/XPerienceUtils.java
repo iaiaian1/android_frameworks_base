@@ -44,19 +44,12 @@ import java.util.List;
  */
 public class XPerienceUtils {
 
+
     public static void switchScreenOff(Context ctx) {
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
         if (pm!= null) {
             pm.goToSleep(SystemClock.uptimeMillis());
         }
-    }
-
-    public static boolean deviceHasFlashlight(Context ctx) {
-        return ctx.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-    }
-
-    public static void toggleCameraFlash() {
-        FireActions.toggleCameraFlash();
     }
 
     public static void sendKeycode(int keycode) {
