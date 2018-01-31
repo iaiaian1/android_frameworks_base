@@ -4143,21 +4143,49 @@ public final class Settings {
         public static final String POWERMENU_SCREENSHOT = "powermenu_screenshot";
 
         /**
-         * Whether to display settings in the power menu
+         * Whether to display the power menu advanced reboot option on a secured lockscreen
+         *
+         * @hide
+         */
+        public static final String POWERMENU_LS_ADVANCED_REBOOT = "powermenu_ls_advanced_reboot";
+
+        /**
+         * Whether to display the power menu screenshot option on a secured lockscreen
+         *
+         * @hide
+         */
+        public static final String POWERMENU_LS_SCREENSHOT = "powermenu_ls_screenshot";
+
+        /**
+         * Whether to display the power menu airplane mode option on a secured lockscreen
+         *
+         * @hide
+         */
+        public static final String POWERMENU_LS_AIRPLANE = "powermenu_ls_airplane";
+
+        /**
+         * Whether to display the power menu reboot option on a secured lockscreen
+         *
+         * @hide
+         */
+        public static final String POWERMENU_LS_REBOOT = "powermenu_ls_reboot";
+
+        /**
+         * Whether to display the advanced reboot option on the power menu
          *
          * @hide
          */
         public static final String POWERMENU_SETTINGS = "powermenu_settings";
 
         /**
-         * Whether to display lock in the power menu
+         * Whether to display the screenshot option on the power menu
          *
          * @hide
          */
         public static final String POWERMENU_LOCKDOWN = "powermenu_lockdown";
 
         /**
-         * Whether to display airplane in the power menu
+         * Whether to display the airplane option on the power menu
          *
          * @hide
          */
