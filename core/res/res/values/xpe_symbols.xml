@@ -82,4 +82,7 @@
   <!-- XPe World Easter Egg -->
   <java-symbol type="drawable" name="xpe_world_logo" />
 
+  <!-- Whether device has turbo power charging support -->
+  <java-symbol type="bool" name="config_hasTurboPowerCharger" />
+
 </resources>
