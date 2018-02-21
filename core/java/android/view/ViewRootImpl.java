@@ -3199,7 +3199,7 @@ public final class ViewRootImpl implements ViewParent,
         scrollToRectOrFocus(null, false);
 
         if (mAttachInfo.mViewScrollChanged) {
-            if (mHaveMoveEvent && !mIsPerfLockAcquired) {
+            if (!SCROLL_BOOST_SS_ENABLE && mHaveMoveEvent && !mIsPerfLockAcquired) {
                 mIsPerfLockAcquired = true;
                 if (mPerf != null) {
                     String currentPackage = mContext.getPackageName();
@@ -5121,11 +5121,13 @@ public final class ViewRootImpl implements ViewParent,
             mAttachInfo.mHandlingPointerEvent = true;
             boolean handled = mView.dispatchPointerEvent(event);
             int action = event.getActionMasked();
-            if (action == MotionEvent.ACTION_MOVE) {
-                mHaveMoveEvent = true;
-            } else if (action == MotionEvent.ACTION_UP) {
-                mHaveMoveEvent = false;
-                mIsPerfLockAcquired = false;
+            if (!SCROLL_BOOST_SS_ENABLE) {
+                if (action == MotionEvent.ACTION_MOVE) {
+                    mHaveMoveEvent = true;
+                } else if (action == MotionEvent.ACTION_UP) {
+                    mHaveMoveEvent = false;
+                    mIsPerfLockAcquired = false;
+                }
             }
             maybeUpdatePointerIcon(event);
             maybeUpdateTooltip(event);
