@@ -164,7 +164,6 @@ public class SyntheticPasswordCrypto {
             keyStore.setEntry(keyAlias,
                     new KeyStore.SecretKeyEntry(secretKey),
                     builder.build());
-
             byte[] intermediate = encrypt(applicationId, APPLICATION_ID_PERSONALIZATION, data);
             return encrypt(secretKey, intermediate);
         } catch (CertificateException | IOException | BadPaddingException

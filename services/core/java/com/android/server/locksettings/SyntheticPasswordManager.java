@@ -793,7 +793,7 @@ public class SyntheticPasswordManager {
         byte[] pwdToken = computePasswordToken(credential, pwd);
 
         final byte[] applicationId;
-		final long sid;
+        final long sid;
         int weaverSlot = loadWeaverSlot(handle, userId);
         if (weaverSlot != INVALID_WEAVER_SLOT) {
             // Weaver based user password
@@ -806,7 +806,7 @@ public class SyntheticPasswordManager {
             if (result.gkResponse.getResponseCode() != VerifyCredentialResponse.RESPONSE_OK) {
                 return result;
             }
-			sid = GateKeeper.INVALID_SECURE_USER_ID;
+            sid = GateKeeper.INVALID_SECURE_USER_ID;
             applicationId = transformUnderWeaverSecret(pwdToken, result.gkResponse.getPayload());
         } else {
             byte[] gkPwdToken = passwordTokenToGkInput(pwdToken);
@@ -839,7 +839,7 @@ public class SyntheticPasswordManager {
                 result.gkResponse = VerifyCredentialResponse.ERROR;
                 return result;
             }
-			sid = sidFromPasswordHandle(pwd.passwordHandle);
+            sid = sidFromPasswordHandle(pwd.passwordHandle);
             applicationId = transformUnderSecdiscardable(pwdToken,
                     loadSecdiscardable(handle, userId));
         }
@@ -915,7 +915,7 @@ public class SyntheticPasswordManager {
         } else {
             secret = decryptSPBlob(getHandleName(handle),
                 Arrays.copyOfRange(blob, 2, blob.length), applicationId);
-		}
+        }
         if (secret == null) {
             Log.e(TAG, "Fail to decrypt SP for user " + userId);
             return null;
