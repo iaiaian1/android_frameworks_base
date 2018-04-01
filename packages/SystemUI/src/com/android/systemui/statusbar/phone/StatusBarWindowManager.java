@@ -79,8 +79,9 @@ public class StatusBarWindowManager implements RemoteInputController.Callback, D
 
     private boolean shouldEnableKeyguardScreenRotation() {
         Resources res = mContext.getResources();
-        return SystemProperties.getBoolean("lockscreen.rot_override", false)
-                || res.getBoolean(R.bool.config_enableLockScreenRotation);
+       /* return SystemProperties.getBoolean("lockscreen.rot_override", false)
+                || res.getBoolean(R.bool.config_enableLockScreenRotation);*/
+	return false;
     }
 
     /**
