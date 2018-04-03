@@ -35,4 +35,10 @@
     <string name="global_action_restart_advanced">Advanced reboot</string>
 
     <string name="statusbar_items_title">Statusbar icon</string>
+
+    <!-- Quick Settings brightness slider -->
+    <string name="tuner_quick_settings">Quick settings</string>
+    <string name="tuner_show_brightness_new">Show brightness slider</string>
+    <string name="tuner_brightness_position_bottom">Brightness slider on bottom</string>
+
 </resources>
