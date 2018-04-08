@@ -74,4 +74,9 @@
 
     <!-- Button that controls inversion of layout of navigation bar -->
     <string name="nav_bar_layout_inverse">Invert layout</string>
+
+    <!-- Smart Pixels QS Tile -->
+    <string name="quick_settings_smart_pixels">Smart Pixels</string>
+    <string name="quick_settings_smart_pixels_on_power_save">Auto-enabled Smart Pixels</string>
+
 </resources>

@@ -42,6 +42,7 @@ import com.android.systemui.qs.tiles.NfcTile;
 import com.android.systemui.qs.tiles.NightDisplayTile;
 import com.android.systemui.qs.tiles.RotationLockTile;
 import com.android.systemui.qs.tiles.CaffeineTile;
+import com.android.systemui.qs.tiles.SmartPixelsTile;
 import com.android.systemui.qs.tiles.UsbTetherTile;
 import com.android.systemui.qs.tiles.UserTile;
 import com.android.systemui.qs.tiles.WeatherTile;
@@ -115,6 +116,8 @@ public class QSFactoryImpl implements QSFactory {
                 return new WeatherTile(mHost);
             case "hwkeys":
                 return new HWKeysTile(mHost);
+            case "smartpixels":
+                return new SmartPixelsTile(mHost);
         }
 
         // Intent tiles.
