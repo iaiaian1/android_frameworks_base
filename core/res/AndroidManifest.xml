@@ -640,6 +640,9 @@
     <protected-broadcast android:name="com.android.systemui.action.RESTART_THEME" />
     <protected-broadcast android:name="com.android.systemui.action.REFRESH_SOUND" />
 
+    <!-- Font service -->
+    <protected-broadcast android:name="com.android.server.ACTION_FONT_CHANGED" />
+
     <!-- ====================================================================== -->
     <!--                          RUNTIME PERMISSIONS                           -->
     <!-- ====================================================================== -->
