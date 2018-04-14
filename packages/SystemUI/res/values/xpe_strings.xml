@@ -68,4 +68,7 @@
    <!--Free Mem Bar-->
    <string name="recents_free_ram"> Free RAM: %1$d MB </string>
 
+   <!-- SysUI Tuner: Button that controls inversion of layout of navigation bar [CHAR LIMIT=60] -->
+   <string name="nav_bar_layout_inverse">Invert button layout</string>
+
 </resources>
