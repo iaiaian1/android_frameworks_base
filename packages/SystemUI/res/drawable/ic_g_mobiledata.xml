@@ -1,27 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2018 The Android Open Source Project
+	Copyright (C) 2018 The XPerience Project
 
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
           http://www.apache.org/licenses/LICENSE-2.0
 
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="6.18dp"
-    android:height="15dp"
-    android:viewportWidth="7"
-    android:viewportHeight="17">
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M6.73,12.24l-0.22,0.27c-0.63,0.73-1.55,1.1-2.76,1.1c-1.08,0-1.92-0.36-2.53-1.07c-0.61-0.71-0.93-1.72-0.94-3.02V7.56 c0-1.39,0.28-2.44,0.84-3.13S2.5,3.39,3.62,3.39c0.95,0,1.69,0.26,2.23,0.79s0.83,1.28,0.89,2.26H5.48 c-0.05-0.62-0.22-1.1-0.52-1.45S4.22,4.46,3.62,4.46c-0.72,0-1.24,0.23-1.57,0.7S1.54,6.37,1.53,7.4v2.03c0,1,0.19,1.77,0.57,2.31 c0.38,0.54,0.93,0.8,1.65,0.8c0.67,0,1.19-0.16,1.54-0.49l0.18-0.17V9.59H3.66V8.52h3.07V12.24z" />
-    <path
-        android:pathData="M 0 0 H 7 V 17 H 0 V 0 Z" />
+-->
+<vector android:tint="?android:colorControlNormal" 
+        android:height="24.0dip" 
+		android:width="24.0dip" 
+		android:viewportWidth="24.0" 
+		android:viewportHeight="24.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <group android:translateX="3.5">
+        <path android:fillColor="#ffffffff" android:pathData="M6.500000,9.900000c-0.200000,0.400000 -0.600000,0.700000 -1.000000,0.900000s-1.000000,0.400000 -1.800000,0.400000c-0.900000,0.000000 -1.700000,-0.300000 -2.200000,-0.800000S0.700000,9.000000 0.700000,7.900000L0.700000,5.600000c0.000000,-1.100000 0.300000,-1.900000 0.800000,-2.400000s1.200000,-0.800000 2.100000,-0.800000c1.000000,0.000000 1.700000,0.200000 2.100000,0.700000s0.700000,1.200000 0.700000,2.100000L4.700000,5.200000c0.000000,-0.500000 -0.100000,-0.900000 -0.200000,-1.100000S4.000000,3.700000 3.600000,3.700000c-0.400000,0.000000 -0.700000,0.200000 -0.900000,0.500000S2.300000,5.000000 2.300000,5.600000l0.000000,2.300000c0.000000,0.700000 0.100000,1.100000 0.300000,1.400000s0.600000,0.500000 1.000000,0.500000c0.300000,0.000000 0.600000,0.000000 0.700000,-0.100000s0.300000,-0.200000 0.400000,-0.300000L4.700000,7.800000L3.500000,7.800000L3.500000,6.600000l2.900000,0.000000L6.400000,9.900000z" />
+    </group>
+
 </vector>
