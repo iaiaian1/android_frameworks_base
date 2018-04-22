@@ -4163,6 +4163,12 @@ public final class Settings {
          */
         public static final String POWERMENU_LS_AIRPLANE = "powermenu_ls_airplane";
 
+	/** Whether to skip music track with volume rocker
+        /**
+	 * @hide
+         */
+	public static final String VOLUME_BUTTON_MUSIC_CONTROL = "volume_button_music_control";
+
         /**
          * Whether to display the power menu reboot option on a secured lockscreen
          *
@@ -4444,6 +4450,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(EGG_MODE);
             PRIVATE_SETTINGS.add(SHOW_BATTERY_PERCENT);
             PRIVATE_SETTINGS.add(DISPLAY_COLOR_MODE);
+            PRIVATE_SETTINGS.add(VOLUME_BUTTON_MUSIC_CONTROL);
         }
 
         /**
