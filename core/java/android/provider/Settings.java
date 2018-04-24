@@ -7290,6 +7290,15 @@ public final class Settings {
                 "managed_profile_contact_remote_search";
 
         /**
+         * Which theme is set for Navbar
+         *
+         * 0 - Default
+         * 1 - Pixel
+         * @hide
+         */
+        public static final String NAVBAR_THEME = "navbar_theme";
+
+        /**
          * Whether or not the automatic storage manager is enabled and should run on the device.
          *
          * @hide
