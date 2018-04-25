@@ -67,6 +67,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import java.lang.reflect.Method;
+
 public final class ShutdownThread extends Thread {
     // constants
     private static final String TAG = "ShutdownThread";
@@ -780,6 +782,33 @@ public final class ShutdownThread extends Thread {
         if (!done[0]) {
             Log.w(TAG, "Timed out waiting for NFC, Radio and Bluetooth shutdown.");
         }
+    }
+
+    /**
+     * XPerience shutdown handler. This function will load the xperience-services jar file
+     * and call into the rebootOrShutdown method defined there if present
+     */
+    private static void deviceRebootOrShutdown(boolean reboot, String reason)
+    {
+            Class<?> cl;
+            String deviceShutdownClassName = "mx.xperience.power.ShutdownXPe";
+            String deviceShutdownMethodName = "rebootOrShutdown";
+            try {
+                    cl = Class.forName(deviceShutdownClassName);
+                    Method m;
+                    try {
+                        m = cl.getMethod(deviceShutdownMethodName, new Class[] {boolean.class, String.class});
+                        m.invoke(cl.newInstance(), reboot, reason);
+                    } catch (NoSuchMethodException ex) {
+                        Log.e(TAG, "Unable to find method " + deviceShutdownMethodName + " in class " + deviceShutdownClassName);
+                    } catch (Exception ex) {
+                        Log.e(TAG, "Unknown exception while trying to invoke " + deviceShutdownMethodName);
+                    }
+            } catch (ClassNotFoundException e) {
+                Log.e(TAG, "Unable to find class " + deviceShutdownClassName);
+            } catch (Exception e) {
+                Log.e(TAG, "Unknown exception while loading class " + deviceShutdownClassName);
+            }
     }
 
     /**
