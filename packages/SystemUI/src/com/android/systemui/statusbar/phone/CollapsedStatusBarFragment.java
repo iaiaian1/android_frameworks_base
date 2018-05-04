@@ -29,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.os.Handler;
 import android.os.UserHandle;
@@ -67,8 +68,8 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private SignalClusterView mSignalClusterView;
 
     // XPerience Status Logo
-    private View mXPerienceLogo;
-    private View mXPerienceLogoRight;
+    private ImageView mXPerienceLogo;
+    private ImageView mXPerienceLogoRight;
     private int mShowLogo;
     private final Handler mHandler = new Handler();
 
@@ -124,8 +125,10 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mSystemIconArea = mStatusBar.findViewById(R.id.system_icon_area);
         mSignalClusterView = mStatusBar.findViewById(R.id.signal_cluster);
         Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mSignalClusterView);
-        mXPerienceLogo = mStatusBar.findViewById(R.id.status_bar_logo);
-        mXPerienceLogoRight = mStatusBar.findViewById(R.id.status_bar_logo_right);
+        mXPerienceLogo = (ImageView) mStatusBar.findViewById(R.id.status_bar_logo);
+		Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mXPerienceLogo);
+        mXPerienceLogoRight  = (ImageView) mStatusBar.findViewById(R.id.status_bar_logo_right);
+		Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mXPerienceLogoRight);
         updateSettings(false);
         // Default to showing until we know otherwise.
         showSystemIconArea(false);
@@ -155,6 +158,8 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         super.onDestroyView();
         Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(mSignalClusterView);
         Dependency.get(StatusBarIconController.class).removeIconGroup(mDarkIconManager);
+        Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(mXPerienceLogo);
+        Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(mXPerienceLogoRight);
         if (mNetworkController.hasEmergencyCryptKeeperText()) {
             mNetworkController.removeCallback(mSignalCallback);
         }
