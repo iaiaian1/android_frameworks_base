@@ -56,6 +56,8 @@
     <!-- Enable face auth only when swiping security view -->
     <bool name="config_faceAuthOnlyOnSecurityView">false</bool>
 
-
     <bool name="config_needCustomFODView">false</bool>
+
+    <!-- Whether device has an alert slider. -->
+    <bool name="config_hasAlertSlider">false</bool>
 </resources>
