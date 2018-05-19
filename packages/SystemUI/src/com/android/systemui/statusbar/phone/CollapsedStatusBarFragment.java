@@ -40,6 +40,7 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 
+import com.android.internal.utils.xperience.UserContentObserver;
 import com.android.systemui.Dependency;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
