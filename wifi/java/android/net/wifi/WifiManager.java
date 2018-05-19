@@ -904,7 +904,7 @@ public class WifiManager {
     /* Number of currently active WifiLocks and MulticastLocks */
     private int mActiveLockCount;
 
-    private WeakReference<Context> mContextWeakRef;
+    private Context mContext;
     IWifiManager mService;
     private final int mTargetSdkVersion;
 
@@ -944,7 +944,7 @@ public class WifiManager {
      * is a system private class.
      */
     public WifiManager(Context context, IWifiManager service, Looper looper) {
-        mContextWeakRef = new WeakReference<Context>(context);
+        mContext = context;
         mService = service;
         mLooper = looper;
         mTargetSdkVersion = context.getApplicationInfo().targetSdkVersion;
@@ -1265,13 +1265,12 @@ public class WifiManager {
      */
     public boolean enableNetwork(int netId, boolean attemptConnect) {
         final boolean pin = attemptConnect && mTargetSdkVersion < Build.VERSION_CODES.LOLLIPOP;
-        Context context = mContextWeakRef.get();
-        if (pin && context != null) {
+        if (pin) {
             NetworkRequest request = new NetworkRequest.Builder()
                     .clearCapabilities()
                     .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
                     .build();
-            NetworkPinner.pin(context, request);
+            NetworkPinner.pin(mContext, request);
         }
 
         boolean success;
@@ -1568,9 +1567,7 @@ public class WifiManager {
     @RequiresPermission(android.Manifest.permission.UPDATE_DEVICE_STATS)
     public boolean startScan(WorkSource workSource) {
         try {
-            Context context = mContextWeakRef.get();
-            if (context == null) return false;
-            String packageName = context.getOpPackageName();
+            String packageName = mContext.getOpPackageName();
             mService.startScan(null, workSource, packageName);
             return true;
         } catch (RemoteException e) {
@@ -1670,9 +1667,7 @@ public class WifiManager {
     public List<ScanResult> getScanResults() {
         android.util.SeempLog.record(55);
         try {
-            Context context = mContextWeakRef.get();
-            if (context == null) return null;
-            return mService.getScanResults(context.getOpPackageName());
+            return mService.getScanResults(mContext.getOpPackageName());
         } catch (RemoteException e) {
             throw e.rethrowFromSystemServer();
         }
@@ -1788,9 +1783,7 @@ public class WifiManager {
      */
     public boolean setWifiEnabled(boolean enabled) {
         try {
-            Context context = mContextWeakRef.get();
-            if (context == null) return false;
-            return mService.setWifiEnabled(context.getOpPackageName(), enabled);
+            return mService.setWifiEnabled(mContext.getOpPackageName(), enabled);
         } catch (RemoteException e) {
             throw e.rethrowFromSystemServer();
         }
@@ -1885,13 +1878,7 @@ public class WifiManager {
     @Deprecated
     @RequiresPermission(android.Manifest.permission.TETHER_PRIVILEGED)
     public boolean setWifiApEnabled(WifiConfiguration wifiConfig, boolean enabled) {
-        Context context = mContextWeakRef.get();
-        if (context == null) {
-            Log.w(TAG, "Pid : " + android.os.Process.myPid()
-                    + " attempted call to setWifiApEnabled: enabled = " + enabled);
-            return false;
-        }
-        String packageName = context.getOpPackageName();
+        String packageName = mContext.getOpPackageName();
 
         Log.w(TAG, packageName + " attempted call to setWifiApEnabled: enabled = " + enabled);
         return false;
@@ -2008,13 +1995,11 @@ public class WifiManager {
     public void startLocalOnlyHotspot(LocalOnlyHotspotCallback callback,
             @Nullable Handler handler) {
         synchronized (mLock) {
-            Context context = mContextWeakRef.get();
-            if (context == null) return;
-            Looper looper = (handler == null) ? context.getMainLooper() : handler.getLooper();
+            Looper looper = (handler == null) ? mContext.getMainLooper() : handler.getLooper();
             LocalOnlyHotspotCallbackProxy proxy =
                     new LocalOnlyHotspotCallbackProxy(this, looper, callback);
             try {
-                String packageName = context.getOpPackageName();
+                String packageName = mContext.getOpPackageName();
                 int returnCode = mService.startLocalOnlyHotspot(
                         proxy.getMessenger(), new Binder(), packageName);
                 if (returnCode != LocalOnlyHotspotCallback.REQUEST_REGISTERED) {
@@ -2093,9 +2078,7 @@ public class WifiManager {
     public void watchLocalOnlyHotspot(LocalOnlyHotspotObserver observer,
             @Nullable Handler handler) {
         synchronized (mLock) {
-            Context context = mContextWeakRef.get();
-            if (context == null && handler == null) return;
-            Looper looper = (handler == null) ? context.getMainLooper() : handler.getLooper();
+            Looper looper = (handler == null) ? mContext.getMainLooper() : handler.getLooper();
             mLOHSObserverProxy = new LocalOnlyHotspotObserverProxy(this, looper, observer);
             try {
                 mService.startWatchLocalOnlyHotspot(
@@ -2703,13 +2686,9 @@ public class WifiManager {
     // Ensure that multiple ServiceHandler threads do not interleave message dispatch.
     private static final Object sServiceHandlerDispatchLock = new Object();
 
-    private static class ServiceHandler extends Handler {
-
-        WeakReference<WifiManager> mWifiManagerWeakRef;
-
-        ServiceHandler(Looper looper, WifiManager wifiManager) {
+    private class ServiceHandler extends Handler {
+        ServiceHandler(Looper looper) {
             super(looper);
-            mWifiManagerWeakRef = new WeakReference<WifiManager>(wifiManager);
         }
 
         @Override
@@ -2720,20 +2699,18 @@ public class WifiManager {
         }
 
         private void dispatchMessageToListeners(Message message) {
-            WifiManager wifiManager = mWifiManagerWeakRef.get();
-            if (wifiManager == null) return;
-            Object listener = wifiManager.removeListener(message.arg2);
+            Object listener = removeListener(message.arg2);
             switch (message.what) {
                 case AsyncChannel.CMD_CHANNEL_HALF_CONNECTED:
                     if (message.arg1 == AsyncChannel.STATUS_SUCCESSFUL) {
-                        wifiManager.mAsyncChannel.sendMessage(AsyncChannel.CMD_CHANNEL_FULL_CONNECTION);
+                        mAsyncChannel.sendMessage(AsyncChannel.CMD_CHANNEL_FULL_CONNECTION);
                     } else {
                         Log.e(TAG, "Failed to set up channel connection");
                         // This will cause all further async API calls on the WifiManager
                         // to fail and throw an exception
-                        wifiManager.mAsyncChannel = null;
+                        mAsyncChannel = null;
                     }
-                    wifiManager.mConnected.countDown();
+                    mConnected.countDown();
                     break;
                 case AsyncChannel.CMD_CHANNEL_FULLY_CONNECTED:
                     // Ignore
@@ -2742,7 +2719,7 @@ public class WifiManager {
                     Log.e(TAG, "Channel connection lost");
                     // This will cause all further async API calls on the WifiManager
                     // to fail and throw an exception
-                    wifiManager.mAsyncChannel = null;
+                    mAsyncChannel = null;
                     getLooper().quit();
                     break;
                     /* ActionListeners grouped together */
@@ -2768,8 +2745,8 @@ public class WifiManager {
                         WpsResult result = (WpsResult) message.obj;
                         ((WpsCallback) listener).onStarted(result.pin);
                         //Listener needs to stay until completion or failure
-                        synchronized (wifiManager.mListenerMapLock) {
-                            wifiManager.mListenerMap.put(message.arg2, listener);
+                        synchronized (mListenerMapLock) {
+                            mListenerMap.put(message.arg2, listener);
                         }
                     }
                     break;
@@ -2846,8 +2823,8 @@ public class WifiManager {
             mAsyncChannel = new AsyncChannel();
             mConnected = new CountDownLatch(1);
 
-            Handler handler = new ServiceHandler(mLooper, this);
-            mAsyncChannel.connect(mContextWeakRef.get(), handler, messenger);
+            Handler handler = new ServiceHandler(mLooper);
+            mAsyncChannel.connect(mContext, handler, messenger);
             try {
                 mConnected.await();
             } catch (InterruptedException e) {

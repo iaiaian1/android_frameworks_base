@@ -29,7 +29,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Slog;
 
-import java.lang.ref.WeakReference;
 import java.util.Stack;
 
 /**
@@ -187,8 +186,8 @@ public class AsyncChannel {
     /** Service connection */
     private AsyncChannelConnection mConnection;
 
-    /** WeakReference of Context for source */
-    private WeakReference<Context> mSrcContextWeakRef;
+    /** Context for source */
+    private Context mSrcContext;
 
     /** Handler for source */
     private Handler mSrcHandler;
@@ -227,7 +226,7 @@ public class AsyncChannel {
         mConnection = new AsyncChannelConnection();
 
         /* Initialize the source information */
-        mSrcContextWeakRef = new WeakReference<Context>(srcContext);
+        mSrcContext = srcContext;
         mSrcHandler = srcHandler;
         mSrcMessenger = new Messenger(srcHandler);
 
@@ -397,7 +396,7 @@ public class AsyncChannel {
         if (DBG) log("connected srcHandler to the dstMessenger  E");
 
         // Initialize source fields
-        mSrcContextWeakRef = new WeakReference<Context>(srcContext);
+        mSrcContext = srcContext;
         mSrcHandler = srcHandler;
         mSrcMessenger = new Messenger(mSrcHandler);
 
@@ -436,6 +435,7 @@ public class AsyncChannel {
      * To close the connection call when handler receives CMD_CHANNEL_DISCONNECTED
      */
     public void disconnected() {
+        mSrcContext = null;
         mSrcHandler = null;
         mSrcMessenger = null;
         mDstMessenger = null;
@@ -447,9 +447,8 @@ public class AsyncChannel {
      * Disconnect
      */
     public void disconnect() {
-        Context srcContext = mSrcContextWeakRef == null ? null : mSrcContextWeakRef.get();
-        if ((mConnection != null) && (srcContext != null)) {
-            srcContext.unbindService(mConnection);
+        if ((mConnection != null) && (mSrcContext != null)) {
+            mSrcContext.unbindService(mConnection);
             mConnection = null;
         }
         try {
