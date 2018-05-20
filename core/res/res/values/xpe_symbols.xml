@@ -85,4 +85,7 @@
   <!-- Whether device has turbo power charging support -->
   <java-symbol type="bool" name="config_hasTurboPowerCharger" />
 
+  <!-- High Brightness Mode -->
+  <java-symbol type="bool" name="config_supportHighBrightness" />
+
 </resources>
