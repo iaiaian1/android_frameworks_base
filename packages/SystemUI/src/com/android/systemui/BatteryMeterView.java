@@ -61,6 +61,7 @@ import com.android.systemui.statusbar.policy.ConfigurationController.Configurati
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.tuner.TunerService.Tunable;
 import com.android.systemui.util.Utils.DisableStateTracker;
+import com.android.systemui.R;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -387,7 +388,7 @@ public class BatteryMeterView extends LinearLayout implements
                 SHOW_BATTERY_PERCENT, 0, mUser);
 
         if ((mShowPercentAvailable && systemSetting && mShowPercentMode != MODE_OFF)
-                || mShowPercentMode == MODE_ON || mShowPercentMode == MODE_ESTIMATE) {
+                || mShowPercentMode == MODE_ON || mShowPercentMode == MODE_ESTIMATE || mForceShowPercent) {
             if (!showing) {
                 mBatteryPercentView = loadPercentView();
                 if (mPercentageStyleId != 0) { // Only set if specified as attribute
