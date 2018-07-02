@@ -2551,7 +2551,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 }
             }
 
-            if (mFirstBoot) {
+            if (!mOnlyCore && mFirstBoot) {
                 requestCopyPreoptedFiles();
             }
 
