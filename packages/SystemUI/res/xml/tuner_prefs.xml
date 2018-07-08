@@ -37,7 +37,8 @@
 
         <com.android.systemui.tuner.StatusBarSwitch
             android:key="headset"
-            android:title="@string/headset" />
+            android:title="@string/headset"
+             android:defaultValue="true" />
 
         <com.android.systemui.tuner.StatusBarSwitch
             android:key="managed_profile"
@@ -100,13 +101,6 @@
             android:key="alarm_clock"
             android:title="@string/status_bar_alarm" />
 
-        <!-- secure -->
-
-        <com.android.systemui.tuner.ClockPreference
-            android:title="@string/tuner_time"
-            android:summary="%s"
-            android:entries="@array/clock_options" />
-
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -140,16 +134,6 @@
           sysui:defValue="true" />
 
     </PreferenceScreen>
-
-    <Preference
-        android:key="nav_bar"
-        android:title="@string/nav_bar"
-        android:fragment="com.android.systemui.tuner.NavBarTuner" />
-
-    <Preference
-            android:key="lockscreen"
-            android:title="@string/tuner_lock_screen"
-            android:fragment="com.android.systemui.tuner.LockscreenFragment" />
 
     <Preference
             android:key="plugins"
