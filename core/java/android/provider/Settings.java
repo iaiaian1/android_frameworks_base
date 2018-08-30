@@ -4319,6 +4319,17 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_WEATHER_TEMP = "status_bar_show_weather_temp";
 
         /**
+         * @hide
+         */
+        public static final String OMNI_LOCKSCREEN_WEATHER_ENABLED = "lockscreen_weather_enabled";
+
+        /**
+         * @hide
+         */
+        private static final Validator OMNI_LOCKSCREEN_WEATHER_ENABLED_VALIDATOR =
+                BOOLEAN_VALIDATOR;
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -4376,7 +4387,8 @@ public final class Settings {
             SHOW_BATTERY_PERCENT,
             NOTIFICATION_VIBRATION_INTENSITY,
             HAPTIC_FEEDBACK_INTENSITY,
-            DISPLAY_COLOR_MODE
+            DISPLAY_COLOR_MODE,
+            OMNI_LOCKSCREEN_WEATHER_ENABLED,
         };
 
         /**
@@ -4492,6 +4504,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(SHOW_BATTERY_PERCENT);
             PRIVATE_SETTINGS.add(DISPLAY_COLOR_MODE);
             PRIVATE_SETTINGS.add(VOLUME_BUTTON_MUSIC_CONTROL);
+            PRIVATE_SETTINGS.add(OMNI_LOCKSCREEN_WEATHER_ENABLED);
         }
 
         /**
@@ -4580,6 +4593,8 @@ public final class Settings {
             VALIDATORS.put(WIFI_STATIC_DNS1, WIFI_STATIC_DNS1_VALIDATOR);
             VALIDATORS.put(WIFI_STATIC_DNS2, WIFI_STATIC_DNS2_VALIDATOR);
             VALIDATORS.put(SHOW_BATTERY_PERCENT, SHOW_BATTERY_PERCENT_VALIDATOR);
+            VALIDATORS.put(OMNI_LOCKSCREEN_WEATHER_ENABLED,
+                    OMNI_LOCKSCREEN_WEATHER_ENABLED_VALIDATOR);
         }
 
         /**
