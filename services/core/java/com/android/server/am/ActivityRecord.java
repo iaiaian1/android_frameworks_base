@@ -2107,13 +2107,9 @@ final class ActivityRecord extends ConfigurationContainer implements AppWindowCo
             Log.i(TAG, sb.toString());
         }
         mStackSupervisor.reportActivityLaunchedLocked(false, this, thisTime, totalTime);
-        if (appInfo != null) {
-            int isGame = 0;
-            isGame = (appInfo.category == ApplicationInfo.CATEGORY_GAME ||
-                      (appInfo.flags & ApplicationInfo.FLAG_IS_GAME) == ApplicationInfo.FLAG_IS_GAME) ? 1 : 0;
-            if (mUxPerf !=  null) {
-                mUxPerf.perfUXEngine_events(BoostFramework.UXE_EVENT_GAME, 0, packageName, isGame);
-            }
+        int isGame = isAppInfoGame();
+        if (mUxPerf !=  null) {
+            mUxPerf.perfUXEngine_events(BoostFramework.UXE_EVENT_GAME, 0, packageName, isGame);
         }
         if (mPerfFirstDraw == null) {
             mPerfFirstDraw = new BoostFramework();
@@ -2126,6 +2122,15 @@ final class ActivityRecord extends ConfigurationContainer implements AppWindowCo
         }
         displayStartTime = 0;
         entry.mLaunchStartTime = 0;
+    }
+
+    public int isAppInfoGame() {
+        int isGame = 0;
+        if (appInfo != null) {
+            isGame = (appInfo.category == ApplicationInfo.CATEGORY_GAME ||
+                      (appInfo.flags & ApplicationInfo.FLAG_IS_GAME) == ApplicationInfo.FLAG_IS_GAME) ? 1 : 0;
+        }
+        return isGame;
     }
 
     @Override
