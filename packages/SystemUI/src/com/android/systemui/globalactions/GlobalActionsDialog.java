@@ -154,8 +154,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     private Action mSilentModeAction;
     private ToggleAction mAirplaneModeOn;
 
-    private ToggleAction.State mAirplaneState = ToggleAction.State.Off;
-
     private AdvancedAction mShowAdvancedToggles;
     private AdvancedAction mRestartRecovery;
     private AdvancedAction mRestartBootloader;
@@ -464,28 +462,38 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                 continue;
             }
             if (GLOBAL_ACTION_KEY_POWER.equals(actionKey)) {
-                mItems.add(new PowerAction());
+              if (Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.POWERMENU_POWER, 1) == 1) {
+                  mItems.add(new PowerAction());
+              }
             } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
-                mItems.add(mAirplaneModeOn);
+              if (Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.POWERMENU_AIRPLANE, 0) == 1) {
+                  mItems.add(mAirplaneModeOn);
+              }
             } else if (GLOBAL_ACTION_KEY_BUGREPORT.equals(actionKey)) {
                 if (Settings.Global.getInt(mContext.getContentResolver(),
                         Settings.Global.BUGREPORT_IN_POWER_MENU, 0) != 0 && isCurrentUserOwner()) {
                     mItems.add(new BugReportAction());
                 }
             } else if (GLOBAL_ACTION_KEY_SILENT.equals(actionKey)) {
-                if (mShowSilentToggle) {
-                    mItems.add(mSilentModeAction);
-                }
+              if (Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.POWERMENU_SOUNDPANEL, 0) == 1) {
+                  mItems.add(mSilentModeAction);
+              }
             } else if (GLOBAL_ACTION_KEY_USERS.equals(actionKey)) {
-                if (SystemProperties.getBoolean("fw.power_user_switcher", false)) {
-                    addUsersToMenu(mItems);
-                }
+              if (Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.POWERMENU_USERS, 0) == 1) {
+                  addUsersToMenu(mItems);
+              }
             } else if (GLOBAL_ACTION_KEY_SETTINGS.equals(actionKey)) {
-                mItems.add(getSettingsAction());
+              if (Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.POWERMENU_SETTINGS, 0) != 0) {
+                  mItems.add(getSettingsAction());
+              }
             } else if (GLOBAL_ACTION_KEY_LOCKDOWN.equals(actionKey)) {
-                if (Settings.Secure.getIntForUser(mContext.getContentResolver(),
-                            Settings.Secure.LOCKDOWN_IN_POWER_MENU, 0, getCurrentUser().id) != 0
-                        && shouldDisplayLockdown()) {
+              if (Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.POWERMENU_LOCKDOWN, 0) != 0) {
                     mItems.add(getLockdownAction());
                     mHasLockdownButton = true;
                 }
@@ -494,9 +502,15 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             } else if (GLOBAL_ACTION_KEY_ASSIST.equals(actionKey)) {
                 mItems.add(getAssistAction());
             } else if (GLOBAL_ACTION_KEY_RESTART.equals(actionKey)) {
-                mItems.add(new RestartAction());
+              if (Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.POWERMENU_REBOOT, 1) == 1) {
+                      mItems.add(new RestartAction());
+              }
             } else if (GLOBAL_ACTION_KEY_SCREENSHOT.equals(actionKey)) {
-                mItems.add(new ScreenshotAction());
+              if (Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.POWERMENU_SCREENSHOT, 0) != 0) {
+                  mItems.add(new ScreenshotAction());
+              }
             } else if (GLOBAL_ACTION_KEY_LOGOUT.equals(actionKey)) {
                 if (mDevicePolicyManager.isLogoutEnabled()
                         && getCurrentUser().id != UserHandle.USER_SYSTEM) {
@@ -504,7 +518,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                     mHasLogoutButton = true;
                 }
             } else if (GLOBAL_ACTION_KEY_RESTART_RECOVERY.equals(actionKey)) {
-                mItems.add(mShowAdvancedToggles);
+                      mItems.add(mShowAdvancedToggles);
             } else {
                 Log.e(TAG, "Invalid global action key " + actionKey);
             }
@@ -1695,8 +1709,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
 
         public void refreshList() {
             updateList(true);
-            // we need to recreate the HardwareBgDrawable
-            HardwareUiLayout.get(mListView).updateSettings();
         }
 
         @Override
