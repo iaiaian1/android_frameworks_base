@@ -99,4 +99,7 @@
     <!-- Whether the device has outdated qti-telephony-common.jar -->
     <bool name="config_oldQtiTelephony">true</bool>
 
+    <!-- True if the notifications should tint the app name with the dynamic or the accent color -->
+    <bool name="config_allowNotificationAppNameTextTinting">false</bool>
+
 </resources>

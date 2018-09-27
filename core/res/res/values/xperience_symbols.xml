@@ -102,4 +102,7 @@
 
   <java-symbol type="bool" name="config_oldQtiTelephony" />
 
+  <!-- Notification app name tint -->
+  <java-symbol type="bool" name="config_allowNotificationAppNameTextTinting" />
+
 </resources>
