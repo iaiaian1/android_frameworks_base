@@ -638,7 +638,7 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
             public void onChange(boolean selfChange, Uri uri) {
                 mScreenOffAnimation = Settings.System.getIntForUser(cr,
                         Settings.System.SCREEN_OFF_ANIMATION,
-                        SCREEN_OFF_FADE, UserHandle.USER_CURRENT);
+                        SCREEN_OFF_CRT, UserHandle.USER_CURRENT);
                 if (mPowerState != null) {
                     mPowerState.setScreenStateAnimator(mScreenOffAnimation);
                 }
@@ -649,7 +649,7 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
                 false, observer, UserHandle.USER_ALL);
         mScreenOffAnimation = Settings.System.getIntForUser(cr,
                 Settings.System.SCREEN_OFF_ANIMATION,
-                SCREEN_OFF_FADE, UserHandle.USER_CURRENT);
+                SCREEN_OFF_CRT, UserHandle.USER_CURRENT);
 
         mPowerState = new DisplayPowerState(mBlanker, mScreenOffAnimation);
 
