@@ -48,4 +48,7 @@
         See also Theme.DeviceDefault.Resolver.Exposed. -->
     <color name="chooser_service_row_background_color_exposed">@color/chooser_service_row_background_color</color>
 
+    <!-- Two target preference vertical divider color -->
+    <color name="list_divider_dark">#64000000</color>
+
 </resources>
