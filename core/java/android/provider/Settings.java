@@ -4389,6 +4389,16 @@ public final class Settings {
         public static final String FONT_INFO = "font_info";
 
         /**
+         * Weather lockscreen temperature scale
+         * @hide
+         */
+        public static final String WEATHER_LOCKSCREEN_UNIT = "weather_lockscreen_unit";
+
+        /** @hide */
+        private static final Validator WEATHER_LOCKSCREEN_UNIT_VALIDATOR =
+               BOOLEAN_VALIDATOR;
+
+        /**
          * Hold list of installed font provider packages. Uses "|" as a delimiter
          *
          * @hide
@@ -4580,6 +4590,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(SMART_PIXELS_PATTERN);
             PRIVATE_SETTINGS.add(SMART_PIXELS_SHIFT_TIMEOUT);
             PRIVATE_SETTINGS.add(SMART_PIXELS_ON_POWER_SAVE);
+            PRIVATE_SETTINGS.add(WEATHER_LOCKSCREEN_UNIT);
         }
 
         /**
@@ -4674,6 +4685,7 @@ public final class Settings {
             VALIDATORS.put(SMART_PIXELS_SHIFT_TIMEOUT, SMART_PIXELS_SHIFT_TIMEOUT_VALIDATOR);
             VALIDATORS.put(SMART_PIXELS_ON_POWER_SAVE, SMART_PIXELS_ON_POWER_SAVE_VALIDATOR);
             VALIDATORS.put(NOTIFICATION_LIGHT_PULSE, BOOLEAN_VALIDATOR);
+            VALIDATORS.put(WEATHER_LOCKSCREEN_UNIT, WEATHER_LOCKSCREEN_UNIT_VALIDATOR);
         }
 
         /**
