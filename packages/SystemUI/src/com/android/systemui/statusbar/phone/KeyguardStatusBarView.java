@@ -24,6 +24,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.database.ContentObserver;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Pair;
@@ -63,6 +65,7 @@ import com.android.systemui.statusbar.policy.UserSwitcherController;
 public class KeyguardStatusBarView extends RelativeLayout
         implements BatteryStateChangeCallback, OnUserInfoChangedListener, ConfigurationListener {
 
+    private static final String FONT_FAMILY = "sans-serif";
     private static final int LAYOUT_NONE = 0;
     private static final int LAYOUT_CUTOUT = 1;
     private static final int LAYOUT_NO_CUTOUT = 2;
@@ -120,7 +123,7 @@ public class KeyguardStatusBarView extends RelativeLayout
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
+        Typeface tf = Typeface.create(FONT_FAMILY, Typeface.NORMAL);
         MarginLayoutParams lp = (MarginLayoutParams) mMultiUserAvatar.getLayoutParams();
         lp.width = lp.height = getResources().getDimensionPixelSize(
                 R.dimen.multi_user_avatar_keyguard_size);
