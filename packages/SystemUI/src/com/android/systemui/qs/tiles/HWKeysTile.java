@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2017 The Nitrogen Project
  *
@@ -123,7 +124,7 @@ public class HWKeysTile extends QSTileImpl<BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.NITROGEN_SETTINGS;
+        return MetricsEvent.RAINBOW_UNICORN;
     }
 
     @Override
