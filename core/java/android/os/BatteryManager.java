@@ -156,12 +156,6 @@ public class BatteryManager {
     @SystemApi
     public static final String EXTRA_EVENT_TIMESTAMP = "android.os.extra.EVENT_TIMESTAMP";
 
-    //Mods
-    public static final String EXTRA_MOD_LEVEL = "mod_level";
-    public static final String EXTRA_MOD_STATUS = "mod_status";
-    public static final String EXTRA_MOD_TYPE = "mod_type";
-    public static final String EXTRA_MOD_FLAG = "mod_flag";
-
     /**
      * Extra for {@link android.content.Intent#ACTION_BATTERY_CHANGED}:
      * boolean value to detect fast charging
