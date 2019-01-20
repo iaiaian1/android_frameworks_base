@@ -1245,33 +1245,6 @@ public class NetworkStats implements Parcelable {
         return pool;
     }
 
-    /**
-     * Safely multiple a value by a rational.
-     * <p>
-     * Internally it uses integer-based math whenever possible, but switches
-     * over to double-based math if values would overflow.
-     */
-    @VisibleForTesting
-    public static long multiplySafe(long value, long num, long den) {
-        long x = value;
-        long y = num;
-
-        long r = x * y;
-        long ax = Math.abs(x);
-        long ay = Math.abs(y);
-        if (((ax | ay) >>> 31 != 0)) {
-            // Some bits greater than 2^31 that might cause overflow
-            // Check the result using the divide operator
-            // and check for the special case of Long.MIN_VALUE * -1
-            if (((y != 0) && (r / y != x)) ||
-                    (x == Long.MIN_VALUE && y == -1)) {
-                // Use double math to avoid overflowing
-                return (long) (((double) num / den) * value);
-            }
-        }
-        return r / den;
-    }
-
     private Entry addTrafficToApplications(int tunUid, String tunIface, String underlyingIface,
             Entry tunIfaceTotal, Entry pool) {
         Entry moved = new Entry();
