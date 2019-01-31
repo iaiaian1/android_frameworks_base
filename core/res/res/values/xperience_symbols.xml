@@ -138,4 +138,9 @@
     <!-- Default end time for Ambient Play quiet period -->
     <java-symbol type="integer" name="config_defaultAmbientPlayQuitPeriodEndTime" />
 
+    <!-- Weather default unit
+         0 - Celsius
+         1 - Fahrenheit -->
+    <java-symbol type="integer" name="weather_lockscreen_default_unit" />
+
 </resources>
