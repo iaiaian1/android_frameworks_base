@@ -2150,6 +2150,17 @@ public class StatusBar extends SystemUI implements DemoMode,
         return themeInfo != null && themeInfo.isEnabled();
     }
 
+    public boolean isUsingLunarTheme() {
+        OverlayInfo themeInfo = null;
+        try {
+            themeInfo = mOverlayManager.getOverlayInfo("com.android.system.theme.lunar",
+                    mLockscreenUserManager.getCurrentUserId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return themeInfo != null && themeInfo.isEnabled();
+    }
+
     // Check for black and white accent overlays
     public void unfuckBlackWhiteAccent() {
         OverlayInfo themeInfo = null;
@@ -4010,6 +4021,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         final boolean nightModeWantsDarkTheme = DARK_THEME_IN_NIGHT_MODE
                 && (config.uiMode & Configuration.UI_MODE_NIGHT_MASK)
                     == Configuration.UI_MODE_NIGHT_YES;
+        boolean useLunarTheme = false;
         boolean useBlackTheme = false;
         boolean useDarkTheme = false;
         if (userThemeSetting == 0) {
@@ -4024,6 +4036,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         } else {
             useBlackTheme = userThemeSetting == 3;
             useDarkTheme = userThemeSetting == 2;
+            useLunarTheme = userThemeSetting == 4;
             // Check for black and white accent so we don't end up
             // with white on white or black on black
             unfuckBlackWhiteAccent();
@@ -4064,6 +4077,17 @@ public class StatusBar extends SystemUI implements DemoMode,
                 } catch (RemoteException e) {
                     Log.w(TAG, "Can't change black theme(s)", e);
             }
+        }
+
+        if (isUsingLunarTheme() != useLunarTheme) {
+                try {
+                    mOverlayManager.setEnabled("com.android.system.theme.lunar",
+                            useLunarTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.settings.theme.lunar",
+                            useLunarTheme, mLockscreenUserManager.getCurrentUserId());
+                } catch (RemoteException e) {
+                    Log.w(TAG, "Can't change theme", e);
+                }
         }
 
         // Lock wallpaper defines the color of the majority of the views, hence we'll use it

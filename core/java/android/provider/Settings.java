@@ -4339,6 +4339,7 @@ public final class Settings {
          * 1 - force light
          * 2 - force dark
          * 3 - force black
+         * 4 - force Lunar
          * @hide
          */
         public static final String SYSTEM_UI_THEME = "system_ui_theme";
