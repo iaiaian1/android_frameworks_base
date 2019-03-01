@@ -4340,6 +4340,7 @@ public final class Settings {
          * 2 - force dark
          * 3 - force black
          * 4 - force Lunar
+         * 5 - force Ilta
          * @hide
          */
         public static final String SYSTEM_UI_THEME = "system_ui_theme";

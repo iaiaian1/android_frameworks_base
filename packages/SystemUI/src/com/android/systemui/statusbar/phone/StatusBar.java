@@ -2161,6 +2161,17 @@ public class StatusBar extends SystemUI implements DemoMode,
         return themeInfo != null && themeInfo.isEnabled();
     }
 
+    public boolean isUsingIltaTheme() {
+        OverlayInfo themeInfo = null;
+        try {
+            themeInfo = mOverlayManager.getOverlayInfo("com.android.system.theme.ilta",
+                    mLockscreenUserManager.getCurrentUserId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return themeInfo != null && themeInfo.isEnabled();
+    }
+
     // Check for black and white accent overlays
     public void unfuckBlackWhiteAccent() {
         OverlayInfo themeInfo = null;
@@ -4021,6 +4032,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         final boolean nightModeWantsDarkTheme = DARK_THEME_IN_NIGHT_MODE
                 && (config.uiMode & Configuration.UI_MODE_NIGHT_MASK)
                     == Configuration.UI_MODE_NIGHT_YES;
+        boolean useIltaTheme = false;
         boolean useLunarTheme = false;
         boolean useBlackTheme = false;
         boolean useDarkTheme = false;
@@ -4037,6 +4049,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             useBlackTheme = userThemeSetting == 3;
             useDarkTheme = userThemeSetting == 2;
             useLunarTheme = userThemeSetting == 4;
+            useIltaTheme = userThemeSetting == 5;
             // Check for black and white accent so we don't end up
             // with white on white or black on black
             unfuckBlackWhiteAccent();
@@ -4085,6 +4098,17 @@ public class StatusBar extends SystemUI implements DemoMode,
                             useLunarTheme, mLockscreenUserManager.getCurrentUserId());
                     mOverlayManager.setEnabled("com.android.settings.theme.lunar",
                             useLunarTheme, mLockscreenUserManager.getCurrentUserId());
+                } catch (RemoteException e) {
+                    Log.w(TAG, "Can't change theme", e);
+                }
+        }
+
+        if (isUsingIltaTheme() != useIltaTheme) {
+                try {
+                    mOverlayManager.setEnabled("com.android.system.theme.ilta",
+                            useIltaTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.settings.theme.ilta",
+                            useIltaTheme, mLockscreenUserManager.getCurrentUserId());
                 } catch (RemoteException e) {
                     Log.w(TAG, "Can't change theme", e);
                 }
