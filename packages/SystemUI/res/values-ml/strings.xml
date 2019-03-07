@@ -16,7 +16,6 @@
  * limitations under the License.
  */
  -->
-
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_label" msgid="4811759950673118541">"സിസ്റ്റം UI"</string>
@@ -1100,4 +1099,5 @@
     <string name="media_output_dialog_pairing_new" msgid="9099497976087485862">"പുതിയ ഉപകരണവുമായി ജോടിയാക്കുക"</string>
     <string name="battery_state_unknown_notification_title" msgid="8464703640483773454">"നിങ്ങളുടെ ബാറ്ററി മീറ്റർ വായിക്കുന്നതിൽ പ്രശ്‌നമുണ്ട്"</string>
     <string name="battery_state_unknown_notification_text" msgid="13720937839460899">"കൂടുതൽ വിവരങ്ങൾക്ക് ടാപ്പ് ചെയ്യുക"</string>
+    <string name="media_output_title" msgid="115223550977351699">"ഇതിലേക്ക് മീഡിയ പ്ലേ ചെയ്യുക"</string>
 </resources>

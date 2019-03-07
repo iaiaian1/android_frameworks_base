@@ -16,7 +16,6 @@
  * limitations under the License.
  */
  -->
-
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_label" msgid="4811759950673118541">"UI συστήματ."</string>
@@ -1100,4 +1099,5 @@
     <string name="media_output_dialog_pairing_new" msgid="9099497976087485862">"Σύζευξη νέας συσκευής"</string>
     <string name="battery_state_unknown_notification_title" msgid="8464703640483773454">"Υπάρχει κάποιο πρόβλημα με την ανάγνωση του μετρητή μπαταρίας"</string>
     <string name="battery_state_unknown_notification_text" msgid="13720937839460899">"Πατήστε για περισσότερες πληροφορίες."</string>
+    <string name="media_output_title" msgid="115223550977351699">"Αναπαραγωγή μέσων σε"</string>
 </resources>
