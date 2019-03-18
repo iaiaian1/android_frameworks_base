@@ -52,6 +52,12 @@
     <string name="keyguard_indication_turbo_power_time">TurboPower connected (<xliff:g id="charging_time_left">%s</xliff:g> until full)</string>
     <string name="keyguard_plugged_in_turbo_power_charging">TurboPower connected</string>
 
+    <!-- Moto mods -->
+    <string name="moto_mods" translatable="false">Moto Mods</string>
+    <string name="mod_battery_format">Moto Mod %1$d%%</string>
+    <string name="mod_info_status_charging_phone">Charging phone</string>
+    <string name="mod_info_status_not_charging">Not charging</string>
+
     <!-- Notify use that they are in Lock-to-app (for devices without navbar)-->
     <string name="screen_pinning_toast_no_navbar">To unpin this screen, touch &amp; hold Back button</string>
 

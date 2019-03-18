@@ -217,6 +217,8 @@
 
     <protected-broadcast android:name="com.android.settingslib.action.REGISTER_SLICE_RECEIVER" />
     <protected-broadcast android:name="com.android.settingslib.action.UNREGISTER_SLICE_RECEIVER" />
+    <protected-broadcast android:name="com.motorola.modservice.ui.action.SETTING_CHANGE"/>
+
 
     <uses-permission android:name="android.permission.ACCESS_SURFACE_FLINGER" />
 
@@ -227,6 +229,8 @@
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
     <uses-permission android:name="android.permission.ACCESS_SURFACE_FLINGER" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+    <uses-permission android:name="com.motorola.mod.permission.MOD_ACCESS_INFO"/>
+    <uses-permission android:name="com.motorola.mod.permission.MOD_INTERNAL"/>
 
     <!-- OmniJaws -->
     <uses-permission android:name="org.omnirom.omnijaws.READ_WEATHER" />
