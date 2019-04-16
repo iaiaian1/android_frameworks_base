@@ -484,6 +484,11 @@ public final class BatteryService extends SystemService {
         dst.batteryFullCharge = src.batteryFullCharge;
         dst.batteryChargeCounter = src.batteryChargeCounter;
         dst.batteryTechnology = src.batteryTechnology;
+        //MODS Love XPerience
+        dts.modLevel = src.modLevel;
+        dts.modStatus = src.modStatus;
+        dts.modType = src.modType;
+        dts.modFlag = src.modFlag;
     }
 
     private void processValuesLocked(boolean force) {
@@ -753,6 +758,10 @@ public final class BatteryService extends SystemService {
         intent.putExtra(BatteryManager.EXTRA_CHARGE_COUNTER, mHealthInfo.batteryChargeCounter);
         intent.putExtra(BatteryManager.EXTRA_DASH_CHARGER, mDashCharger);
         intent.putExtra(BatteryManager.EXTRA_TURBO_POWER, mTurboPower);
+        intent.putExtra(BatteryManager.EXTRA_MOD_LEVEL, mBatteryProps.modLevel);
+        intent.putExtra(BatteryManager.EXTRA_MOD_STATUS, mBatteryProps.modStatus);
+        intent.putExtra(BatteryManager.EXTRA_MOD_TYPE, mBatteryProps.modType);
+        intent.putExtra(BatteryManager.EXTRA_MOD_FLAG, mBatteryProps.modFlag);
         intent.putExtra("mod_level", mBatteryModProps.modLevel);
         intent.putExtra("mod_status", mBatteryModProps.modStatus);
         intent.putExtra("mod_flag", mBatteryModProps.modFlag);
