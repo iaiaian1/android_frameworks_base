@@ -70,6 +70,8 @@ public class WeatherTile extends QSTileImpl<BooleanState> implements OmniJawsCli
         super(host);
         mWeatherClient = new OmniJawsClient(mContext);
         mEnabled = mWeatherClient.isOmniJawsEnabled();
+        mWeatherImage = mContext.getResources().getDrawable(R.drawable.ic_qs_weather_default_off);
+        mWeatherLabel = mContext.getResources().getString(R.string.omnijaws_label_default);
         mActivityStarter = Dependency.get(ActivityStarter.class);
         mDetailAdapter = (WeatherDetailAdapter) createDetailAdapter();
     }
@@ -159,7 +161,6 @@ public class WeatherTile extends QSTileImpl<BooleanState> implements OmniJawsCli
             mWeatherData = null;
             mWeatherClient.setOmniJawsEnabled(false);
         }
-        refreshState();
     }
 
     @Override
@@ -173,19 +174,17 @@ public class WeatherTile extends QSTileImpl<BooleanState> implements OmniJawsCli
         if (DEBUG) Log.d(TAG, "handleUpdateState " + mEnabled);
         state.dualTarget = true;
         state.value = mEnabled;
-        state.state = state.value ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE;
+        state.isTransient = false;
         if (mEnabled) {
-            if (mWeatherImage == null) {
-                state.icon = ResourceIcon.get(R.drawable.ic_qs_weather_default_on);
-                state.label = mContext.getResources().getString(R.string.omnijaws_label_default);
-            } else {
-                state.icon = new DrawableIcon(mWeatherImage);
-                state.label = mWeatherLabel;
-            }
+            state.label = mWeatherLabel;
+            state.icon = new DrawableIcon(mWeatherImage);
+            state.state = Tile.STATE_ACTIVE;
         } else {
-            mWeatherImage = null;
-            state.icon = ResourceIcon.get(R.drawable.ic_qs_weather_default_off);
-            state.label = mContext.getResources().getString(R.string.omnijaws_label_default);
+            mWeatherLabel = mContext.getResources().getString(R.string.omnijaws_label_default);
+            mWeatherImage = mContext.getResources().getDrawable(R.drawable.ic_qs_weather_default_off);
+            state.label = mWeatherLabel;
+            state.icon = new DrawableIcon(mWeatherImage);
+            state.state = Tile.STATE_INACTIVE;
         }
     }
 
@@ -197,8 +196,7 @@ public class WeatherTile extends QSTileImpl<BooleanState> implements OmniJawsCli
     private void queryAndUpdateWeather() {
         try {
             if (DEBUG) Log.d(TAG, "queryAndUpdateWeather " + mEnabled);
-            mWeatherImage = null;
-            mWeatherLabel = mContext.getResources().getString(R.string.omnijaws_label_default);
+            mWeatherImage = mWeatherClient.getDefaultWeatherConditionImage();
             if (mEnabled) {
                 mWeatherClient.queryWeather();
                 mWeatherData = mWeatherClient.getWeatherInfo();
@@ -252,11 +250,7 @@ public class WeatherTile extends QSTileImpl<BooleanState> implements OmniJawsCli
                 mDetailedView.startProgress();
             } else {
                 mDetailedView.stopProgress();
-                mDetailedView.post(() -> {
-                    mDetailedView.updateWeatherData(null);
-                });
             }
-            refreshState();
         }
 
         @Override

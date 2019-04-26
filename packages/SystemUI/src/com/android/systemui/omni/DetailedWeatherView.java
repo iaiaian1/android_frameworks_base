@@ -81,7 +81,7 @@ public class DetailedWeatherView extends FrameLayout {
     private View mProgressContainer;
     private TextView mStatusMsg;
     private View mEmptyView;
-    private ImageView mEmptyViewImage;
+    private View mEmptyViewImage;
     private View mWeatherLine;
     private TextView mProviderName;
 
@@ -133,7 +133,7 @@ public class DetailedWeatherView extends FrameLayout {
         mCurrentText = (TextView) findViewById(R.id.current_text);
         mStatusMsg = (TextView) findViewById(R.id.status_msg);
         mEmptyView = findViewById(android.R.id.empty);
-        mEmptyViewImage = (ImageView) findViewById(R.id.empty_weather_image);
+        mEmptyViewImage = findViewById(R.id.empty_weather_image);
         mWeatherLine = findViewById(R.id.current_weather);
         mProviderName = (TextView) findViewById(R.id.current_weather_provider);
 
@@ -171,10 +171,8 @@ public class DetailedWeatherView extends FrameLayout {
         if (weatherData == null || !mWeatherClient.isOmniJawsEnabled()) {
             setErrorView();
             if (mWeatherClient.isOmniJawsEnabled()) {
-                mEmptyViewImage.setImageResource(R.drawable.ic_qs_weather_default_on);
                 mStatusMsg.setText(getResources().getString(R.string.omnijaws_service_unkown));
             } else {
-                mEmptyViewImage.setImageResource(R.drawable.ic_qs_weather_default_off);
                 mStatusMsg.setText(getResources().getString(R.string.omnijaws_service_disabled));
             }
             return;
@@ -311,10 +309,8 @@ public class DetailedWeatherView extends FrameLayout {
         setErrorView();
 
         if (errorReason == OmniJawsClient.EXTRA_ERROR_DISABLED) {
-            mEmptyViewImage.setImageResource(R.drawable.ic_qs_weather_default_off);
             mStatusMsg.setText(getResources().getString(R.string.omnijaws_service_disabled));
         } else {
-            mEmptyViewImage.setImageResource(R.drawable.ic_qs_weather_default_on);
             mStatusMsg.setText(getResources().getString(R.string.omnijaws_service_error_long));
         }
     }
