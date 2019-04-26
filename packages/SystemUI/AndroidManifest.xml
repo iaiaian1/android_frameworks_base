@@ -232,9 +232,6 @@
     <uses-permission android:name="com.motorola.mod.permission.MOD_ACCESS_INFO"/>
     <uses-permission android:name="com.motorola.mod.permission.MOD_INTERNAL"/>
 
-    <!-- OmniJaws -->
-    <uses-permission android:name="org.omnirom.omnijaws.READ_WEATHER" />
-
     <application
         android:name=".SystemUIApplication"
         android:persistent="true"

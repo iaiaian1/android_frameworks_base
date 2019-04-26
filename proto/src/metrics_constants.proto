@@ -6505,10 +6505,6 @@ message MetricsEvent {
 
     //END XPerience Constants
 
-    // Omni Metrics
-    OMNI_QS_WEATHER = 2151;
-    OMNI_QS_WEATHER_DETAILS = 2152;
-
     // BEGIN PA CONSTANTS
     // Settings -> Backup & Reset -> Feature Preferences
     FEATURE_PREFERENCES = 9001;
