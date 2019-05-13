@@ -95,12 +95,14 @@
     <!-- Whether the device supports Smart Pixels -->
     <bool name="config_enableSmartPixels">false</bool>
 
+
     <!-- Whether the device has outdated qti-telephony-common.jar -->
     <bool name="config_oldQtiTelephony">true</bool>
 
     <!-- True if the notifications should tint the app name with the dynamic or the accent color -->
     <bool name="config_allowNotificationAppNameTextTinting">false</bool>
 
+<<<<<<< HEAD
     <!-- Default start time for Ambient Play quiet period
          Represented as milliseconds from midnight (e.g. 79200000 == 10pm). -->
     <integer name="config_defaultAmbientPlayQuitPeriodStartTime">79200000</integer>
@@ -114,4 +116,6 @@
          1 - Fahrenheit -->
     <integer name="weather_lockscreen_default_unit">0</integer>
 
+=======
+>>>>>>> parent of e0902082025... Ambient Play: Introduce saving options [1/2]
 </resources>
