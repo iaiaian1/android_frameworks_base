@@ -128,22 +128,14 @@
     <java-symbol type="drawable" name="weather_thunderstorms" />
     <java-symbol type="drawable" name="weather_windy" />
 
+<<<<<<< HEAD
     <!-- Ambient play -->
     <java-symbol type="string" name="ambient_recognition_notification" />
     <java-symbol type="string" name="ambient_recognition_information" />
-
-<<<<<<< HEAD
-    <!-- Default start time for Ambient Play quiet period -->
-    <java-symbol type="integer" name="config_defaultAmbientPlayQuitPeriodStartTime" />
-
-    <!-- Default end time for Ambient Play quiet period -->
-    <java-symbol type="integer" name="config_defaultAmbientPlayQuitPeriodEndTime" />
 
     <!-- Weather default unit
          0 - Celsius
          1 - Fahrenheit -->
     <java-symbol type="integer" name="weather_lockscreen_default_unit" />
 
-=======
->>>>>>> parent of e0902082025... Ambient Play: Introduce saving options [1/2]
 </resources>
