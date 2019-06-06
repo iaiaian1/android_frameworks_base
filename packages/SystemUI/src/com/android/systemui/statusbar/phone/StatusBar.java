@@ -239,7 +239,6 @@ import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.statusbar.policy.UserInfoControllerImpl;
 import com.android.systemui.statusbar.policy.UserSwitcherController;
 import com.android.systemui.statusbar.policy.ZenModeController;
-import com.android.systemui.tuner.TunerService;
 import com.android.systemui.util.InjectionInflationController;
 import com.android.systemui.volume.VolumeComponent;
 
@@ -2240,6 +2239,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                 checkBarModes();
                 mAutoHideController.touchAutoHide();
             }
+            mStatusBarStateController.setSystemUiVisibility(mSystemUiVisibility);
         }
         mLightBarController.onSystemUiVisibilityChanged(fullscreenStackVis, dockedStackVis,
                 mask, fullscreenStackBounds, dockedStackBounds, sbModeChanged, mStatusBarMode,
@@ -4112,6 +4112,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                 }
 
                 private void setPulsing(boolean pulsing) {
+                    mStatusBarStateController.setPulsing(pulsing);
                     mStatusBarKeyguardViewManager.setPulsing(pulsing);
                     mKeyguardViewMediator.setPulsing(pulsing);
                     mNotificationPanel.setPulsing(pulsing);
