@@ -26,7 +26,7 @@
     <dimen name="vertical_max_swift">1.0dp</dimen>
 
     <!-- The width/height of the charging indicator view on keyguard. -->
-    <dimen name="keyguard_charging_indication_height">48dp</dimen>
-    <dimen name="keyguard_charging_indication_width">24dp</dimen>
+    <dimen name="keyguard_charging_indication_height">96dp</dimen>
+    <dimen name="keyguard_charging_indication_width">48dp</dimen>
 
 </resources>
