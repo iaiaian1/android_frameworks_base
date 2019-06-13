@@ -28,10 +28,10 @@ import android.os.UserHandle;
 
 public class ThermalController {
 
-    public static final String SERVICE_PACKAGE = "org.pixelexperience.thermalcontroller";
+    public static final String SERVICE_PACKAGE = "mx.xperience.thermalcontroller";
     public static final String ACTIVE_PACKAGE_CHANGED_ACTION = "android.intent.action.ACTIVE_PACKAGE_CHANGED";
     public static final String ACTIVE_PACKAGE_CHANGED_EXTRA = "package_name";
-    public static final String AUTHORITY = "org.pixelexperience.thermalcontroller";
+    public static final String AUTHORITY ="mx.xperience.thermalcontroller";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/preferences");
     public static final String COLUMN_PROFILE = "profile";
     public static final String[] PROJECTION_DEFAULT = new String[]{COLUMN_PROFILE};
