@@ -753,6 +753,10 @@ public final class BatteryService extends SystemService {
         intent.putExtra(BatteryManager.EXTRA_CHARGE_COUNTER, mHealthInfo.batteryChargeCounter);
         intent.putExtra(BatteryManager.EXTRA_DASH_CHARGER, mDashCharger);
         intent.putExtra(BatteryManager.EXTRA_TURBO_POWER, mTurboPower);
+        intent.putExtra(BatteryManager.EXTRA_MOD_LEVEL, mHealthInfo.modLevel);
+        intent.putExtra(BatteryManager.EXTRA_MOD_STATUS, mHealthInfo.modStatus);
+        intent.putExtra(BatteryManager.EXTRA_MOD_TYPE, mHealthInfo.modType);
+        intent.putExtra(BatteryManager.EXTRA_MOD_FLAG, mHealthInfo.modFlag);
         intent.putExtra("mod_level", mBatteryModProps.modLevel);
         intent.putExtra("mod_status", mBatteryModProps.modStatus);
         intent.putExtra("mod_flag", mBatteryModProps.modFlag);
