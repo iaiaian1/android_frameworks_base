@@ -42,7 +42,7 @@ public final class MotorolaSettings {
     public static final String ALT_SHIFT_TOGGLE_FTR_AVAILABLE = "alt_shift_toggle_ftr_available";
     public static final String ASSISTED_DIALING_STATE = "assisted_dialing_state";
     public static final String AUDIO_ROUTING = "audio_routing";
-    public static final String AUTHORITY = "com.motorola.android.providers.settings";
+    public static final String AUTHORITY = "com.motorola.android.provider.MotorolaSettings";
     public static final String AUTH_DEVICES_ENABLED = "auth_devices_enabled";
     public static final String AUTH_DEVICE_LIST = "auth_device_list";
     public static final String AUTO_DISABLE_TRACKPAD = "lapdock_disable_trackpad";
