@@ -701,7 +701,7 @@ public final class MotorolaSettings {
         public static final String CCC_DEVICE_SECRET = "ccc.dsec";
         public static final String CCC_DEVICE_SESSION_TOKEN = "ccc.sst";
         public static final String[] CLONE_TO_MANAGED_PROFILE = new String[0];
-        public static final Uri CONTENT_URI = Uri.parse("content://com.motorola.android.providers.settings/secure");
+        public static final Uri CONTENT_URI = Uri.parse("content://com.motorola.android.provider.Motorolasettings/secure");
         public static final String CUR_COUNTRY_AREA_CODE = "cur_country_area_code";
         public static final String CUR_COUNTRY_CODE = "cur_country_code";
         public static final String CUR_COUNTRY_IDD = "cur_country_idd";

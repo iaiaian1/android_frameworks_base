@@ -29,18 +29,52 @@ import com.motorola.android.provider.MotorolaSettings.Secure;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 public class ModUtils {
 
     private static String TAG = ModUtils.class.getSimpleName();
     private static final boolean DEBUG = Log.isLoggable(TAG, 3);
     private static final Intent DYNAMIC_MOD_BATTERY_HISTORY_CHART_INTENT = new Intent("com.motorola.extensions.settings.MODS_BATTERY_HISTORY_CHART");
+    public static Process pros;
+    public static String gb_battery = "/sys/class/power_supply/gb_battery/";
+	public static String mod_typepath = "/sys/class/power_supply/gb_ptp/internal_send";
+
+    public static String readSysFS(String path){
+		String result = "";
+            String[] args = new String[]{"/system/bin/cat", path};
+            ProcessBuilder cmd;
+            try {
+                cmd = new ProcessBuilder(args);
+
+                Process process = cmd.start();
+                InputStream in = process.getInputStream();
+                byte[] re = new byte[32768];
+                int read = 0;
+                while ((read = in.read(re, 0, 32768)) != -1) {
+                    String string = new String(re, 0, read);
+                    result += string;
+                }
+                in.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+			return result.trim();
+	}
 
     public static int getModBatteryLevel(Intent batteryChangedIntent) {
-        return (batteryChangedIntent.getIntExtra("mod_level", -1) * 100) / batteryChangedIntent.getIntExtra("scale", 100);
+		String Result = readSysFS(gb_battery + "capacity").toString();
+        return Integer.parseInt(Result);
     }
 
     public static int getModBatteryType(Intent batteryChangedIntent) {
-        return batteryChangedIntent.getIntExtra("mod_type", 0);
+		String Result = readSysFS(mod_typepath).toString();
+        return Integer.parseInt(Result);
     }
 
     public static boolean isModActive(int device_level, int mod_level, int mod_type) {
