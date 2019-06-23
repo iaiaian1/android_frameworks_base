@@ -543,7 +543,7 @@ public final class BatteryService extends SystemService {
                 mHealthInfo.batteryChargeCounter != mLastChargeCounter ||
                 mInvalidCharger != mLastInvalidCharger ||
                 mDashCharger != mLastDashCharger ||
-                mTurboPower != mLastTurboPower)) ||
+                mTurboPower != mLastTurboPower ||
                 mBatteryModProps.modLevel != mLastModLevel ||
                 mBatteryModProps.modStatus != mLastModStatus ||
                 mBatteryModProps.modFlag != mLastModFlag ||
