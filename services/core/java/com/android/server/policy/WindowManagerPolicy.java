@@ -627,8 +627,6 @@ public interface WindowManagerPolicy extends WindowManagerPolicyConstants {
          */
         void screenTurningOff(ScreenOffListener listener);
 
-        void addSystemUIVisibilityFlag(int flags);
-
         /**
          * Convert the lid state to a human readable format.
          */

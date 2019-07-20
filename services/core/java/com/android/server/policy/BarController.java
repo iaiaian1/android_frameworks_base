@@ -28,7 +28,6 @@ import android.util.Slog;
 import android.util.proto.ProtoOutputStream;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.WindowManagerPolicyControl;
 
 import com.android.server.LocalServices;
 import com.android.server.policy.WindowManagerPolicy.WindowState;
@@ -139,10 +138,9 @@ public class BarController {
 
     public int applyTranslucentFlagLw(WindowState win, int vis, int oldVis) {
         if (mWin != null) {
-            WindowManager.LayoutParams attrs = win != null ? win.getAttrs() : null;
-            if (attrs != null && (attrs.privateFlags
+            if (win != null && (win.getAttrs().privateFlags
                     & WindowManager.LayoutParams.PRIVATE_FLAG_INHERIT_TRANSLUCENT_DECOR) == 0) {
-                int fl = WindowManagerPolicyControl.getWindowFlags(attrs.flags, attrs);
+                int fl = PolicyControl.getWindowFlags(win, null);
                 if ((fl & mTranslucentWmFlag) != 0) {
                     vis |= mTranslucentFlag;
                 } else {
