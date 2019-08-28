@@ -812,6 +812,9 @@ public final class DefaultPermissionGrantPolicy {
             grantPermissionsToPackage(themePickerPackage, userId, false /* ignoreSystemPackage */,
                     true /*whitelistRestrictedPermissions*/, STORAGE_PERMISSIONS);
         }
+
+        // Google Markup
+        grantSystemFixedPermissionsToSystemPackage("com.google.android.markup", userId, STORAGE_PERMISSIONS);
     }
 
     private String getDefaultSystemHandlerActivityPackageForCategory(String category, int userId) {
