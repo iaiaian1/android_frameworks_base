@@ -30,6 +30,9 @@
     <java-symbol type="array" name="config_deviceKeyHandlerLibs" />
     <java-symbol type="array" name="config_deviceKeyHandlerClasses" />
 
+    <!-- Post reset runnable for all clients -->
+    <java-symbol type="bool" name="config_fingerprintPostResetRunnableForAllClients" />
+
     <!-- Extended Power Menu -->
     <java-symbol type="array" name="config_extendedGlobalActionsList" />
     <java-symbol type="drawable" name="ic_restart_quick" />
