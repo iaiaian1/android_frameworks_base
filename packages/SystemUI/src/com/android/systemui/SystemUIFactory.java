@@ -53,6 +53,8 @@ import com.android.systemui.volume.VolumeDialogComponent;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -161,6 +163,12 @@ public class SystemUIFactory {
 
     public VolumeDialogComponent createVolumeDialogComponent(SystemUI systemUi, Context context) {
         return new VolumeDialogComponent(systemUi, context);
+    }
+
+    @Singleton
+    @Provides
+    public EnhancedEstimates provideEnhancedEstimates(Context context) {
+        return new EnhancedEstimatesImpl(context);
     }
 
     @Module
