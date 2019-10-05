@@ -20,4 +20,7 @@
     <!-- Leaf shaped overlay -->
     <string name="icon_shape_leaf_overlay" translatable="false">Leaf</string>
 
+    <!-- Bottom margin size when fingerprint in display is active -->
+    <dimen name="keyguard_indication_margin_bottom_fingerprint_in_display">@dimen/keyguard_indication_margin_bottom</dimen>
+
 </resources>
