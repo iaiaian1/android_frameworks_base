@@ -25,6 +25,8 @@ import android.os.SystemClock;
 
 import com.android.internal.statusbar.IStatusBarService;
 
+import java.util.Locale;
+
 /**
  * Some custom utilities
  */
@@ -67,5 +69,11 @@ public class XPerienceUtils {
                 }
             }
         }
+    }
+
+    // Check for Chinese language
+    public static boolean isChineseLanguage() {
+       return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
+               Locale.CHINESE.getLanguage());
     }
 }
