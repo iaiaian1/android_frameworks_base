@@ -1098,14 +1098,17 @@ public class CommandQueue extends IStatusBar.Stub implements CallbackController<
                 case MSG_RECENTS_ANIMATION_STATE_CHANGED:
                     for (int i = 0; i < mCallbacks.size(); i++) {
                         mCallbacks.get(i).onRecentsAnimationStateChanged(msg.arg1 > 0);
+					}
+					break;
                 case MSG_TOGGLE_CAMERA_FLASH:
                     for (int i = 0; i < mCallbacks.size(); i++) {
                         mCallbacks.get(i).toggleCameraFlash();
                     }
                     break;
-            }
-        }
-    }
+			}
+		}
+	}
+
 
     // Need this class since CommandQueue already extends IStatusBar.Stub, so CommandQueueStart
     // is needed so it can extend SystemUI.
