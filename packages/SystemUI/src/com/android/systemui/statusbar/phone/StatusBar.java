@@ -654,9 +654,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
 
         public void update() {
-            if (mStatusBarWindow != null) {
-                mStatusBarWindow.updateSettings();
-            }
         }
     }
 
