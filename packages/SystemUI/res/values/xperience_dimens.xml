@@ -39,4 +39,5 @@
     <!-- Sets a custom extra padding for the QS icons and statusbar date -->
     <dimen name="qs_items_padding">8dp</dimen>
 
+    <dimen name="qs_temperatur_icon_size">16sp</dimen>
 </resources>
