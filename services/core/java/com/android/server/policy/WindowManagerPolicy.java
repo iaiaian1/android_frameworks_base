@@ -982,7 +982,7 @@ public interface WindowManagerPolicy extends WindowManagerPolicyConstants {
      * Create and return an animation to re-display a window that was force hidden by Keyguard.
      */
     public Animation createHiddenByKeyguardExit(boolean onWallpaper,
-            boolean goingToNotificationShade, boolean subtleAnimation);
+            boolean goingToNotificationShade);
 
     /**
      * Create and return an animation to let the wallpaper disappear after being shown behind

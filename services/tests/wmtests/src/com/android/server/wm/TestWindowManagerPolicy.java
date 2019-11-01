@@ -142,7 +142,7 @@ class TestWindowManagerPolicy implements WindowManagerPolicy {
 
     @Override
     public Animation createHiddenByKeyguardExit(boolean onWallpaper,
-            boolean goingToNotificationShade, boolean subtleAnimation) {
+            boolean goingToNotificationShade) {
         return null;
     }
 
