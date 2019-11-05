@@ -87,6 +87,8 @@ open class ThemedBatteryDrawable(private val context: Context, frameColor: Int) 
 
     private var batteryLevel = 0
 
+    private var showPercent = false
+
     private val invalidateRunnable: () -> Unit = {
         invalidateSelf()
     }
@@ -321,6 +323,14 @@ open class ThemedBatteryDrawable(private val context: Context, frameColor: Int) 
 
     public fun getBatteryLevel(): Int {
         return batteryLevel
+    }
+
+    fun setShowPercent(show:Boolean) {
+      if (showPercent !== show)
+      {
+        showPercent = show
+        postInvalidate()
+      }
     }
 
     override fun onBoundsChange(bounds: Rect?) {
