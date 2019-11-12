@@ -4635,9 +4635,18 @@ public final class Settings {
                 ANY_INTEGER_VALIDATOR;
 
         /**
+         * Force show navigation bar setting.
+         * @hide
+         */
+        public static final String FORCE_SHOW_NAVBAR = "force_show_navbar";
+
+         /** @hide */
         public static final Validator FORCE_SHOW_NAVBAR_VALIDATOR =
                 BOOLEAN_VALIDATOR;
 
+
+        /**
+         * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
          * NOTE: Settings are backed up and restored in the order they appear
@@ -4835,21 +4844,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(NETWORK_TRAFFIC_STATE);
             PRIVATE_SETTINGS.add(NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD);
             PRIVATE_SETTINGS.add(NETWORK_TRAFFIC_HIDEARROW);
-<<<<<<< HEAD
-            PRIVATE_SETTINGS.add(POWERMENU_SOUNDPANEL);
-            PRIVATE_SETTINGS.add(POWERMENU_SCREENSHOT);
-            PRIVATE_SETTINGS.add(POWERMENU_SETTINGS);
-            PRIVATE_SETTINGS.add(POWERMENU_LOCKDOWN);
-            PRIVATE_SETTINGS.add(POWERMENU_AIRPLANE);
-            PRIVATE_SETTINGS.add(POWERMENU_RESTART);
-            PRIVATE_SETTINGS.add(POWERMENU_RESTART_RECOVERY);
-            PRIVATE_SETTINGS.add(POWERMENU_POWER);
-            PRIVATE_SETTINGS.add(POWERMENU_USERS);
-            PRIVATE_SETTINGS.add(POWERMENU_LOGOUT);
-            PRIVATE_SETTINGS.add(POWERMENU_LOCKSCREEN);
             PRIVATE_SETTINGS.add(FORCE_SHOW_NAVBAR);
-=======
->>>>>>> parent of 775a00b4ca6... Pimp the power menu out [1/2]
         }
 
         /**
@@ -4952,21 +4947,7 @@ public final class Settings {
             VALIDATORS.put(NETWORK_TRAFFIC_STATE, NETWORK_TRAFFIC_STATE_VALIDATOR);
             VALIDATORS.put(NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD, NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD_VALIDATOR);
             VALIDATORS.put(NETWORK_TRAFFIC_HIDEARROW, NETWORK_TRAFFIC_HIDEARROW_VALIDATOR);
-<<<<<<< HEAD
-            VALIDATORS.put(POWERMENU_SOUNDPANEL, POWERMENU_SOUNDPANEL_VALIDATOR);
-            VALIDATORS.put(POWERMENU_SCREENSHOT, POWERMENU_SCREENSHOT_VALIDATOR);
-            VALIDATORS.put(POWERMENU_SETTINGS, POWERMENU_SETTINGS_VALIDATOR);
-            VALIDATORS.put(POWERMENU_LOCKDOWN, POWERMENU_LOCKDOWN_VALIDATOR);
-            VALIDATORS.put(POWERMENU_AIRPLANE, POWERMENU_AIRPLANE_VALIDATOR);
-            VALIDATORS.put(POWERMENU_RESTART, POWERMENU_RESTART_VALIDATOR);
-            VALIDATORS.put(POWERMENU_RESTART_RECOVERY, POWERMENU_RESTART_RECOVERY_VALIDATOR);
-            VALIDATORS.put(POWERMENU_POWER, POWERMENU_POWER_VALIDATOR);
-            VALIDATORS.put(POWERMENU_USERS, POWERMENU_USERS_VALIDATOR);
-            VALIDATORS.put(POWERMENU_LOGOUT, POWERMENU_LOGOUT_VALIDATOR);
-            VALIDATORS.put(POWERMENU_LOCKSCREEN, POWERMENU_LOCKSCREEN_VALIDATOR);
             VALIDATORS.put(FORCE_SHOW_NAVBAR, FORCE_SHOW_NAVBAR_VALIDATOR);
-=======
->>>>>>> parent of 775a00b4ca6... Pimp the power menu out [1/2]
         }
 
         /**
