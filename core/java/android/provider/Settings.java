@@ -4762,6 +4762,13 @@ public final class Settings {
         private static final Validator STATUS_BAR_FILE_HEADER_IMAGE_VALIDATOR = ANY_STRING_VALIDATOR;
 
         /**
+         * @hide
+         */
+        public static final String USE_OLD_MOBILETYPE = "use_old_mobiletype";
+
+        private static final Validator USE_OLD_MOBILETYPE_VALIDATOR = BOOLEAN_VALIDATOR;
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -4843,6 +4850,7 @@ public final class Settings {
             STATUS_BAR_CUSTOM_HEADER_PROVIDER,
             STATUS_BAR_CUSTOM_HEADER_IMAGE,
             STATUS_BAR_FILE_HEADER_IMAGE,
+            USE_OLD_MOBILETYPE,
         };
 
         /**
@@ -4983,6 +4991,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(STATUS_BAR_CUSTOM_HEADER_PROVIDER);
             PRIVATE_SETTINGS.add(STATUS_BAR_CUSTOM_HEADER_IMAGE);
             PRIVATE_SETTINGS.add(STATUS_BAR_FILE_HEADER_IMAGE);
+            PRIVATE_SETTINGS.add(USE_OLD_MOBILETYPE);
         }
 
         /**
@@ -5099,6 +5108,7 @@ public final class Settings {
             VALIDATORS.put(STATUS_BAR_CUSTOM_HEADER_PROVIDER, STATUS_BAR_CUSTOM_HEADER_PROVIDER_VALIDATOR);
             VALIDATORS.put(STATUS_BAR_CUSTOM_HEADER_IMAGE, STATUS_BAR_CUSTOM_HEADER_IMAGE_VALIDATOR);
             VALIDATORS.put(STATUS_BAR_FILE_HEADER_IMAGE, STATUS_BAR_FILE_HEADER_IMAGE_VALIDATOR);
+            VALIDATORS.put(USE_OLD_MOBILETYPE, USE_OLD_MOBILETYPE_VALIDATOR);
         }
 
         /**
