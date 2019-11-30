@@ -73,4 +73,7 @@
     <string name="stabilization_velocity_friction">Velocity Friction</string>
     <string name="stabilization_velocity_amplitude">Velocity Amplitude</string>
     <string name="stabilization_position_friction">Position Friction</string>
+
+    <!-- Name of the battery status bar icon. -->
+    <string name="status_bar_battery">Battery</string>
 </resources>
