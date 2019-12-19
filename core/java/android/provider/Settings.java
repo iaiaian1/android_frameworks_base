@@ -4636,6 +4636,15 @@ public final class Settings {
         private static final Validator PULSE_AMBIENT_LIGHT_AUTO_COLOR_VALIDATOR = BOOLEAN_VALIDATOR;
 
         /**
+         * Duration of Ambient edge light in seconds
+         * @hide
+         */
+        public static final String PULSE_AMBIENT_LIGHT_DURATION = "pulse_ambient_light_duration";
+
+        /** @hide */
+        private static final Validator PULSE_AMBIENT_LIGHT_DURATION_VALIDATOR = ANY_INTEGER_VALIDATOR;
+
+        /**
          * Network traffic inactivity threshold (default is 1 kBs)
          *
          * @hide
@@ -4769,6 +4778,7 @@ public final class Settings {
             PULSE_AMBIENT_LIGHT,
             PULSE_AMBIENT_LIGHT_COLOR,
             PULSE_AMBIENT_LIGHT_AUTO_COLOR,
+            PULSE_AMBIENT_LIGHT_DURATION,
             FLASHLIGHT_ON_CALL,
         };
 
@@ -4902,6 +4912,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(PULSE_AMBIENT_LIGHT);
             PRIVATE_SETTINGS.add(PULSE_AMBIENT_LIGHT_COLOR);
             PRIVATE_SETTINGS.add(PULSE_AMBIENT_LIGHT_AUTO_COLOR);
+            PRIVATE_SETTINGS.add(PULSE_AMBIENT_LIGHT_DURATION);
             PRIVATE_SETTINGS.add(FLASHLIGHT_ON_CALL);
         }
 
@@ -5011,6 +5022,7 @@ public final class Settings {
             VALIDATORS.put(PULSE_AMBIENT_LIGHT, PULSE_AMBIENT_LIGHT_VALIDATOR);
             VALIDATORS.put(PULSE_AMBIENT_LIGHT_COLOR, PULSE_AMBIENT_LIGHT_COLOR_VALIDATOR);
             VALIDATORS.put(PULSE_AMBIENT_LIGHT_AUTO_COLOR, PULSE_AMBIENT_LIGHT_AUTO_COLOR_VALIDATOR);
+            VALIDATORS.put(PULSE_AMBIENT_LIGHT_DURATION, PULSE_AMBIENT_LIGHT_DURATION_VALIDATOR);
             VALIDATORS.put(FLASHLIGHT_ON_CALL, FLASHLIGHT_ON_CALL_VALIDATOR);
         }
 
