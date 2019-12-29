@@ -75,7 +75,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import vendor.xpe.biometrics.fingerprint.inscreen.V1_0.IFingerprintInscreen;
+import vendor.xperience.biometrics.fingerprint.inscreen.V1_0.IFingerprintInscreen;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -104,7 +104,7 @@ public class FingerprintService extends BiometricServiceBase {
     private static final int MAX_FAILED_ATTEMPTS_LOCKOUT_PERMANENT = 20;
     private static final long FAIL_LOCKOUT_TIMEOUT_MS = 30 * 1000;
     private static final String KEY_LOCKOUT_RESET_USER = "lockout_reset_user";
-    private static final String FOD = "vendor.xpe.biometrics.fingerprint.inscreen";
+    private static final String FOD = "vendor.xperience.biometrics.fingerprint.inscreen";
 
     private final boolean mHasFod;
     private boolean mIsKeyguard;

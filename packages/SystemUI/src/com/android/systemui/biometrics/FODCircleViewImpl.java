@@ -27,7 +27,7 @@ import com.android.systemui.statusbar.CommandQueue.Callbacks;
 
 public class FODCircleViewImpl extends SystemUI implements CommandQueue.Callbacks {
     private static final String TAG = "FODCircleViewImpl";
-    private static final String FOD = "vendor.xpe.biometrics.fingerprint.inscreen";
+    private static final String FOD = "vendor.xperience.biometrics.fingerprint.inscreen";
 
     private FODCircleView mFodCircleView;
 

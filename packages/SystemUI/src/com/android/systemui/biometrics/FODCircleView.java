@@ -45,8 +45,8 @@ import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.keyguard.KeyguardUpdateMonitorCallback;
 import com.android.systemui.R;
 
-import vendor.xpe.biometrics.fingerprint.inscreen.V1_0.IFingerprintInscreen;
-import vendor.xpe.biometrics.fingerprint.inscreen.V1_0.IFingerprintInscreenCallback;
+import vendor.xperience.biometrics.fingerprint.inscreen.V1_0.IFingerprintInscreen;
+import vendor.xperience.biometrics.fingerprint.inscreen.V1_0.IFingerprintInscreenCallback;
 
 import java.util.NoSuchElementException;
 import java.util.Timer;
