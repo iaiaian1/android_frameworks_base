@@ -73,6 +73,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.ContentResolver;
 import android.database.ContentObserver;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -3908,6 +3909,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
 
         void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.Secure.AMBIENT_VISUALIZER_ENABLED),
                     false, this, UserHandle.USER_ALL);
