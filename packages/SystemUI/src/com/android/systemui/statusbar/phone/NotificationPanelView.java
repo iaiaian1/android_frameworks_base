@@ -1042,7 +1042,7 @@ public class NotificationPanelView extends PanelView implements
             MetricsLogger.count(mContext, COUNTER_PANEL_OPEN_PEEK, 1);
             return true;
         }
-        if (!shouldQuickSettingsIntercept(mDownX, mDownY, 0)
+        if (!shouldQuickSettingsIntercept(mDownX, mDownY, 0, true, false)
                 && mPulseExpansionHandler.onInterceptTouchEvent(event)) {
             return true;
         }
@@ -1251,7 +1251,7 @@ public class NotificationPanelView extends PanelView implements
             expand(true /* animate */);
         }
         initDownStates(event);
-        if (!mIsExpanding && !shouldQuickSettingsIntercept(mDownX, mDownY, 0)
+        if (!mIsExpanding && !shouldQuickSettingsIntercept(mDownX, mDownY, 0, true, false)
                 && mPulseExpansionHandler.onTouchEvent(event)) {
             // We're expanding all the other ones shouldn't get this anymore
             return true;
