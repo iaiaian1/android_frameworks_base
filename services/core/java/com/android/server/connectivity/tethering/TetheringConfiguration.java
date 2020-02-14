@@ -16,6 +16,7 @@
 
 package com.android.server.connectivity.tethering;
 
+import static android.content.Context.TELEPHONY_SERVICE;
 import static android.net.ConnectivityManager.TYPE_ETHERNET;
 import static android.net.ConnectivityManager.TYPE_MOBILE;
 import static android.net.ConnectivityManager.TYPE_MOBILE_DUN;
@@ -40,6 +41,7 @@ import android.os.SystemProperties;
 import android.net.util.SharedLog;
 import android.provider.Settings;
 import android.telephony.SubscriptionManager;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.android.internal.annotations.VisibleForTesting;
@@ -240,8 +242,9 @@ public class TetheringConfiguration {
     }
 
     /** Check whether dun is required. */
-    public static boolean checkDunRequired(Context ctx) {
-        return false;
+    public static boolean checkDunRequired(Context ctx, int id) {
+        final TelephonyManager tm = (TelephonyManager) ctx.getSystemService(TELEPHONY_SERVICE);
+        return (tm != null) ? tm.getTetherApnRequired(id) : false;
     }
 
     private static Collection<Integer> getUpstreamIfaceTypes(Resources res, boolean dunRequired) {
