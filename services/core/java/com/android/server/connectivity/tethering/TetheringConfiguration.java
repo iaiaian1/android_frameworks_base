@@ -116,7 +116,7 @@ public class TetheringConfiguration {
         }
         tetherableBluetoothRegexs = getResourceStringArray(res, config_tether_bluetooth_regexs);
 
-        isDunRequired = checkDunRequired(ctx);
+        isDunRequired = checkDunRequired(ctx, subId);
 
         chooseUpstreamAutomatically = getResourceBoolean(res, config_tether_upstream_automatic);
         preferredUpstreamIfaceTypes = getUpstreamIfaceTypes(res, isDunRequired);
