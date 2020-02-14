@@ -4301,7 +4301,4 @@
     <string name="user_authentication_failed"></string>
     <string name="service_not_subscribed"></string>
     <string name="multi_conn_to_same_pdn_not_allowed"></string>
-
-    <!-- Whether or not we should show the option to show battery percentage -->
-    <bool name="config_battery_percentage_setting_available">true</bool>
 </resources>
