@@ -151,11 +151,6 @@
       <item quantity="other">SIM is now disabled. Enter PUK code to continue. You have <xliff:g id="_NUMBER_1">%d</xliff:g> remaining attempts before SIM becomes permanently unusable. Contact operator for details.</item>
       <item quantity="one">SIM is now disabled. Enter PUK code to continue. You have <xliff:g id="_NUMBER_0">%d</xliff:g> remaining attempt before SIM becomes permanently unusable. Contact operator for details.</item>
     </plurals>
-<<<<<<< HEAD
-    <string name="clock_title_default" msgid="6342735240617459864">"Default"</string>
-    <string name="clock_title_bubble" msgid="2204559396790593213">"Bubble"</string>
-    <string name="clock_title_analog" msgid="8409262532900918273">"Analogue"</string>
-=======
     <string name="clock_title_default" msgid="6645600990069154049">"Default"</string>
     <string name="clock_title_bubble" msgid="1286365278681892114">"Bubble"</string>
     <string name="clock_title_analog" msgid="4047401488577315053">"Analogue"</string>
@@ -239,5 +234,4 @@
     <item msgid="848339003778952950">"Fifty\nEight"</item>
     <item msgid="5798985802835423618">"Fifty\nNine"</item>
   </string-array>
->>>>>>> 6293b20b906... TextClock: Bring back the translations
 </resources>
