@@ -427,7 +427,7 @@ public class BatteryMeterDrawableBase extends Drawable {
     }
 
     @Override
-    public void draw(Canvas c) {
+    /*public void draw(Canvas c) {
       if (mFastCharging && mCharging) {
           drawBolt(c);
       } else {
@@ -447,6 +447,25 @@ public class BatteryMeterDrawableBase extends Drawable {
                   break;
           }
       }
+  }*/
+
+  public void draw(Canvas c) {
+	  if (mFastCharging && mCharging)drawBolt(c);
+		switch (mMeterStyle) {
+            case BATTERY_STYLE_DOTTED_CIRCLE:
+                 drawDottedCircle(c);
+                 break;
+            case BATTERY_STYLE_CIRCLE:
+                 drawCircle(c);
+                 break;
+            case BATTERY_STYLE_CM_CIRCLE:
+                 drawCMCircle(c);
+                 break;
+            case BATTERY_STYLE_NORMAL:
+            default:
+                 drawRectangle(c);
+                 break;
+		}
   }
 
   private void drawRectangle(Canvas c) {
