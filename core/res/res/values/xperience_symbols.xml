@@ -60,4 +60,7 @@
 
     <!-- Whether device has ChargeTurbo charging support all xiaomis for example -->
     <java-symbol type="bool" name="config_hasChargeTurbo" />
+
+    <!-- Enable face auth only when swiping security view -->
+    <java-symbol type="bool" name="config_faceAuthOnlyOnSecurityView" />
 </resources>

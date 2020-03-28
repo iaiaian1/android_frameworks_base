@@ -116,6 +116,7 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
         public void onFullyShown() {
             updateStates();
             mStatusBar.wakeUpIfDozing(SystemClock.uptimeMillis(), mContainer, "BOUNCER_VISIBLE");
+            onKeyguardBouncerFullyShownChanged(true);
         }
 
         @Override
@@ -130,6 +131,7 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
 
         @Override
         public void onFullyHidden() {
+            onKeyguardBouncerFullyShownChanged(false);
         }
 
         @Override
@@ -936,6 +938,10 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
                     .show(navigationBars());
         }
     };
+
+    private void onKeyguardBouncerFullyShownChanged(boolean fullyShown){
+        mKeyguardUpdateManager.onKeyguardBouncerFullyShown(fullyShown);
+    }
 
     protected void updateStates() {
         if (mContainer == null ) {
