@@ -507,8 +507,8 @@ public class BatteryMeterView extends LinearLayout implements
         res.getValue(R.dimen.status_bar_icon_scale_factor, typedValue, true);
         float iconScaleFactor = typedValue.getFloat();
 
-        int batteryHeight = res.getDimensionPixelSize(R.dimen.status_bar_battery_icon_height);
-        int batteryWidth = mBatteryStyle == BATTERY_STYLE_CIRCLE ?
+		int batteryHeight = res.getDimensionPixelSize(R.dimen.status_bar_battery_icon_height);
+        int batteryWidth = mBatteryStyle == BATTERY_STYLE_CIRCLE || mBatteryStyle == BATTERY_STYLE_DOTTED_CIRCLE ?
                 res.getDimensionPixelSize(R.dimen.status_bar_battery_icon_circle_width) :
                 res.getDimensionPixelSize(R.dimen.status_bar_battery_icon_width);
         int marginBottom = res.getDimensionPixelSize(R.dimen.battery_margin_bottom);
@@ -526,7 +526,7 @@ public class BatteryMeterView extends LinearLayout implements
         if (mBatteryStyle == BATTERY_STYLE_PORTRAIT) {
             mBatteryIconView.setImageDrawable(mThemedDrawable);
         } else {
-            // mCircleDrawable.setMeterStyle(mBatteryStyle);
+            mCircleDrawable.setMeterStyle(mBatteryStyle);
             mBatteryIconView.setImageDrawable(mCircleDrawable);
         }
     }
