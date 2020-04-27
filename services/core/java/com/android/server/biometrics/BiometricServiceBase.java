@@ -653,6 +653,8 @@ public abstract class BiometricServiceBase extends SystemService
         mPowerManager = mContext.getSystemService(PowerManager.class);
         mUserManager = UserManager.get(mContext);
         mMetricsLogger = new MetricsLogger();
+        mPostResetRunnableForAllClients = mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_fingerprintPostResetRunnableForAllClients);
     }
 
     @Override
