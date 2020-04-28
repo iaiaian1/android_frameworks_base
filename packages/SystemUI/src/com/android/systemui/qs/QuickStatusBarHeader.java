@@ -22,7 +22,6 @@ import android.annotation.ColorInt;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -30,13 +29,11 @@ import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.ContentObserver;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.UserHandle;
 import android.provider.AlarmClock;
 import android.provider.DeviceConfig;
 import android.provider.Settings;
@@ -183,9 +180,6 @@ public class QuickStatusBarHeader extends RelativeLayout implements
             resolver.registerContentObserver(Settings.System
                     .getUriFor(Settings.System.QS_BATTERY_MODE), false,
                     this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System
-                    .getUriFor(Settings.System.STATUS_BAR_BATTERY_STYLE), false,
-                    this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_CUSTOM_HEADER), false,
                    this, UserHandle.USER_ALL);
@@ -314,7 +308,6 @@ public class QuickStatusBarHeader extends RelativeLayout implements
         mBatteryRemainingIcon.setPercentShowMode(BatteryMeterView.MODE_ESTIMATE);
         mRingerModeTextView.setSelected(true);
         mNextAlarmTextView.setSelected(true);
-        updateSettings();
 
         mPermissionsHubEnabled = PrivacyItemControllerKt.isPermissionsHubEnabled();
         // Change the ignored slots when DeviceConfig flag changes
@@ -590,14 +583,6 @@ public class QuickStatusBarHeader extends RelativeLayout implements
             mBatteryRemainingIcon.setShowPercent(0);
             mBatteryRemainingIcon.setPercentShowMode(BatteryMeterView.MODE_ESTIMATE);
         }
-        mBatteryRemainingIcon.updatePercentView();
-        mBatteryRemainingIcon.updateVisibility();
-    }
-
-    private void updateSBBatteryStyle() {
-        mBatteryRemainingIcon.setBatteryStyle(Settings.System.getInt(mContext.getContentResolver(),
-        Settings.System.STATUS_BAR_BATTERY_STYLE, 0));
-        mBatteryRemainingIcon.updateBatteryStyle();
         mBatteryRemainingIcon.updatePercentView();
         mBatteryRemainingIcon.updateVisibility();
     }
