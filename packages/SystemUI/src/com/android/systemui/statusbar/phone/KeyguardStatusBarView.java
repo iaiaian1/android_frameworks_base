@@ -461,8 +461,6 @@ public class KeyguardStatusBarView extends RelativeLayout
     @Override
     public void onOverlayChanged() {
         mHasBigCutout = CutoutUtils.hasBigCutout(getContext());
-        mShowPercentAvailable = getContext().getResources().getBoolean(
-                com.android.internal.R.bool.config_battery_percentage_setting_available);
         mCarrierLabel.setTextAppearance(
                 Utils.getThemeAttr(mContext, com.android.internal.R.attr.textAppearanceSmall));
         onThemeChanged();
