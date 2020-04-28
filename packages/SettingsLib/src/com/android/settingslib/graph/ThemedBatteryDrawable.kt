@@ -326,8 +326,11 @@ open class ThemedBatteryDrawable(private val context: Context, frameColor: Int) 
     }
 
     fun setShowPercent(show:Boolean) {
+      if (showPercent !== show)
+      {
         showPercent = show
         postInvalidate()
+      }
     }
 
     override fun onBoundsChange(bounds: Rect?) {
