@@ -140,6 +140,8 @@ public class BubbleControllerTest extends SysuiTestCase {
     private KeyguardBypassController mKeyguardBypassController;
     @Mock
     private FloatingContentCoordinator mFloatingContentCoordinator;
+    @Mock
+    private BubbleDataRepository mDataRepository;
 
     private SysUiState mSysUiState;
     private boolean mSysUiStateBubblesExpanded;
@@ -275,8 +277,10 @@ public class BubbleControllerTest extends SysuiTestCase {
                 mFeatureFlagsOldPipeline,
                 mDumpManager,
                 mFloatingContentCoordinator,
+                mDataRepository,
                 mSysUiState,
-                mock(INotificationManager.class));
+                mock(INotificationManager.class),
+                mWindowManager);
         mBubbleController.setExpandListener(mBubbleExpandListener);
 
         // Get a reference to the BubbleController's entry listener

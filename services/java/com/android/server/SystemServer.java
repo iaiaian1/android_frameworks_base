@@ -594,7 +594,6 @@ public final class SystemServer {
             startBootstrapServices(t);
             startCoreServices(t);
             startOtherServices(t);
-            SystemServerInitThreadPool.shutdown();
         } catch (Throwable ex) {
             Slog.e("System", "******************************************");
             Slog.e("System", "************ Failure starting system services", ex);
@@ -1928,6 +1927,10 @@ public final class SystemServer {
                     || mPackageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
                 t.traceBegin("StartTvInputManager");
                 mSystemServiceManager.startService(TvInputManagerService.class);
+                t.traceEnd();
+            }
+
+            if (mPackageManager.hasSystemFeature(PackageManager.FEATURE_TUNER)) {
                 t.traceBegin("StartTunerResourceManager");
                 mSystemServiceManager.startService(TunerResourceManagerService.class);
                 t.traceEnd();

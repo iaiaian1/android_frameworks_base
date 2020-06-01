@@ -211,14 +211,16 @@ public class Divider extends SystemUI implements DividerView.DividerCallbacks,
             mTargetShown = imeShouldShow;
             if (mLastAdjustTop < 0) {
                 mLastAdjustTop = imeShouldShow ? hiddenTop : shownTop;
-            } else {
-                // Check for an "interruption" of an existing animation. In this case, we need to
-                // fake-flip the last-known state direction so that the animation completes in the
-                // other direction.
+            } else if (mLastAdjustTop != (imeShouldShow ? mShownTop : mHiddenTop)) {
                 if (mTargetAdjusted != targetAdjusted && targetAdjusted == mAdjusted) {
-                    if (mLastAdjustTop != (imeShouldShow ? mShownTop : mHiddenTop)) {
-                        mAdjusted = mTargetAdjusted;
-                    }
+                    // Check for an "interruption" of an existing animation. In this case, we
+                    // need to fake-flip the last-known state direction so that the animation
+                    // completes in the other direction.
+                    mAdjusted = mTargetAdjusted;
+                } else if (targetAdjusted && mTargetAdjusted && mAdjusted) {
+                    // Already fully adjusted for IME, but IME height has changed; so, force-start
+                    // an async animation to the new IME height.
+                    mAdjusted = false;
                 }
             }
             if (mPaused) {
@@ -634,6 +636,11 @@ public class Divider extends SystemUI implements DividerView.DividerCallbacks,
         }
     }
 
+    void onSplitDismissed() {
+        mMinimized = false;
+        updateVisibility(false /* visible */);
+    }
+
     /** Switch to minimized state if appropriate */
     public void setMinimized(final boolean minimized) {
         if (DEBUG) Slog.d(TAG, "posting ext setMinimized " + minimized + " vis:" + mVisible);
@@ -805,5 +812,13 @@ public class Divider extends SystemUI implements DividerView.DividerCallbacks,
             }
             updateVisibility(true /* visible */);
         }
+    }
+
+    /** @return the container token for the secondary split root task. */
+    public WindowContainerToken getSecondaryRoot() {
+        if (mSplits == null || mSplits.mSecondary == null) {
+            return null;
+        }
+        return mSplits.mSecondary.token;
     }
 }

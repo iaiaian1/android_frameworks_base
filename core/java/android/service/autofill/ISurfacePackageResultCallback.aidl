@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.android.keyguard
+package android.service.autofill;
 
-import android.graphics.drawable.Drawable
+import android.view.SurfaceControlViewHost;
 
-import java.util.List
-
-/** State for lock screen media controls. */
-data class KeyguardMedia(
-    val foregroundColor: Int,
-    val backgroundColor: Int,
-    val app: String?,
-    val appIcon: Drawable?,
-    val artist: String?,
-    val song: String?,
-    val artwork: Drawable?,
-    val actionIcons: List<Drawable>
-)
+/**
+ * Interface to receive a SurfaceControlViewHost.SurfacePackage.
+ *
+ * @hide
+ */
+oneway interface ISurfacePackageResultCallback {
+    void onResult(in SurfaceControlViewHost.SurfacePackage result);
+}

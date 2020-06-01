@@ -18,7 +18,6 @@ package com.android.server.wm;
 
 import static android.app.ActivityTaskManager.INVALID_TASK_ID;
 import static android.app.ActivityTaskManager.RESIZE_MODE_FORCED;
-import static android.app.ActivityTaskManager.RESIZE_MODE_SYSTEM;
 import static android.app.ActivityTaskManager.RESIZE_MODE_SYSTEM_SCREEN_ROTATION;
 import static android.app.WindowConfiguration.ACTIVITY_TYPE_ASSISTANT;
 import static android.app.WindowConfiguration.ACTIVITY_TYPE_HOME;
@@ -29,7 +28,6 @@ import static android.app.WindowConfiguration.PINNED_WINDOWING_MODE_ELEVATION_IN
 import static android.app.WindowConfiguration.ROTATION_UNDEFINED;
 import static android.app.WindowConfiguration.WINDOWING_MODE_FREEFORM;
 import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN;
-import static android.app.WindowConfiguration.WINDOWING_MODE_PINNED;
 import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_PRIMARY;
 import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_SECONDARY;
 import static android.app.WindowConfiguration.WINDOWING_MODE_UNDEFINED;
@@ -82,7 +80,6 @@ import static com.android.server.wm.ActivityTaskManagerDebugConfig.POSTFIX_TASKS
 import static com.android.server.wm.ActivityTaskManagerDebugConfig.TAG_ATM;
 import static com.android.server.wm.ActivityTaskManagerDebugConfig.TAG_WITH_CLASS_NAME;
 import static com.android.server.wm.ActivityTaskManagerService.TAG_STACK;
-import static com.android.server.wm.DragResizeMode.DRAG_RESIZE_MODE_DOCKED_DIVIDER;
 import static com.android.server.wm.IdentifierProto.HASH_CODE;
 import static com.android.server.wm.IdentifierProto.TITLE;
 import static com.android.server.wm.IdentifierProto.USER_ID;
@@ -110,7 +107,6 @@ import android.app.ActivityManager.TaskSnapshot;
 import android.app.ActivityOptions;
 import android.app.ActivityTaskManager;
 import android.app.AppGlobals;
-import android.app.PictureInPictureParams;
 import android.app.TaskInfo;
 import android.app.WindowConfiguration;
 import android.content.ComponentName;
@@ -491,12 +487,6 @@ class Task extends WindowContainer<WindowContainer> {
     boolean mTaskAppearedSent;
 
     /**
-     * Last Picture-in-Picture params applicable to the task. Updated when the app
-     * enters Picture-in-Picture or when setPictureInPictureParams is called.
-     */
-    PictureInPictureParams mPictureInPictureParams = new PictureInPictureParams.Builder().build();
-
-    /**
      * This task was created by the task organizer which has the following implementations.
      * <ul>
      *     <lis>The task won't be removed when it is empty. Removal has to be an explicit request
@@ -662,7 +652,7 @@ class Task extends WindowContainer<WindowContainer> {
         updateTaskDescription();
     }
 
-    boolean resize(Rect bounds, int resizeMode, boolean preserveWindow, boolean deferResume) {
+    boolean resize(Rect bounds, int resizeMode, boolean preserveWindow) {
         mAtmService.deferWindowLayout();
 
         try {
@@ -702,7 +692,7 @@ class Task extends WindowContainer<WindowContainer> {
             boolean kept = true;
             if (updatedConfig) {
                 final ActivityRecord r = topRunningActivityLocked();
-                if (r != null && !deferResume) {
+                if (r != null) {
                     kept = r.ensureActivityConfiguration(0 /* globalChanges */,
                             preserveWindow);
                     // Preserve other windows for resizing because if resizing happens when there
@@ -854,30 +844,11 @@ class Task extends WindowContainer<WindowContainer> {
             // TODO: Should this call be moved inside the resize method in WM?
             toStack.prepareFreezingTaskBounds();
 
-            // Make sure the task has the appropriate bounds/size for the stack it is in.
-            final boolean toStackSplitScreenPrimary =
-                    toStackWindowingMode == WINDOWING_MODE_SPLIT_SCREEN_PRIMARY;
-            final Rect configBounds = getRequestedOverrideBounds();
-            if ((toStackWindowingMode == WINDOWING_MODE_FULLSCREEN
-                    || toStackWindowingMode == WINDOWING_MODE_SPLIT_SCREEN_SECONDARY)
-                    && !Objects.equals(configBounds, toStack.getRequestedOverrideBounds())) {
-                kept = resize(toStack.getRequestedOverrideBounds(), RESIZE_MODE_SYSTEM,
-                        !mightReplaceWindow, deferResume);
-            } else if (toStackWindowingMode == WINDOWING_MODE_FREEFORM) {
-                Rect bounds = getLaunchBounds();
-                if (bounds == null) {
-                    mStackSupervisor.getLaunchParamsController().layoutTask(this, null);
-                    bounds = configBounds;
-                }
-                kept = resize(bounds, RESIZE_MODE_FORCED, !mightReplaceWindow, deferResume);
-            } else if (toStackSplitScreenPrimary || toStackWindowingMode == WINDOWING_MODE_PINNED) {
-                if (toStackSplitScreenPrimary && moveStackMode == REPARENT_KEEP_STACK_AT_FRONT) {
-                    // Move recents to front so it is not behind home stack when going into docked
-                    // mode
-                    mStackSupervisor.moveRecentsStackToFront(reason);
-                }
-                kept = resize(toStack.getRequestedOverrideBounds(), RESIZE_MODE_SYSTEM,
-                        !mightReplaceWindow, deferResume);
+            if (toStackWindowingMode == WINDOWING_MODE_SPLIT_SCREEN_PRIMARY
+                    && moveStackMode == REPARENT_KEEP_STACK_AT_FRONT) {
+                // Move recents to front so it is not behind home stack when going into docked
+                // mode
+                mStackSupervisor.moveRecentsStackToFront(reason);
             }
         } finally {
             mAtmService.continueWindowLayout();
@@ -2013,7 +1984,7 @@ class Task extends WindowContainer<WindowContainer> {
     }
 
     void updateSurfaceSize(SurfaceControl.Transaction transaction) {
-        if (mSurfaceControl == null || mCreatedByOrganizer) {
+        if (mSurfaceControl == null || isOrganized()) {
             return;
         }
 
@@ -3059,15 +3030,6 @@ class Task extends WindowContainer<WindowContainer> {
         return mDragResizeMode;
     }
 
-    /**
-     * Puts this task into docked drag resizing mode. See {@link DragResizeMode}.
-     *
-     * @param resizing Whether to put the task into drag resize mode.
-     */
-    public void setTaskDockedResizing(boolean resizing) {
-        setDragResizing(resizing, DRAG_RESIZE_MODE_DOCKED_DIVIDER);
-    }
-
     void adjustBoundsForDisplayChangeIfNeeded(final DisplayContent displayContent) {
         if (displayContent == null) {
             return;
@@ -3334,6 +3296,16 @@ class Task extends WindowContainer<WindowContainer> {
         });
     }
 
+    boolean isTopActivityFocusable() {
+        final ActivityRecord r = topRunningActivity();
+        return r != null ? r.isFocusable()
+                : (isFocusable() && getWindowConfiguration().canReceiveKeys());
+    }
+
+    boolean isFocusableAndVisible() {
+        return isTopActivityFocusable() && shouldBeVisible(null /* starting */);
+    }
+
     void positionChildAtTop(ActivityRecord child) {
         positionChildAt(child, POSITION_TOP);
     }
@@ -3592,10 +3564,11 @@ class Task extends WindowContainer<WindowContainer> {
         info.resizeMode = top != null ? top.mResizeMode : mResizeMode;
         info.topActivityType = top.getActivityType();
 
-        if (mPictureInPictureParams.empty()) {
+        ActivityRecord rootActivity = top.getRootActivity();
+        if (rootActivity == null || rootActivity.pictureInPictureArgs.empty()) {
             info.pictureInPictureParams = null;
         } else {
-            info.pictureInPictureParams = mPictureInPictureParams;
+            info.pictureInPictureParams = rootActivity.pictureInPictureArgs;
         }
         info.topActivityInfo = mReuseActivitiesReport.top != null
                 ? mReuseActivitiesReport.top.info
@@ -4511,8 +4484,7 @@ class Task extends WindowContainer<WindowContainer> {
         updateShadowsRadius(hasFocus, getPendingTransaction());
     }
 
-    void setPictureInPictureParams(PictureInPictureParams p) {
-        mPictureInPictureParams.copyOnlySet(p);
+    void onPictureInPictureParamsChanged() {
         if (isOrganized()) {
             mAtmService.mTaskOrganizerController.dispatchTaskInfoChanged(this, true /* force */);
         }
@@ -4552,7 +4524,14 @@ class Task extends WindowContainer<WindowContainer> {
         if (mForceHiddenFlags == newFlags) {
             return false;
         }
+        final boolean wasHidden = isForceHidden();
         mForceHiddenFlags = newFlags;
+        if (wasHidden && isFocusableAndVisible()) {
+            // The change in force-hidden state will change visibility without triggering a stack
+            // order change, so we should reset the preferred top focusable stack to ensure it's not
+            // used if a new activity is started from this task.
+            getDisplayArea().resetPreferredTopFocusableStackIfBelow(this);
+        }
         return true;
     }
 

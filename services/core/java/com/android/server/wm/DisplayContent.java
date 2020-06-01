@@ -54,7 +54,6 @@ import static android.view.WindowManager.LayoutParams.FIRST_APPLICATION_WINDOW;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
 import static android.view.WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
 import static android.view.WindowManager.LayoutParams.LAST_APPLICATION_WINDOW;
@@ -1620,9 +1619,7 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
             }
         }
 
-        // Announce rotation only if we will not animate as we already have the
-        // windows in final state. Otherwise, we make this call at the rotation end.
-        if (screenRotationAnimation == null && mWmService.mAccessibilityController != null) {
+        if (mWmService.mAccessibilityController != null) {
             mWmService.mAccessibilityController.onRotationChangedLocked(this);
         }
     }
@@ -2547,6 +2544,9 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
         }
         for (int i = mTapExcludedWindows.size() - 1; i >= 0; i--) {
             final WindowState win = mTapExcludedWindows.get(i);
+            if (!win.isVisibleLw()) {
+                continue;
+            }
             win.getTouchableRegion(mTmpRegion);
             mTouchExcludeRegion.op(mTmpRegion, Region.Op.UNION);
         }
@@ -3704,8 +3704,7 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
     }
 
     boolean hasSecureWindowOnScreen() {
-        final WindowState win = getWindow(
-                w -> w.isOnScreen() && (w.mAttrs.flags & FLAG_SECURE) != 0);
+        final WindowState win = getWindow(w -> w.isOnScreen() && mWmService.isSecureLocked(w));
         return win != null;
     }
 
@@ -5241,25 +5240,13 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
      * the display naturally.
      */
     private void applyRotationAndFinishFixedRotation(int oldRotation, int newRotation) {
-        if (mFixedRotationLaunchingApp == null) {
+        final WindowToken rotatedLaunchingApp = mFixedRotationLaunchingApp;
+        if (rotatedLaunchingApp == null) {
             applyRotation(oldRotation, newRotation);
             return;
         }
 
-        // The display may be about to rotate seamlessly, and the animation of closing apps may
-        // still animate in old rotation. So make sure the outdated animation won't show on the
-        // rotated display.
-        forAllActivities(a -> {
-            if (a.nowVisible && a != mFixedRotationLaunchingApp
-                    && a.getWindowConfiguration().getRotation() != newRotation) {
-                final WindowContainer<?> w = a.getAnimatingContainer();
-                if (w != null) {
-                    w.cancelAnimation();
-                }
-            }
-        });
-
-        mFixedRotationLaunchingApp.finishFixedRotationTransform(
+        rotatedLaunchingApp.finishFixedRotationTransform(
                 () -> applyRotation(oldRotation, newRotation));
         mFixedRotationLaunchingApp = null;
     }
@@ -5540,7 +5527,7 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
         /**
          * The animating activity which shows the recents task list. It is set between
          * {@link RecentsAnimationController#initialize} and
-         * {@link RecentsAnimationController#cancelAnimation}.
+         * {@link RecentsAnimationController#cleanupAnimation}.
          */
         private ActivityRecord mAnimatingRecents;
 
@@ -5563,14 +5550,25 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
          * If {@link #mAnimatingRecents} still has fixed rotation, it should be moved to top so we
          * don't clear {@link #mFixedRotationLaunchingApp} that will be handled by transition.
          */
-        void onFinishRecentsAnimation() {
+        void onFinishRecentsAnimation(boolean moveRecentsToBack) {
             final ActivityRecord animatingRecents = mAnimatingRecents;
             mAnimatingRecents = null;
-            if (animatingRecents != null && animatingRecents == mFixedRotationLaunchingApp
-                    && !animatingRecents.hasFixedRotationTransform()) {
-                // The recents activity won't be the top, such as giving up the swipe up gesture
-                // and return to the original top.
+            if (!moveRecentsToBack) {
+                // The recents activity will be the top, such as staying at recents list or
+                // returning to home (if home and recents are the same activity).
+                return;
+            }
+
+            if (animatingRecents != null && animatingRecents == mFixedRotationLaunchingApp) {
+                // Because it won't affect display orientation, just finish the transform.
+                animatingRecents.finishFixedRotationTransform();
                 mFixedRotationLaunchingApp = null;
+            } else {
+                // If there is already a launching activity that is not the recents, before its
+                // transition is completed, the recents animation may be started. So if the recents
+                // activity won't be the top, the display orientation should be updated according
+                // to the current top activity.
+                continueUpdateOrientationForDiffOrienLaunchingApp();
             }
         }
 

@@ -262,9 +262,6 @@ public class RootWindowContainer extends WindowContainer<DisplayContent>
     /** Set when a power hint has started, but not ended. */
     private boolean mPowerHintSent;
 
-    /** Used to keep ensureActivitiesVisible() from being entered recursively. */
-    private boolean mInEnsureActivitiesVisible = false;
-
     // The default minimal size that will be used if the activity doesn't specify its minimal size.
     // It will be calculated when the default display gets added.
     int mDefaultMinSizeOfResizeableTaskDp = -1;
@@ -1993,14 +1990,13 @@ public class RootWindowContainer extends WindowContainer<DisplayContent>
      */
     void ensureActivitiesVisible(ActivityRecord starting, int configChanges,
             boolean preserveWindows, boolean notifyClients) {
-        if (mInEnsureActivitiesVisible) {
+        if (mStackSupervisor.inActivityVisibilityUpdate()) {
             // Don't do recursive work.
             return;
         }
-        mInEnsureActivitiesVisible = true;
 
         try {
-            mStackSupervisor.getKeyguardController().beginActivityVisibilityUpdate();
+            mStackSupervisor.beginActivityVisibilityUpdate();
             // First the front stacks. In case any are not fullscreen and are in front of home.
             for (int displayNdx = getChildCount() - 1; displayNdx >= 0; --displayNdx) {
                 final DisplayContent display = getChildAt(displayNdx);
@@ -2008,8 +2004,7 @@ public class RootWindowContainer extends WindowContainer<DisplayContent>
                         notifyClients);
             }
         } finally {
-            mStackSupervisor.getKeyguardController().endActivityVisibilityUpdate();
-            mInEnsureActivitiesVisible = false;
+            mStackSupervisor.endActivityVisibilityUpdate();
         }
     }
 
@@ -2175,7 +2170,7 @@ public class RootWindowContainer extends WindowContainer<DisplayContent>
             final boolean singleActivity = task.getChildCount() == 1;
             final ActivityStack stack;
             if (singleActivity) {
-                stack = r.getRootTask();
+                stack = (ActivityStack) task;
             } else {
                 // In the case of multiple activities, we will create a new task for it and then
                 // move the PIP activity into the task.
@@ -2187,6 +2182,11 @@ public class RootWindowContainer extends WindowContainer<DisplayContent>
                 // On the other hand, ActivityRecord#onParentChanged takes care of setting the
                 // up-to-dated pinned stack information on this newly created stack.
                 r.reparent(stack, MAX_VALUE, reason);
+            }
+            if (stack.getParent() != taskDisplayArea) {
+                // stack is nested, but pinned tasks need to be direct children of their
+                // display area, so reparent.
+                stack.reparent(taskDisplayArea, true /* onTop */);
             }
             stack.setWindowingMode(WINDOWING_MODE_PINNED);
 
@@ -2507,20 +2507,6 @@ public class RootWindowContainer extends WindowContainer<DisplayContent>
             }
         }
         return list;
-    }
-
-    void deferUpdateBounds(int activityType) {
-        final ActivityStack stack = getStack(WINDOWING_MODE_UNDEFINED, activityType);
-        if (stack != null) {
-            stack.deferUpdateBounds();
-        }
-    }
-
-    void continueUpdateBounds(int activityType) {
-        final ActivityStack stack = getStack(WINDOWING_MODE_UNDEFINED, activityType);
-        if (stack != null) {
-            stack.continueUpdateBounds();
-        }
     }
 
     @Override

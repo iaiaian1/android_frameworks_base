@@ -182,6 +182,8 @@ public class ResolverActivity extends Activity implements
     private BroadcastReceiver mWorkProfileStateReceiver;
     private UserHandle mHeaderCreatorUser;
 
+    private UserHandle mWorkProfileUserHandle;
+
     /**
      * Get the string resource to be used as a label for the link to the resolver activity for an
      * action.
@@ -361,8 +363,10 @@ public class ResolverActivity extends Activity implements
         // of the last used choice to highlight it in the list.  We need to always
         // turn this off when running under voice interaction, since it results in
         // a more complicated UI that the current voice interaction flow is not able
-        // to handle.
-        boolean filterLastUsed = mSupportsAlwaysUseOption && !isVoiceInteraction();
+        // to handle. We also turn it off when the work tab is shown to simplify the UX.
+        boolean filterLastUsed = mSupportsAlwaysUseOption && !isVoiceInteraction()
+                && !shouldShowTabs();
+        mWorkProfileUserHandle = fetchWorkProfileUserProfile();
         mMultiProfilePagerAdapter = createMultiProfilePagerAdapter(initialIntents, rList, filterLastUsed);
         if (configureContentView()) {
             return;
@@ -527,13 +531,18 @@ public class ResolverActivity extends Activity implements
         return UserHandle.of(ActivityManager.getCurrentUser());
     }
     protected @Nullable UserHandle getWorkProfileUserHandle() {
+        return mWorkProfileUserHandle;
+    }
+
+    protected @Nullable UserHandle fetchWorkProfileUserProfile() {
+        mWorkProfileUserHandle = null;
         UserManager userManager = getSystemService(UserManager.class);
         for (final UserInfo userInfo : userManager.getProfiles(ActivityManager.getCurrentUser())) {
             if (userInfo.isManagedProfile()) {
-                return userInfo.getUserHandle();
+                mWorkProfileUserHandle = userInfo.getUserHandle();
             }
         }
-        return null;
+        return mWorkProfileUserHandle;
     }
 
     private boolean hasWorkProfile() {

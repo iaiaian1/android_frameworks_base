@@ -97,14 +97,12 @@ import static android.view.Display.INVALID_DISPLAY;
 import static android.view.Surface.ROTATION_270;
 import static android.view.Surface.ROTATION_90;
 import static android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
-import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
 import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_STARTING;
 import static android.view.WindowManager.LayoutParams.TYPE_BASE_APPLICATION;
 import static android.view.WindowManager.TRANSIT_ACTIVITY_CLOSE;
-import static android.view.WindowManager.TRANSIT_DOCK_TASK_FROM_RECENTS;
 import static android.view.WindowManager.TRANSIT_TASK_CLOSE;
 import static android.view.WindowManager.TRANSIT_TASK_OPEN_BEHIND;
 import static android.view.WindowManager.TRANSIT_UNSET;
@@ -577,7 +575,7 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
     private final WindowState.UpdateReportedVisibilityResults mReportedVisibilityResults =
             new WindowState.UpdateReportedVisibilityResults();
 
-    boolean mUseTransferredAnimation;
+    private boolean mUseTransferredAnimation;
 
     /**
      * @see #currentLaunchCanTurnScreenOn()
@@ -1167,8 +1165,14 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
             } else {
                 mLastReportedMultiWindowMode = inMultiWindowMode;
                 computeConfigurationAfterMultiWindowModeChange();
-                ensureActivityConfiguration(0 /* globalChanges */, PRESERVE_WINDOWS,
-                        true /* ignoreVisibility */);
+                // If the activity is in stopping or stopped state, for instance, it's in the
+                // split screen task and not the top one, the last configuration it should keep
+                // is the one before multi-window mode change.
+                final ActivityState state = getState();
+                if (state != STOPPED && state != STOPPING) {
+                    ensureActivityConfiguration(0 /* globalChanges */, PRESERVE_WINDOWS,
+                            true /* ignoreVisibility */);
+                }
             }
         }
     }
@@ -1288,12 +1292,6 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
         }
 
         if (stack != null && stack.topRunningActivity() == this) {
-            // carry over the PictureInPictureParams to the parent stack without calling
-            // TaskOrganizerController#dispatchTaskInfoChanged.
-            // this is to ensure the stack holding up-to-dated pinned stack information
-            // when activity is re-parented to enter pip mode, see also
-            // RootWindowContainer#moveActivityToPinnedStack
-            stack.mPictureInPictureParams.copyOnlySet(pictureInPictureArgs);
             // make ensure the TaskOrganizer still works after re-parenting
             if (firstWindowDrawn) {
                 stack.setHasBeenVisible(true);
@@ -1589,13 +1587,9 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
         hasBeenLaunched = false;
         mStackSupervisor = supervisor;
 
-        // b/35954083: Limit task affinity to uid to avoid various issues associated with sharing
-        // affinity across uids.
-        final String uid = Integer.toString(info.applicationInfo.uid);
-        if (info.taskAffinity != null && !info.taskAffinity.startsWith(uid)) {
-            info.taskAffinity = uid + ":" + info.taskAffinity;
-        }
+        info.taskAffinity = getTaskAffinityWithUid(info.taskAffinity, info.applicationInfo.uid);
         taskAffinity = info.taskAffinity;
+        final String uid = Integer.toString(info.applicationInfo.uid);
         if (info.windowLayout != null && info.windowLayout.windowLayoutAffinity != null
                 && !info.windowLayout.windowLayoutAffinity.startsWith(uid)) {
             info.windowLayout.windowLayoutAffinity =
@@ -1654,6 +1648,22 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
 
         if (mPerf == null)
             mPerf = new BoostFramework();
+    }
+
+    /**
+     * Generate the task affinity with uid. For b/35954083, Limit task affinity to uid to avoid
+     * issues associated with sharing affinity across uids.
+     *
+     * @param affinity The affinity of the activity.
+     * @param uid The user-ID that has been assigned to this application.
+     * @return The task affinity with uid.
+     */
+    static String getTaskAffinityWithUid(String affinity, int uid) {
+        final String uidStr = Integer.toString(uid);
+        if (affinity != null && !affinity.startsWith(uidStr)) {
+            affinity = uidStr + ":" + affinity;
+        }
+        return affinity;
     }
 
     static int getLockTaskLaunchMode(ActivityInfo aInfo, @Nullable ActivityOptions options) {
@@ -1889,13 +1899,7 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
     private int getStartingWindowType(boolean newTask, boolean taskSwitch, boolean processRunning,
             boolean allowTaskSnapshot, boolean activityCreated, boolean fromRecents,
             ActivityManager.TaskSnapshot snapshot) {
-        if (getDisplayContent().mAppTransition.getAppTransition()
-                == TRANSIT_DOCK_TASK_FROM_RECENTS) {
-            // TODO(b/34099271): Remove this statement to add back the starting window and figure
-            // out why it causes flickering, the starting window appears over the thumbnail while
-            // the docked from recents transition occurs
-            return STARTING_WINDOW_TYPE_NONE;
-        } else if (newTask || !processRunning || (taskSwitch && !activityCreated)) {
+        if (newTask || !processRunning || (taskSwitch && !activityCreated)) {
             return STARTING_WINDOW_TYPE_SPLASH_SCREEN;
         } else if (taskSwitch && allowTaskSnapshot) {
             if (snapshotOrientationSameAsTask(snapshot) || (snapshot != null && fromRecents)) {
@@ -2119,12 +2123,20 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
 
     @Override
     boolean fillsParent() {
-        return occludesParent();
+        return occludesParent(true /* includingFinishing */);
     }
 
-    /** Returns true if this activity is opaque and fills the entire space of this task. */
+    /** Returns true if this activity is not finishing, is opaque and fills the entire space of
+     * this task. */
     boolean occludesParent() {
-        return !finishing && mOccludesParent;
+        return occludesParent(false /* includingFinishing */);
+    }
+
+    private boolean occludesParent(boolean includingFinishing) {
+        if (!includingFinishing && finishing) {
+            return false;
+        }
+        return mOccludesParent;
     }
 
     boolean setOccludesParent(boolean occludesParent) {
@@ -3370,12 +3382,14 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
                 }
                 setClientVisible(fromActivity.mClientVisible);
 
-                transferAnimation(fromActivity);
+                if (fromActivity.isAnimating()) {
+                    transferAnimation(fromActivity);
 
-                // When transferring an animation, we no longer need to apply an animation to the
-                // the token we transfer the animation over. Thus, set this flag to indicate we've
-                // transferred the animation.
-                mUseTransferredAnimation = true;
+                    // When transferring an animation, we no longer need to apply an animation to
+                    // the token we transfer the animation over. Thus, set this flag to indicate
+                    // we've transferred the animation.
+                    mUseTransferredAnimation = true;
+                }
 
                 mWmService.updateFocusedWindowLocked(
                         UPDATE_FOCUS_WILL_PLACE_SURFACES, true /*updateInputWindows*/);
@@ -4307,8 +4321,9 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
      *         screenshot.
      */
     boolean shouldUseAppThemeSnapshot() {
-        return mDisablePreviewScreenshots || forAllWindows(w -> (w.mAttrs.flags & FLAG_SECURE) != 0,
-                true /* topToBottom */);
+        return mDisablePreviewScreenshots || forAllWindows(w -> {
+                    return mWmService.isSecureLocked(w);
+                }, true /* topToBottom */);
     }
 
     /**
@@ -7561,7 +7576,7 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
         if (mThumbnail != null){
             mThumbnail.dumpDebug(proto, THUMBNAIL);
         }
-        proto.write(FILLS_PARENT, mOccludesParent);
+        proto.write(FILLS_PARENT, fillsParent());
         proto.write(APP_STOPPED, mAppStopped);
         proto.write(TRANSLUCENT, !occludesParent());
         proto.write(VISIBLE, mVisible);
@@ -7791,6 +7806,6 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
 
     void setPictureInPictureParams(PictureInPictureParams p) {
         pictureInPictureArgs.copyOnlySet(p);
-        getTask().getRootTask().setPictureInPictureParams(p);
+        getTask().getRootTask().onPictureInPictureParamsChanged();
     }
 }

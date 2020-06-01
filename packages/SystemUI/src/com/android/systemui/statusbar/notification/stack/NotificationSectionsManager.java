@@ -29,10 +29,12 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.android.internal.annotations.VisibleForTesting;
-import com.android.keyguard.KeyguardMediaPlayer;
 import com.android.systemui.R;
+import com.android.systemui.media.KeyguardMediaController;
+import com.android.systemui.media.MediaHierarchyManager;
 import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
 import com.android.systemui.statusbar.StatusBarState;
@@ -74,17 +76,17 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
     private final StatusBarStateController mStatusBarStateController;
     private final ConfigurationController mConfigurationController;
     private final PeopleHubViewAdapter mPeopleHubViewAdapter;
-    private final KeyguardMediaPlayer mKeyguardMediaPlayer;
     private final NotificationSectionsFeatureManager mSectionsFeatureManager;
+    private final KeyguardMediaController mKeyguardMediaController;
     private final int mNumberOfSections;
-
+    private final NotificationSectionsLogger mLogger;
     private final PeopleHubViewBoundary mPeopleHubViewBoundary = new PeopleHubViewBoundary() {
         @Override
         public void setVisible(boolean isVisible) {
             if (mPeopleHubVisible != isVisible) {
                 mPeopleHubVisible = isVisible;
                 if (mInitialized) {
-                    updateSectionBoundaries();
+                    updateSectionBoundaries("PeopleHub visibility changed");
                 }
             }
         }
@@ -109,6 +111,7 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
     @Nullable private View.OnClickListener mOnClearGentleNotifsClickListener;
 
     private SectionHeaderView mAlertingHeader;
+    private SectionHeaderView mIncomingHeader;
 
     private PeopleHubView mPeopleHubView;
     private boolean mPeopleHubVisible = false;
@@ -122,15 +125,18 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
             StatusBarStateController statusBarStateController,
             ConfigurationController configurationController,
             PeopleHubViewAdapter peopleHubViewAdapter,
-            KeyguardMediaPlayer keyguardMediaPlayer,
-            NotificationSectionsFeatureManager sectionsFeatureManager) {
+            KeyguardMediaController keyguardMediaController,
+            NotificationSectionsFeatureManager sectionsFeatureManager,
+            NotificationSectionsLogger logger) {
+
         mActivityStarter = activityStarter;
         mStatusBarStateController = statusBarStateController;
         mConfigurationController = configurationController;
         mPeopleHubViewAdapter = peopleHubViewAdapter;
-        mKeyguardMediaPlayer = keyguardMediaPlayer;
         mSectionsFeatureManager = sectionsFeatureManager;
         mNumberOfSections = mSectionsFeatureManager.getNumberOfBuckets();
+        mKeyguardMediaController = keyguardMediaController;
+        mLogger = logger;
     }
 
     NotificationSection[] createSectionsForBuckets() {
@@ -199,12 +205,14 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
             mPeopleHubSubscription = mPeopleHubViewAdapter.bindView(mPeopleHubViewBoundary);
         }
 
-        if (mMediaControlsView != null) {
-            mKeyguardMediaPlayer.unbindView();
-        }
+        mIncomingHeader = reinflateView(
+                mIncomingHeader, layoutInflater, R.layout.status_bar_notification_section_header);
+        mIncomingHeader.setHeaderText(R.string.notification_section_header_incoming);
+        mIncomingHeader.setOnHeaderClickListener(this::onGentleHeaderClick);
+
         mMediaControlsView = reinflateView(mMediaControlsView, layoutInflater,
                 R.layout.keyguard_media_header);
-        mKeyguardMediaPlayer.bindView(mMediaControlsView);
+        mKeyguardMediaController.attach(mMediaControlsView);
     }
 
     /** Listener for when the "clear all" button is clicked on the gentle notification header. */
@@ -218,6 +226,7 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
                 || view == mMediaControlsView
                 || view == mPeopleHubView
                 || view == mAlertingHeader
+                || view == mIncomingHeader
                 || !Objects.equals(getBucket(view), getBucket(previous));
     }
 
@@ -229,6 +238,8 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
     private Integer getBucket(View view) {
         if (view == mGentleHeader) {
             return BUCKET_SILENT;
+        } else if (view == mIncomingHeader) {
+            return BUCKET_HEADS_UP;
         } else if (view == mMediaControlsView) {
             return BUCKET_MEDIA_CONTROLS;
         } else if (view == mPeopleHubView) {
@@ -241,14 +252,69 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
         return null;
     }
 
+    private void logShadeContents() {
+        final int childCount = mParent.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = mParent.getChildAt(i);
+            if (child == mIncomingHeader) {
+                mLogger.logPosition(i, "INCOMING HEADER");
+                continue;
+            }
+            if (child == mMediaControlsView) {
+                mLogger.logPosition(i, "MEDIA CONTROLS");
+                continue;
+            }
+            if (child == mPeopleHubView) {
+                mLogger.logPosition(i, "CONVERSATIONS HEADER");
+                continue;
+            }
+            if (child == mAlertingHeader) {
+                mLogger.logPosition(i, "ALERTING HEADER");
+                continue;
+            }
+            if (child == mGentleHeader) {
+                mLogger.logPosition(i, "SILENT HEADER");
+                continue;
+            }
+
+            if (!(child instanceof ExpandableNotificationRow)) {
+                mLogger.logPosition(i, "other:" + child.getClass().getName());
+                continue;
+            }
+            ExpandableNotificationRow row = (ExpandableNotificationRow) child;
+            // Once we enter a new section, calculate the target position for the header.
+            switch (row.getEntry().getBucket()) {
+                case BUCKET_HEADS_UP:
+                    mLogger.logPosition(i, "Heads Up");
+                    break;
+                case BUCKET_PEOPLE:
+                    mLogger.logPosition(i, "Conversation");
+                    break;
+                case BUCKET_ALERTING:
+                    mLogger.logPosition(i, "Alerting");
+                    break;
+                case BUCKET_SILENT:
+                    mLogger.logPosition(i, "Silent");
+                    break;
+            }
+        }
+    }
+
+    @VisibleForTesting
+    void updateSectionBoundaries() {
+        updateSectionBoundaries("test");
+    }
+
     /**
      * Should be called whenever notifs are added, removed, or updated. Updates section boundary
      * bookkeeping and adds/moves/removes section headers if appropriate.
      */
-    void updateSectionBoundaries() {
+    void updateSectionBoundaries(String reason) {
         if (!isUsingMultipleSections()) {
             return;
         }
+
+        mLogger.logStartSectionUpdate(reason);
 
         // The overall strategy here is to iterate over the current children of mParent, looking
         // for where the sections headers are currently positioned, and where each section begins.
@@ -258,7 +324,6 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
 
         final boolean showHeaders = mStatusBarStateController.getState() != StatusBarState.KEYGUARD;
         final boolean usingPeopleFiltering = mSectionsFeatureManager.isFilteringEnabled();
-        final boolean isKeyguard = mStatusBarStateController.getState() == StatusBarState.KEYGUARD;
         final boolean usingMediaControls = mSectionsFeatureManager.isMediaControlsEnabled();
 
         boolean peopleNotifsPresent = false;
@@ -266,7 +331,9 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
         int currentMediaControlsIdx = -1;
         // Currently, just putting media controls in the front and incrementing the position based
         // on the number of heads-up notifs.
-        int mediaControlsTarget = isKeyguard && usingMediaControls ? 0 : -1;
+        int mediaControlsTarget = usingMediaControls ? 0 : -1;
+        int currentIncomingHeaderIdx = -1;
+        int incomingHeaderTarget = -1;
         int currentPeopleHeaderIdx = -1;
         int peopleHeaderTarget = -1;
         int currentAlertingHeaderIdx = -1;
@@ -281,24 +348,34 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
             View child = mParent.getChildAt(i);
 
             // Track the existing positions of the headers
+            if (child == mIncomingHeader) {
+                mLogger.logPosition(i, "INCOMING HEADER");
+                currentIncomingHeaderIdx = i;
+                continue;
+            }
             if (child == mMediaControlsView) {
+                mLogger.logPosition(i, "MEDIA CONTROLS");
                 currentMediaControlsIdx = i;
                 continue;
             }
             if (child == mPeopleHubView) {
+                mLogger.logPosition(i, "CONVERSATIONS HEADER");
                 currentPeopleHeaderIdx = i;
                 continue;
             }
             if (child == mAlertingHeader) {
+                mLogger.logPosition(i, "ALERTING HEADER");
                 currentAlertingHeaderIdx = i;
                 continue;
             }
             if (child == mGentleHeader) {
+                mLogger.logPosition(i, "SILENT HEADER");
                 currentGentleHeaderIdx = i;
                 continue;
             }
 
             if (!(child instanceof ExpandableNotificationRow)) {
+                mLogger.logPosition(i, "other");
                 continue;
             }
             lastNotifIndex = i;
@@ -306,11 +383,33 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
             // Once we enter a new section, calculate the target position for the header.
             switch (row.getEntry().getBucket()) {
                 case BUCKET_HEADS_UP:
+                    mLogger.logPosition(i, "Heads Up");
+                    if (showHeaders && incomingHeaderTarget == -1) {
+                        incomingHeaderTarget = i;
+                        // Offset the target if there are other headers before this that will be
+                        // moved.
+                        if (currentIncomingHeaderIdx != -1) {
+                            incomingHeaderTarget--;
+                        }
+                        if (currentMediaControlsIdx != -1) {
+                            incomingHeaderTarget--;
+                        }
+                        if (currentPeopleHeaderIdx != -1) {
+                            incomingHeaderTarget--;
+                        }
+                        if (currentAlertingHeaderIdx != -1) {
+                            incomingHeaderTarget--;
+                        }
+                        if (currentGentleHeaderIdx != -1) {
+                            incomingHeaderTarget--;
+                        }
+                    }
                     if (mediaControlsTarget != -1) {
                         mediaControlsTarget++;
                     }
                     break;
                 case BUCKET_PEOPLE:
+                    mLogger.logPosition(i, "Conversation");
                     peopleNotifsPresent = true;
                     if (showHeaders && peopleHeaderTarget == -1) {
                         peopleHeaderTarget = i;
@@ -328,6 +427,7 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
                     }
                     break;
                 case BUCKET_ALERTING:
+                    mLogger.logPosition(i, "Alerting");
                     if (showHeaders && usingPeopleFiltering && alertingHeaderTarget == -1) {
                         alertingHeaderTarget = i;
                         // Offset the target if there are other headers before this that will be
@@ -341,6 +441,7 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
                     }
                     break;
                 case BUCKET_SILENT:
+                    mLogger.logPosition(i, "Silent");
                     if (showHeaders && gentleHeaderTarget == -1) {
                         gentleHeaderTarget = i;
                         // Offset the target if there are other headers before this that will be
@@ -371,6 +472,14 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
             }
         }
 
+        mLogger.logStr("New header target positions:");
+
+        mLogger.logPosition(incomingHeaderTarget, "INCOMING HEADER");
+        mLogger.logPosition(mediaControlsTarget, "MEDIA CONTROLS");
+        mLogger.logPosition(peopleHeaderTarget, "CONVERSATIONS HEADER");
+        mLogger.logPosition(alertingHeaderTarget, "ALERTING HEADER");
+        mLogger.logPosition(gentleHeaderTarget, "SILENT HEADER");
+
         // Add headers in reverse order to preserve indices
         adjustHeaderVisibilityAndPosition(
                 gentleHeaderTarget, mGentleHeader, currentGentleHeaderIdx);
@@ -378,8 +487,15 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
                 alertingHeaderTarget, mAlertingHeader, currentAlertingHeaderIdx);
         adjustHeaderVisibilityAndPosition(
                 peopleHeaderTarget, mPeopleHubView, currentPeopleHeaderIdx);
-        adjustViewPosition(
-                mediaControlsTarget, mMediaControlsView, currentMediaControlsIdx);
+        adjustViewPosition(mediaControlsTarget, mMediaControlsView, currentMediaControlsIdx);
+        adjustViewPosition(incomingHeaderTarget, mIncomingHeader, currentIncomingHeaderIdx);
+
+
+        mLogger.logStr("Final order:");
+
+        logShadeContents();
+
+        mLogger.logStr("Section boundary update complete");
 
         // Update headers to reflect state of section contents
         mGentleHeader.setAreThereDismissableGentleNotifs(
@@ -553,7 +669,7 @@ public class NotificationSectionsManager implements StackScrollAlgorithm.Section
 
     void hidePeopleRow() {
         mPeopleHubVisible = false;
-        updateSectionBoundaries();
+        updateSectionBoundaries("PeopleHub dismissed");
     }
 
     void setHeaderForegroundColor(@ColorInt int color) {

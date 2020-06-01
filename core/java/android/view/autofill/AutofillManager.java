@@ -18,6 +18,7 @@ package android.view.autofill;
 
 import static android.service.autofill.FillRequest.FLAG_MANUAL_REQUEST;
 import static android.service.autofill.FillRequest.FLAG_PASSWORD_INPUT_TYPE;
+import static android.service.autofill.FillRequest.FLAG_VIEW_NOT_FOCUSED;
 import static android.view.autofill.Helper.sDebug;
 import static android.view.autofill.Helper.sVerbose;
 import static android.view.autofill.Helper.toList;
@@ -879,7 +880,30 @@ public final class AutofillManager {
      * @param view view requesting the new autofill context.
      */
     public void requestAutofill(@NonNull View view) {
-        notifyViewEntered(view, FLAG_MANUAL_REQUEST);
+        int flags = FLAG_MANUAL_REQUEST;
+        if (!view.isFocused()) {
+            flags |= FLAG_VIEW_NOT_FOCUSED;
+        }
+        notifyViewEntered(view, flags);
+    }
+
+    /**
+     * Explicitly cancels the current session and requests a new autofill context.
+     *
+     * <p>Normally, the autofill context is automatically started if necessary when
+     * {@link #notifyViewEntered(View)} is called, but this method should be used in
+     * cases where it must be explicitly started or restarted. Currently, this method should only
+     * be called by
+     * {@link android.service.autofill.augmented.AugmentedAutofillService#requestAutofill(
+     * ComponentName, AutofillId)} to cancel the current session and trigger the autofill flow in
+     * a new session, giving the autofill service or the augmented autofill service a chance to
+     * send updated suggestions.
+     *
+     * @param view view requesting the new autofill context.
+     */
+    void requestAutofillFromNewSession(@NonNull View view) {
+        cancel();
+        notifyViewEntered(view);
     }
 
     /**
@@ -907,7 +931,11 @@ public final class AutofillManager {
      * @param absBounds absolute boundaries of the virtual view in the screen.
      */
     public void requestAutofill(@NonNull View view, int virtualId, @NonNull Rect absBounds) {
-        notifyViewEntered(view, virtualId, absBounds, FLAG_MANUAL_REQUEST);
+        int flags = FLAG_MANUAL_REQUEST;
+        if (!view.isFocused()) {
+            flags |= FLAG_VIEW_NOT_FOCUSED;
+        }
+        notifyViewEntered(view, virtualId, absBounds, flags);
     }
 
     /**
@@ -1403,7 +1431,7 @@ public final class AutofillManager {
      * methods such as {@link android.app.Activity#finish()}.
      */
     public void cancel() {
-        if (sVerbose) Log.v(TAG, "cancel() called by app");
+        if (sVerbose) Log.v(TAG, "cancel() called by app or augmented autofill service");
         if (!hasAutofillFeature()) {
             return;
         }
@@ -1875,7 +1903,13 @@ public final class AutofillManager {
                 final SyncResultReceiver receiver = new SyncResultReceiver(SYNC_CALLS_TIMEOUT_MS);
                 mService.addClient(mServiceClient, client.autofillClientGetComponentName(),
                         userId, receiver);
-                final int flags = receiver.getIntResult();
+                int flags = 0;
+                try {
+                    flags = receiver.getIntResult();
+                } catch (SyncResultReceiver.TimeoutException e) {
+                    Log.w(TAG, "Failed to initialize autofill: " + e);
+                    return;
+                }
                 mEnabled = (flags & FLAG_ADD_CLIENT_ENABLED) != 0;
                 sDebug = (flags & FLAG_ADD_CLIENT_DEBUG) != 0;
                 sVerbose = (flags & FLAG_ADD_CLIENT_VERBOSE) != 0;
@@ -3484,7 +3518,7 @@ public final class AutofillManager {
             if (sVerbose) {
                 Log.v(TAG, "requestAutofill() by AugmentedAutofillService.");
             }
-            afm.post(() -> afm.requestAutofill(view));
+            afm.post(() -> afm.requestAutofillFromNewSession(view));
             return true;
         }
 

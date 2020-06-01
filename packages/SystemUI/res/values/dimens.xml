@@ -306,6 +306,7 @@
     <dimen name="global_screenshot_bg_padding">20dp</dimen>
     <dimen name="global_screenshot_bg_protection_height">400dp</dimen>
     <dimen name="global_screenshot_x_scale">80dp</dimen>
+    <dimen name="screenshot_bg_protection_height">242dp</dimen>
     <dimen name="screenshot_preview_elevation">6dp</dimen>
     <dimen name="screenshot_offset_y">48dp</dimen>
     <dimen name="screenshot_offset_x">16dp</dimen>
@@ -497,6 +498,7 @@
     <dimen name="qs_quick_tile_padding">12dp</dimen>
     <dimen name="qs_header_gear_translation">16dp</dimen>
     <dimen name="qs_header_tile_margin_horizontal">4dp</dimen>
+    <dimen name="qs_header_tile_margin_bottom">18dp</dimen>
     <dimen name="qs_page_indicator_width">16dp</dimen>
     <dimen name="qs_page_indicator_height">8dp</dimen>
     <dimen name="qs_tile_icon_size">24dp</dimen>
@@ -1042,6 +1044,10 @@
     <dimen name="bottom_padding">48dp</dimen>
     <dimen name="edge_margin">8dp</dimen>
 
+    <!-- The absolute side margins of quick settings -->
+    <dimen name="quick_settings_side_margins">16dp</dimen>
+    <dimen name="quick_settings_expanded_bottom_margin">16dp</dimen>
+    <dimen name="quick_settings_media_extra_bottom_margin">4dp</dimen>
     <dimen name="rounded_corner_content_padding">0dp</dimen>
     <dimen name="nav_content_padding">0dp</dimen>
     <dimen name="nav_quick_scrub_track_edge_padding">24dp</dimen>
@@ -1168,7 +1174,7 @@
     <!-- Default (and minimum) height of the expanded view shown when the bubble is expanded -->
     <dimen name="bubble_expanded_default_height">180dp</dimen>
     <!-- Default height of bubble overflow -->
-    <dimen name="bubble_overflow_height">460dp</dimen>
+    <dimen name="bubble_overflow_height">480dp</dimen>
     <!-- Bubble overflow padding when there are no bubbles  -->
     <dimen name="bubble_overflow_empty_state_padding">16dp</dimen>
     <!-- Padding of container for overflow bubbles -->
@@ -1229,12 +1235,12 @@
 
     <!-- Size of media cards in the QSPanel carousel -->
     <dimen name="qs_media_width">350dp</dimen>
-    <dimen name="qs_media_padding">8dp</dimen>
+    <dimen name="qs_media_padding">16dp</dimen>
     <dimen name="qs_media_panel_outer_padding">16dp</dimen>
-    <dimen name="qs_media_corner_radius">10dp</dimen>
-    <dimen name="qs_media_album_size">72dp</dimen>
+    <dimen name="qs_media_album_size">52dp</dimen>
     <dimen name="qs_seamless_icon_size">20dp</dimen>
     <dimen name="qqs_media_spacing">8dp</dimen>
+    <dimen name="qqs_horizonal_tile_padding_bottom">8dp</dimen>
 
     <dimen name="magnification_border_size">5dp</dimen>
     <dimen name="magnification_frame_move_short">5dp</dimen>
@@ -1310,7 +1316,7 @@
     <dimen name="controls_card_margin">2dp</dimen>
     <item name="control_card_elevation" type="dimen" format="float">15</item>
 
-    <dimen name="controls_dialog_padding">8dp</dimen>
+    <dimen name="controls_dialog_padding">32dp</dimen>
     <dimen name="controls_dialog_control_width">200dp</dimen>
 
     <!-- Screen Record -->

@@ -153,6 +153,7 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
     private final NotificationGroupManager mNotificationGroupManager;
     private final ShadeController mShadeController;
     private final FloatingContentCoordinator mFloatingContentCoordinator;
+    private final BubbleDataRepository mDataRepository;
 
     private BubbleData mBubbleData;
     private ScrimView mBubbleScrim;
@@ -174,7 +175,7 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
     private INotificationManager mINotificationManager;
 
     // Callback that updates BubbleOverflowActivity on data change.
-    @Nullable private BubbleData.Listener mOverflowListener = null;
+    @Nullable private Runnable mOverflowCallback = null;
 
     private final NotificationInterruptStateProvider mNotificationInterruptStateProvider;
     private IStatusBarService mBarService;
@@ -279,30 +280,6 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
         }
     }
 
-    public BubbleController(Context context,
-            NotificationShadeWindowController notificationShadeWindowController,
-            StatusBarStateController statusBarStateController,
-            ShadeController shadeController,
-            BubbleData data,
-            ConfigurationController configurationController,
-            NotificationInterruptStateProvider interruptionStateProvider,
-            ZenModeController zenModeController,
-            NotificationLockscreenUserManager notifUserManager,
-            NotificationGroupManager groupManager,
-            NotificationEntryManager entryManager,
-            NotifPipeline notifPipeline,
-            FeatureFlags featureFlags,
-            DumpManager dumpManager,
-            FloatingContentCoordinator floatingContentCoordinator,
-            SysUiState sysUiState,
-            INotificationManager notificationManager) {
-        this(context, notificationShadeWindowController, statusBarStateController, shadeController,
-                data, null /* synchronizer */, configurationController, interruptionStateProvider,
-                zenModeController, notifUserManager, groupManager, entryManager,
-                notifPipeline, featureFlags, dumpManager, floatingContentCoordinator, sysUiState,
-                notificationManager);
-    }
-
     /**
      * Injected constructor. See {@link BubbleModule}.
      */
@@ -322,8 +299,10 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
             FeatureFlags featureFlags,
             DumpManager dumpManager,
             FloatingContentCoordinator floatingContentCoordinator,
+            BubbleDataRepository dataRepository,
             SysUiState sysUiState,
-            INotificationManager notificationManager) {
+            INotificationManager notificationManager,
+            WindowManager windowManager) {
         dumpManager.registerDumpable(TAG, this);
         mContext = context;
         mShadeController = shadeController;
@@ -331,6 +310,7 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
         mNotifUserManager = notifUserManager;
         mZenModeController = zenModeController;
         mFloatingContentCoordinator = floatingContentCoordinator;
+        mDataRepository = dataRepository;
         mINotificationManager = notificationManager;
         mZenModeController.addCallback(new ZenModeController.Callback() {
             @Override
@@ -391,7 +371,7 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
         }
         mSurfaceSynchronizer = synchronizer;
 
-        mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        mWindowManager = windowManager;
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
 
@@ -591,8 +571,8 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
         mInflateSynchronously = inflateSynchronously;
     }
 
-    void setOverflowListener(BubbleData.Listener listener) {
-        mOverflowListener = listener;
+    void setOverflowCallback(Runnable updateOverflow) {
+        mOverflowCallback = updateOverflow;
     }
 
     /**
@@ -630,7 +610,7 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
                 // themselves.
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.TYPE_TRUSTED_APPLICATION_OVERLAY,
                 // Start not focusable - we'll become focusable when expanded so the ActivityView
                 // can use the IME.
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
@@ -1006,8 +986,8 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
         @Override
         public void applyUpdate(BubbleData.Update update) {
             // Update bubbles in overflow.
-            if (mOverflowListener != null) {
-                mOverflowListener.applyUpdate(update);
+            if (mOverflowCallback != null) {
+                mOverflowCallback.run();
             }
 
             // Collapsing? Do this first before remaining steps.
@@ -1018,6 +998,7 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
             // Do removals, if any.
             ArrayList<Pair<Bubble, Integer>> removedBubbles =
                     new ArrayList<>(update.removedBubbles);
+            ArrayList<Bubble> bubblesToBeRemovedFromRepository = new ArrayList<>();
             for (Pair<Bubble, Integer> removed : removedBubbles) {
                 final Bubble bubble = removed.first;
                 @DismissReason final int reason = removed.second;
@@ -1027,12 +1008,14 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
                 if (reason == DISMISS_USER_CHANGED) {
                     continue;
                 }
+                if (reason == DISMISS_NOTIF_CANCEL) {
+                    bubblesToBeRemovedFromRepository.add(bubble);
+                }
                 if (!mBubbleData.hasBubbleInStackWithKey(bubble.getKey())) {
                     if (!mBubbleData.hasOverflowBubbleWithKey(bubble.getKey())
                         && (!bubble.showInShade()
                             || reason == DISMISS_NOTIF_CANCEL
-                            || reason == DISMISS_GROUP_CANCELLED
-                            || reason == DISMISS_OVERFLOW_MAX_REACHED)) {
+                            || reason == DISMISS_GROUP_CANCELLED)) {
                         // The bubble is now gone & the notification is hidden from the shade, so
                         // time to actually remove it
                         for (NotifCallback cb : mCallbacks) {
@@ -1056,9 +1039,12 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
                     }
                 }
             }
+            mDataRepository.removeBubbles(mCurrentUserId, bubblesToBeRemovedFromRepository);
 
             if (update.addedBubble != null) {
+                mDataRepository.addBubble(mCurrentUserId, update.addedBubble);
                 mStackView.addBubble(update.addedBubble);
+
             }
 
             if (update.updatedBubble != null) {
@@ -1068,6 +1054,7 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
             // At this point, the correct bubbles are inflated in the stack.
             // Make sure the order in bubble data is reflected in bubble row.
             if (update.orderChanged) {
+                mDataRepository.addBubbles(mCurrentUserId, update.bubbles);
                 mStackView.updateBubbleOrder(update.bubbles);
             }
 
@@ -1099,6 +1086,9 @@ public class BubbleController implements ConfigurationController.ConfigurationLi
                     Log.d(TAG, BubbleDebugConfig.formatBubblesString(mStackView.getBubblesOnScreen(),
                             mStackView.getExpandedBubble()));
                 }
+                Log.d(TAG, "\n[BubbleData] overflow:");
+                Log.d(TAG, BubbleDebugConfig.formatBubblesString(mBubbleData.getOverflowBubbles(),
+                        null) + "\n");
             }
         }
     };

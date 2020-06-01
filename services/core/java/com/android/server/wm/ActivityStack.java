@@ -246,12 +246,6 @@ public class ActivityStack extends Task {
      */
     boolean mInResumeTopActivity = false;
 
-    private boolean mUpdateBoundsDeferred;
-    private boolean mUpdateBoundsDeferredCalled;
-    private boolean mUpdateDisplayedBoundsDeferredCalled;
-    private final Rect mDeferredBounds = new Rect();
-    private final Rect mDeferredDisplayedBounds = new Rect();
-
     int mCurrentUser;
 
     /** For comparison with DisplayContent bounds. */
@@ -716,8 +710,10 @@ public class ActivityStack extends Task {
         // Need to make sure windowing mode is supported. If we in the process of creating the stack
         // no need to resolve the windowing mode again as it is already resolved to the right mode.
         if (!creating) {
-            windowingMode = taskDisplayArea.validateWindowingMode(windowingMode,
-                    null /* ActivityRecord */, topTask, getActivityType());
+            if (!taskDisplayArea.isValidWindowingMode(windowingMode, null /* ActivityRecord */,
+                    topTask, getActivityType())) {
+                windowingMode = WINDOWING_MODE_UNDEFINED;
+            }
         }
         if (taskDisplayArea.getRootSplitScreenPrimaryTask() == this
                 && windowingMode == WINDOWING_MODE_SPLIT_SCREEN_SECONDARY) {
@@ -854,58 +850,6 @@ public class ActivityStack extends Task {
         return getDisplayContent();
     }
 
-    /**
-     * Defers updating the bounds of the stack. If the stack was resized/repositioned while
-     * deferring, the bounds will update in {@link #continueUpdateBounds()}.
-     */
-    void deferUpdateBounds() {
-        if (!mUpdateBoundsDeferred) {
-            mUpdateBoundsDeferred = true;
-            mUpdateBoundsDeferredCalled = false;
-        }
-    }
-
-    /**
-     * Continues updating bounds after updates have been deferred. If there was a resize attempt
-     * between {@link #deferUpdateBounds()} and {@link #continueUpdateBounds()}, the stack will
-     * be resized to that bounds.
-     */
-    void continueUpdateBounds() {
-        if (mUpdateBoundsDeferred) {
-            mUpdateBoundsDeferred = false;
-            if (mUpdateBoundsDeferredCalled) {
-                setTaskBounds(mDeferredBounds);
-                setBounds(mDeferredBounds);
-            }
-        }
-    }
-
-    private boolean updateBoundsAllowed(Rect bounds) {
-        if (!mUpdateBoundsDeferred) {
-            return true;
-        }
-        if (bounds != null) {
-            mDeferredBounds.set(bounds);
-        } else {
-            mDeferredBounds.setEmpty();
-        }
-        mUpdateBoundsDeferredCalled = true;
-        return false;
-    }
-
-    private boolean updateDisplayedBoundsAllowed(Rect bounds) {
-        if (!mUpdateBoundsDeferred) {
-            return true;
-        }
-        if (bounds != null) {
-            mDeferredDisplayedBounds.set(bounds);
-        } else {
-            mDeferredDisplayedBounds.setEmpty();
-        }
-        mUpdateDisplayedBoundsDeferredCalled = true;
-        return false;
-    }
-
     /** @return true if the stack can only contain one task */
     boolean isSingleTaskInstance() {
         final DisplayContent display = getDisplay();
@@ -1016,16 +960,6 @@ public class ActivityStack extends Task {
                     REPARENT_LEAVE_STACK_IN_PLACE, false /* animate */, false /* deferResume */,
                     "moveToBack");
         }
-    }
-
-    boolean isTopActivityFocusable() {
-        final ActivityRecord r = topRunningActivity();
-        return r != null ? r.isFocusable()
-                : (isFocusable() && getWindowConfiguration().canReceiveKeys());
-    }
-
-    boolean isFocusableAndVisible() {
-        return isTopActivityFocusable() && shouldBeVisible(null /* starting */);
     }
 
     // TODO: Should each user have there own stacks?
@@ -1361,6 +1295,8 @@ public class ActivityStack extends Task {
             prev.cpuTimeAtResume = 0; // reset it
         }
 
+        mRootWindowContainer.ensureActivitiesVisible(resuming, 0, !PRESERVE_WINDOWS);
+
         // Notify when the task stack has changed, but only if visibilities changed (not just
         // focus). Also if there is an active pinned stack - we always want to notify it about
         // task stack changes, because its positioning may depend on it.
@@ -1369,8 +1305,6 @@ public class ActivityStack extends Task {
             mAtmService.getTaskChangeNotificationController().notifyTaskStackChanged();
             mStackSupervisor.mAppVisibilitiesChangedSinceLastPause = false;
         }
-
-        mRootWindowContainer.ensureActivitiesVisible(resuming, 0, !PRESERVE_WINDOWS);
     }
 
     boolean isTopStackInDisplayArea() {
@@ -1390,8 +1324,17 @@ public class ActivityStack extends Task {
     /**
      * Make sure that all activities that need to be visible in the stack (that is, they
      * currently can be seen by the user) actually are and update their configuration.
+     * @param starting The top most activity in the task.
+     *                 The activity is either starting or resuming.
+     *                 Caller should ensure starting activity is visible.
+     * @param preserveWindows Flag indicating whether windows should be preserved when updating
+     *                        configuration in {@link mEnsureActivitiesVisibleHelper}.
+     * @param configChanges Parts of the configuration that changed for this activity for evaluating
+     *                      if the screen should be frozen as part of
+     *                      {@link mEnsureActivitiesVisibleHelper}.
+     *
      */
-    void ensureActivitiesVisible(ActivityRecord starting, int configChanges,
+    void ensureActivitiesVisible(@Nullable ActivityRecord starting, int configChanges,
             boolean preserveWindows) {
         ensureActivitiesVisible(starting, configChanges, preserveWindows, true /* notifyClients */);
     }
@@ -1400,13 +1343,23 @@ public class ActivityStack extends Task {
      * Ensure visibility with an option to also update the configuration of visible activities.
      * @see #ensureActivitiesVisible(ActivityRecord, int, boolean)
      * @see RootWindowContainer#ensureActivitiesVisible(ActivityRecord, int, boolean)
+     * @param starting The top most activity in the task.
+     *                 The activity is either starting or resuming.
+     *                 Caller should ensure starting activity is visible.
+     * @param notifyClients Flag indicating whether the visibility updates should be sent to the
+     *                      clients in {@link mEnsureActivitiesVisibleHelper}.
+     * @param preserveWindows Flag indicating whether windows should be preserved when updating
+     *                        configuration in {@link mEnsureActivitiesVisibleHelper}.
+     * @param configChanges Parts of the configuration that changed for this activity for evaluating
+     *                      if the screen should be frozen as part of
+     *                      {@link mEnsureActivitiesVisibleHelper}.
      */
     // TODO: Should be re-worked based on the fact that each task as a stack in most cases.
-    void ensureActivitiesVisible(ActivityRecord starting, int configChanges,
+    void ensureActivitiesVisible(@Nullable ActivityRecord starting, int configChanges,
             boolean preserveWindows, boolean notifyClients) {
         mTopActivityOccludesKeyguard = false;
         mTopDismissingKeyguardActivity = null;
-        mStackSupervisor.getKeyguardController().beginActivityVisibilityUpdate();
+        mStackSupervisor.beginActivityVisibilityUpdate();
         try {
             mEnsureActivitiesVisibleHelper.process(
                     starting, configChanges, preserveWindows, notifyClients);
@@ -1417,7 +1370,7 @@ public class ActivityStack extends Task {
                 notifyActivityDrawnLocked(null);
             }
         } finally {
-            mStackSupervisor.getKeyguardController().endActivityVisibilityUpdate();
+            mStackSupervisor.endActivityVisibilityUpdate();
         }
     }
 
@@ -1705,6 +1658,8 @@ public class ActivityStack extends Task {
                     ensureActivitiesVisible(null /* starting */, 0 /* configChanges */,
                             !PRESERVE_WINDOWS);
                     nothingToResume = shouldSleepActivities();
+                } else if (next.currentLaunchCanTurnScreenOn() && next.canTurnScreenOn()) {
+                    nothingToResume = false;
                 }
             }
             if (nothingToResume) {
@@ -2424,8 +2379,10 @@ public class ActivityStack extends Task {
     boolean shouldUpRecreateTaskLocked(ActivityRecord srec, String destAffinity) {
         // Basic case: for simple app-centric recents, we need to recreate
         // the task if the affinity has changed.
+
+        final String affinity = ActivityRecord.getTaskAffinityWithUid(destAffinity, srec.getUid());
         if (srec == null || srec.getTask().affinity == null
-                || !srec.getTask().affinity.equals(destAffinity)) {
+                || !srec.getTask().affinity.equals(affinity)) {
             return true;
         }
         // Document-centric case: an app may be split in to multiple documents;
@@ -2743,10 +2700,6 @@ public class ActivityStack extends Task {
     // TODO: Can only be called from special methods in ActivityStackSupervisor.
     // Need to consolidate those calls points into this resize method so anyone can call directly.
     void resize(Rect displayedBounds, boolean preserveWindows, boolean deferResume) {
-        if (!updateBoundsAllowed(displayedBounds)) {
-            return;
-        }
-
         Trace.traceBegin(TRACE_TAG_WINDOW_MANAGER, "stack.resize_" + getRootTaskId());
         mAtmService.deferWindowLayout();
         try {
@@ -2786,10 +2739,6 @@ public class ActivityStack extends Task {
      * basically resizes both stack and task bounds to the same bounds.
      */
    private void setTaskBounds(Rect bounds) {
-        if (!updateBoundsAllowed(bounds)) {
-            return;
-        }
-
         final PooledConsumer c = PooledLambda.obtainConsumer(ActivityStack::setTaskBounds,
                 PooledLambda.__(Task.class), bounds);
         forAllLeafTasks(c, true /* traverseTopToBottom */);

@@ -21,6 +21,7 @@ import static com.android.systemui.bubbles.BubbleDebugConfig.TAG_BUBBLES;
 import static com.android.systemui.bubbles.BubbleDebugConfig.TAG_WITH_CLASS_NAME;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -32,6 +33,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -103,15 +105,14 @@ public class BubbleOverflowActivity extends Activity {
                 - res.getDimensionPixelSize(R.dimen.bubble_overflow_padding);
         final int viewHeight = recyclerViewHeight / rows;
 
-        mAdapter = new BubbleOverflowAdapter(mOverflowBubbles,
+        mAdapter = new BubbleOverflowAdapter(getApplicationContext(), mOverflowBubbles,
                 mBubbleController::promoteBubbleFromOverflow, viewWidth, viewHeight);
         mRecyclerView.setAdapter(mAdapter);
-
-        mOverflowBubbles.addAll(mBubbleController.getOverflowBubbles());
-        mAdapter.notifyDataSetChanged();
-        setEmptyStateVisibility();
-
-        mBubbleController.setOverflowListener(mDataListener);
+        onDataChanged(mBubbleController.getOverflowBubbles());
+        mBubbleController.setOverflowCallback(() -> {
+            onDataChanged(mBubbleController.getOverflowBubbles());
+        });
+        onThemeChanged();
     }
 
     /**
@@ -138,14 +139,6 @@ public class BubbleOverflowActivity extends Activity {
         }
     }
 
-    void setEmptyStateVisibility() {
-        if (mOverflowBubbles.isEmpty()) {
-            mEmptyState.setVisibility(View.VISIBLE);
-        } else {
-            mEmptyState.setVisibility(View.GONE);
-        }
-    }
-
     void setBackgroundColor() {
         final TypedArray ta = getApplicationContext().obtainStyledAttributes(
                 new int[]{android.R.attr.colorBackgroundFloating});
@@ -154,40 +147,22 @@ public class BubbleOverflowActivity extends Activity {
         findViewById(android.R.id.content).setBackgroundColor(bgColor);
     }
 
-    private final BubbleData.Listener mDataListener = new BubbleData.Listener() {
+    void onDataChanged(List<Bubble> bubbles) {
+        mOverflowBubbles.clear();
+        mOverflowBubbles.addAll(bubbles);
+        mAdapter.notifyDataSetChanged();
 
-        @Override
-        public void applyUpdate(BubbleData.Update update) {
-
-            Bubble toRemove = update.removedOverflowBubble;
-            if (toRemove != null) {
-                if (DEBUG_OVERFLOW) {
-                    Log.d(TAG, "remove: " + toRemove);
-                }
-                toRemove.cleanupViews();
-                int i = mOverflowBubbles.indexOf(toRemove);
-                mOverflowBubbles.remove(toRemove);
-                mAdapter.notifyItemRemoved(i);
-            }
-
-            Bubble toAdd = update.addedOverflowBubble;
-            if (toAdd != null) {
-                if (DEBUG_OVERFLOW) {
-                    Log.d(TAG, "add: " + toAdd);
-                }
-                mOverflowBubbles.add(0, toAdd);
-                mAdapter.notifyItemInserted(0);
-            }
-
-            setEmptyStateVisibility();
-
-            if (DEBUG_OVERFLOW) {
-                Log.d(TAG, BubbleDebugConfig.formatBubblesString(
-                        mBubbleController.getOverflowBubbles(),
-                        null));
-            }
+        if (mOverflowBubbles.isEmpty()) {
+            mEmptyState.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyState.setVisibility(View.GONE);
         }
-    };
+
+        if (DEBUG_OVERFLOW) {
+            Log.d(TAG, "Updated overflow bubbles:\n" + BubbleDebugConfig.formatBubblesString(
+                    mOverflowBubbles, /*selected*/ null));
+        }
+    }
 
     @Override
     public void onStart() {
@@ -221,13 +196,15 @@ public class BubbleOverflowActivity extends Activity {
 }
 
 class BubbleOverflowAdapter extends RecyclerView.Adapter<BubbleOverflowAdapter.ViewHolder> {
+    private Context mContext;
     private Consumer<Bubble> mPromoteBubbleFromOverflow;
     private List<Bubble> mBubbles;
     private int mWidth;
     private int mHeight;
 
-    public BubbleOverflowAdapter(List<Bubble> list, Consumer<Bubble> promoteBubble, int width,
-            int height) {
+    public BubbleOverflowAdapter(Context context, List<Bubble> list, Consumer<Bubble> promoteBubble,
+            int width, int height) {
+        mContext = context;
         mBubbles = list;
         mPromoteBubbleFromOverflow = promoteBubble;
         mWidth = width;
@@ -259,6 +236,32 @@ class BubbleOverflowAdapter extends RecyclerView.Adapter<BubbleOverflowAdapter.V
             notifyDataSetChanged();
             mPromoteBubbleFromOverflow.accept(b);
         });
+
+        final CharSequence titleCharSeq =
+                b.getEntry().getSbn().getNotification().extras.getCharSequence(
+                        Notification.EXTRA_TITLE);
+        String titleStr = mContext.getResources().getString(R.string.notification_bubble_title);
+        if (titleCharSeq != null) {
+            titleStr = titleCharSeq.toString();
+        }
+        vh.iconView.setContentDescription(mContext.getResources().getString(
+                R.string.bubble_content_description_single, titleStr, b.getAppName()));
+
+        vh.iconView.setAccessibilityDelegate(
+                new View.AccessibilityDelegate() {
+                    @Override
+                    public void onInitializeAccessibilityNodeInfo(View host,
+                            AccessibilityNodeInfo info) {
+                        super.onInitializeAccessibilityNodeInfo(host, info);
+                        // Talkback prompts "Double tap to add back to stack"
+                        // instead of the default "Double tap to activate"
+                        info.addAction(
+                                new AccessibilityNodeInfo.AccessibilityAction(
+                                        AccessibilityNodeInfo.ACTION_CLICK,
+                                        mContext.getResources().getString(
+                                                R.string.bubble_accessibility_action_add_back)));
+                    }
+                });
 
         Bubble.FlyoutMessage message = b.getFlyoutMessage();
         if (message != null && message.senderName != null) {

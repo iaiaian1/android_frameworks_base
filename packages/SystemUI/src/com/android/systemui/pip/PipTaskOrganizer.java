@@ -58,6 +58,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Manages PiP tasks such as resize and offset.
  *
@@ -69,6 +72,7 @@ import java.util.function.Consumer;
  * This class is also responsible for general resize/offset PiP operations within SysUI component,
  * see also {@link com.android.systemui.pip.phone.PipMotionHelper}.
  */
+@Singleton
 public class PipTaskOrganizer extends TaskOrganizer {
     private static final String TAG = PipTaskOrganizer.class.getSimpleName();
 
@@ -192,6 +196,7 @@ public class PipTaskOrganizer extends TaskOrganizer {
             mSurfaceControlTransactionFactory;
     private PictureInPictureParams mPictureInPictureParams;
 
+    @Inject
     public PipTaskOrganizer(Context context, @NonNull PipBoundsHandler boundsHandler,
             @NonNull PipSurfaceTransactionHelper surfaceTransactionHelper,
             @Nullable Divider divider) {
@@ -547,6 +552,9 @@ public class PipTaskOrganizer extends TaskOrganizer {
                     ? null : destinationBounds;
             // As for the final windowing mode, simply reset it to undefined.
             wct.setWindowingMode(mToken, WINDOWING_MODE_UNDEFINED);
+            if (mSplitDivider != null && direction == TRANSITION_DIRECTION_TO_SPLIT_SCREEN) {
+                wct.reparent(mToken, mSplitDivider.getSecondaryRoot(), true /* onTop */);
+            }
         } else {
             taskBounds = destinationBounds;
         }

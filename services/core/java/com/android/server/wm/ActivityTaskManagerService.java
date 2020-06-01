@@ -3340,7 +3340,7 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
 
                 // After reparenting (which only resizes the task to the stack bounds), resize the
                 // task to the actual bounds provided
-                task.resize(bounds, resizeMode, preserveWindow, !DEFER_RESUME);
+                task.resize(bounds, resizeMode, preserveWindow);
             }
         } finally {
             Binder.restoreCallingIdentity(ident);
@@ -6076,20 +6076,6 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
         @Override
         public void notifySingleTaskDisplayDrawn(int displayId) {
             mTaskChangeNotificationController.notifySingleTaskDisplayDrawn(displayId);
-        }
-
-        @Override
-        public void notifyAppTransitionFinished() {
-            synchronized (mGlobalLock) {
-                mStackSupervisor.notifyAppTransitionDone();
-            }
-        }
-
-        @Override
-        public void notifyAppTransitionCancelled() {
-            synchronized (mGlobalLock) {
-                mStackSupervisor.notifyAppTransitionDone();
-            }
         }
 
         @Override

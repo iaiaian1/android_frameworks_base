@@ -29,7 +29,6 @@ import static com.android.systemui.util.InjectionInflationController.VIEW_CONTEX
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-import android.app.TaskStackBuilder;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeAnimator;
@@ -51,9 +50,9 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ServiceManager;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
@@ -756,8 +755,8 @@ public class NotificationStackScrollLayout extends ViewGroup implements ScrollAd
         boolean showFooterView = (showDismissView || hasActiveNotifications())
                 && mStatusBarState != StatusBarState.KEYGUARD
                 && !mRemoteInputManager.getController().isRemoteInputActive();
-        boolean showHistory = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.NOTIFICATION_HISTORY_ENABLED, 0) == 1;
+        boolean showHistory = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                Settings.Secure.NOTIFICATION_HISTORY_ENABLED, 0, UserHandle.USER_CURRENT) == 1;
 
         updateFooterView(showFooterView, showDismissView, showHistory);
     }
@@ -3073,6 +3072,9 @@ public class NotificationStackScrollLayout extends ViewGroup implements ScrollAd
      */
     @ShadeViewRefactor(RefactorComponent.STATE_RESOLVER)
     private boolean generateRemoveAnimation(ExpandableView child) {
+        if (!child.wantsAddAndRemoveAnimations()) {
+            return false;
+        }
         if (removeRemovedChildFromHeadsUpChangeAnimations(child)) {
             mAddedHeadsUpChildren.remove(child);
             return false;
@@ -3427,7 +3429,8 @@ public class NotificationStackScrollLayout extends ViewGroup implements ScrollAd
     @Override
     @ShadeViewRefactor(RefactorComponent.STATE_RESOLVER)
     public void generateAddAnimation(ExpandableView child, boolean fromMoreCard) {
-        if (mIsExpanded && mAnimationsEnabled && !mChangePositionInProgress && !isFullyHidden()) {
+        if (mIsExpanded && mAnimationsEnabled && !mChangePositionInProgress && !isFullyHidden()
+                && child.wantsAddAndRemoveAnimations()) {
             // Generate Animations
             mChildrenToAddAnimated.add(child);
             if (fromMoreCard) {
@@ -5730,8 +5733,8 @@ public class NotificationStackScrollLayout extends ViewGroup implements ScrollAd
                 R.layout.status_bar_no_notifications, this, false);
         view.setText(R.string.empty_shade_text);
         view.setOnClickListener(v -> {
-            final boolean showHistory = Settings.Secure.getInt(mContext.getContentResolver(),
-                    Settings.Secure.NOTIFICATION_HISTORY_ENABLED, 0) == 1;
+            final boolean showHistory = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                    Settings.Secure.NOTIFICATION_HISTORY_ENABLED, 0, UserHandle.USER_CURRENT) == 1;
             Intent intent = showHistory ? new Intent(
                     Settings.ACTION_NOTIFICATION_HISTORY) : new Intent(
                     Settings.ACTION_NOTIFICATION_SETTINGS);
@@ -5840,7 +5843,7 @@ public class NotificationStackScrollLayout extends ViewGroup implements ScrollAd
         // Let's update the footer once the notifications have been updated (in the next frame)
         post(() -> {
             updateFooter();
-            updateSectionBoundaries();
+            updateSectionBoundaries("dynamic privacy changed");
         });
     }
 
@@ -5921,8 +5924,8 @@ public class NotificationStackScrollLayout extends ViewGroup implements ScrollAd
 
     /** Updates the indices of the boundaries between sections. */
     @ShadeViewRefactor(RefactorComponent.INPUT)
-    public void updateSectionBoundaries() {
-        mSectionsManager.updateSectionBoundaries();
+    public void updateSectionBoundaries(String reason) {
+        mSectionsManager.updateSectionBoundaries(reason);
     }
 
     private void updateContinuousBackgroundDrawing() {
