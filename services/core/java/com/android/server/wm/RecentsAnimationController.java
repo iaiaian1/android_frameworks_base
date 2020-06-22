@@ -406,8 +406,9 @@ public class RecentsAnimationController implements DeathRecipient {
         }
 
         // Save the minimized home height
-        mMinimizedHomeBounds = mDisplayContent.getDefaultTaskDisplayArea().getRootHomeTask()
-                .getBounds();
+        final ActivityStack rootHomeTask =
+                mDisplayContent.getDefaultTaskDisplayArea().getRootHomeTask();
+        mMinimizedHomeBounds = rootHomeTask != null ? rootHomeTask.getBounds() : null;
 
         mService.mWindowPlacerLocked.performSurfacePlacement();
 
@@ -514,9 +515,14 @@ public class RecentsAnimationController implements DeathRecipient {
 
     void addTaskToTargets(Task task, OnAnimationFinishedCallback finishedCallback) {
         if (mRunner != null) {
+            // No need to send task appeared when the task target already exists.
+            if (isAnimatingTask(task)) {
+                return;
+            }
             final RemoteAnimationTarget target = createTaskRemoteAnimation(task, finishedCallback);
-            if (target == null) return;
-
+            if (target == null) {
+                return;
+            }
             ProtoLog.d(WM_DEBUG_RECENTS_ANIMATIONS, "addTaskToTargets, target: %s", target);
             try {
                 mRunner.onTaskAppeared(target);
@@ -799,7 +805,8 @@ public class RecentsAnimationController implements DeathRecipient {
         // Only apply the input consumer if it is enabled, it is not the target (home/recents)
         // being revealed with the transition, and we are actively animating the app as a part of
         // the animation
-        return mInputConsumerEnabled && !isTargetApp(activity) && isAnimatingApp(activity);
+        return mInputConsumerEnabled && activity != null
+                && !isTargetApp(activity) && isAnimatingApp(activity);
     }
 
     boolean updateInputConsumerForApp(InputWindowHandle inputWindowHandle,

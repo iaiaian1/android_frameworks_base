@@ -44,8 +44,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-
 import com.android.internal.config.sysui.SystemUiDeviceConfigFlags;
 import com.android.internal.statusbar.NotificationVisibility;
 import com.android.systemui.Dependency;
@@ -53,7 +51,6 @@ import com.android.systemui.Dumpable;
 import com.android.systemui.Interpolators;
 import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.dagger.qualifiers.Main;
-import com.android.systemui.media.MediaData;
 import com.android.systemui.media.MediaDataManager;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
 import com.android.systemui.statusbar.dagger.StatusBarModule;
@@ -70,6 +67,7 @@ import com.android.systemui.statusbar.phone.StatusBar;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
 import com.android.systemui.util.DeviceConfigProxy;
 import com.android.systemui.util.Utils;
+import com.android.systemui.util.concurrency.DelayableExecutor;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -79,7 +77,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executor;
 
 import dagger.Lazy;
 
@@ -104,8 +101,15 @@ public class NotificationMediaManager implements Dumpable {
         PAUSED_MEDIA_STATES.add(PlaybackState.STATE_PAUSED);
         PAUSED_MEDIA_STATES.add(PlaybackState.STATE_ERROR);
     }
+    private static final HashSet<Integer> INACTIVE_MEDIA_STATES = new HashSet<>();
+    static {
+        INACTIVE_MEDIA_STATES.add(PlaybackState.STATE_NONE);
+        INACTIVE_MEDIA_STATES.add(PlaybackState.STATE_STOPPED);
+        INACTIVE_MEDIA_STATES.add(PlaybackState.STATE_ERROR);
+    }
 
     private final NotificationEntryManager mEntryManager;
+    private final MediaDataManager mMediaDataManager;
 
     @Nullable
     private Lazy<NotificationShadeWindowController> mNotificationShadeWindowController;
@@ -117,7 +121,7 @@ public class NotificationMediaManager implements Dumpable {
     @Nullable
     private LockscreenWallpaper mLockscreenWallpaper;
 
-    private final Executor mMainExecutor;
+    private final DelayableExecutor mMainExecutor;
 
     private final Context mContext;
     private final MediaSessionManager mMediaSessionManager;
@@ -189,7 +193,7 @@ public class NotificationMediaManager implements Dumpable {
             NotificationEntryManager notificationEntryManager,
             MediaArtworkProcessor mediaArtworkProcessor,
             KeyguardBypassController keyguardBypassController,
-            @Main Executor mainExecutor,
+            @Main DelayableExecutor mainExecutor,
             DeviceConfigProxy deviceConfig,
             MediaDataManager mediaDataManager) {
         mContext = context;
@@ -205,6 +209,7 @@ public class NotificationMediaManager implements Dumpable {
         mNotificationShadeWindowController = notificationShadeWindowController;
         mEntryManager = notificationEntryManager;
         mMainExecutor = mainExecutor;
+        mMediaDataManager = mediaDataManager;
 
         notificationEntryManager.addNotificationEntryListener(new NotificationEntryListener() {
 
@@ -248,8 +253,22 @@ public class NotificationMediaManager implements Dumpable {
                 mPropertiesChangedListener);
     }
 
+    /**
+     * Check if a state should be considered actively playing
+     * @param state a PlaybackState
+     * @return true if playing
+     */
     public static boolean isPlayingState(int state) {
         return !PAUSED_MEDIA_STATES.contains(state);
+    }
+
+    /**
+     * Check if a state should be considered active (playing or paused)
+     * @param state a PlaybackState
+     * @return true if active
+     */
+    public static boolean isActiveState(int state) {
+        return !INACTIVE_MEDIA_STATES.contains(state);
     }
 
     public void setUpWithPresenter(NotificationPresenter presenter) {
@@ -342,21 +361,18 @@ public class NotificationMediaManager implements Dumpable {
                             UserHandle.USER_ALL);
 
                     for (MediaController aController : sessions) {
-                        if (PlaybackState.STATE_PLAYING ==
-                                getMediaControllerPlaybackState(aController)) {
-                            // now to see if we have one like this
-                            final String pkg = aController.getPackageName();
+                        // now to see if we have one like this
+                        final String pkg = aController.getPackageName();
 
-                            for (NotificationEntry entry : allNotifications) {
-                                if (entry.getSbn().getPackageName().equals(pkg)) {
-                                    if (DEBUG_MEDIA) {
-                                        Log.v(TAG, "DEBUG_MEDIA: found controller matching "
-                                                + entry.getSbn().getKey());
-                                    }
-                                    controller = aController;
-                                    mediaNotification = entry;
-                                    break;
+                        for (NotificationEntry entry : allNotifications) {
+                            if (entry.getSbn().getPackageName().equals(pkg)) {
+                                if (DEBUG_MEDIA) {
+                                    Log.v(TAG, "DEBUG_MEDIA: found controller matching "
+                                            + entry.getSbn().getKey());
                                 }
+                                controller = aController;
+                                mediaNotification = entry;
+                                break;
                             }
                         }
                     }

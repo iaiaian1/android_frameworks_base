@@ -17,30 +17,37 @@
 package com.android.systemui.media
 
 import android.app.Notification
+import android.app.PendingIntent
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.Icon
+import android.media.MediaDescription
 import android.media.MediaMetadata
 import android.media.session.MediaSession
 import android.net.Uri
 import android.service.notification.StatusBarNotification
 import android.text.TextUtils
 import android.util.Log
-import com.android.internal.util.ContrastColorUtil
+import com.android.internal.graphics.ColorUtils
+import com.android.systemui.R
 import com.android.systemui.dagger.qualifiers.Background
 import com.android.systemui.dagger.qualifiers.Main
+import com.android.systemui.statusbar.NotificationMediaManager
 import com.android.systemui.statusbar.notification.MediaNotificationProcessor
+import com.android.systemui.statusbar.notification.NotificationEntryManager
+import com.android.systemui.statusbar.notification.NotificationEntryManager.UNDEFINED_DISMISS_REASON
 import com.android.systemui.statusbar.notification.row.HybridGroupManager
+import com.android.systemui.util.Assert
 import com.android.systemui.util.Utils
 import java.io.IOException
 import java.util.concurrent.Executor
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.collections.LinkedHashMap
 
 // URI fields to try loading album art from
 private val ART_URIS = arrayOf(
@@ -50,9 +57,24 @@ private val ART_URIS = arrayOf(
 )
 
 private const val TAG = "MediaDataManager"
+private const val DEFAULT_LUMINOSITY = 0.25f
+private const val LUMINOSITY_THRESHOLD = 0.05f
+private const val SATURATION_MULTIPLIER = 0.8f
 
-private val LOADING = MediaData(false, 0, 0, null, null, null, null, null,
-        emptyList(), emptyList(), null, null, null)
+private val LOADING = MediaData(false, 0, null, null, null, null, null,
+        emptyList(), emptyList(), "INVALID", null, null, null, null)
+
+fun isMediaNotification(sbn: StatusBarNotification): Boolean {
+    if (!sbn.notification.hasMediaSession()) {
+        return false
+    }
+    val notificationStyle = sbn.notification.notificationStyle
+    if (Notification.DecoratedMediaCustomViewStyle::class.java.equals(notificationStyle) ||
+            Notification.MediaStyle::class.java.equals(notificationStyle)) {
+        return true
+    }
+    return false
+}
 
 /**
  * A class that facilitates management and loading of Media Data, ready for binding.
@@ -61,27 +83,94 @@ private val LOADING = MediaData(false, 0, 0, null, null, null, null, null,
 class MediaDataManager @Inject constructor(
     private val context: Context,
     private val mediaControllerFactory: MediaControllerFactory,
+    private val mediaTimeoutListener: MediaTimeoutListener,
+    private val notificationEntryManager: NotificationEntryManager,
+    private val mediaResumeListener: MediaResumeListener,
     @Background private val backgroundExecutor: Executor,
-    @Main private val foregroundExcecutor: Executor
+    @Main private val foregroundExecutor: Executor
 ) {
 
     private val listeners: MutableSet<Listener> = mutableSetOf()
     private val mediaEntries: LinkedHashMap<String, MediaData> = LinkedHashMap()
+    private val useMediaResumption: Boolean = Utils.useMediaResumption(context)
+
+    init {
+        mediaTimeoutListener.timeoutCallback = { token: String, timedOut: Boolean ->
+            setTimedOut(token, timedOut) }
+        addListener(mediaTimeoutListener)
+
+        if (useMediaResumption) {
+            mediaResumeListener.addTrackToResumeCallback = { desc: MediaDescription,
+                resumeAction: Runnable, token: MediaSession.Token, appName: String,
+                appIntent: PendingIntent, packageName: String ->
+                addResumptionControls(desc, resumeAction, token, appName, appIntent, packageName)
+            }
+            mediaResumeListener.resumeComponentFoundCallback = { key: String, action: Runnable? ->
+                mediaEntries.get(key)?.resumeAction = action
+                mediaEntries.get(key)?.hasCheckedForResume = true
+            }
+            addListener(mediaResumeListener)
+        }
+    }
 
     fun onNotificationAdded(key: String, sbn: StatusBarNotification) {
-        if (isMediaNotification(sbn)) {
-            if (!mediaEntries.containsKey(key)) {
-                mediaEntries.put(key, LOADING)
+        if (Utils.useQsMediaPlayer(context) && isMediaNotification(sbn)) {
+            Assert.isMainThread()
+            val oldKey = findExistingEntry(key, sbn.packageName)
+            if (oldKey == null) {
+                val temp = LOADING.copy(packageName = sbn.packageName)
+                mediaEntries.put(key, temp)
+            } else if (oldKey != key) {
+                // Move to new key
+                val oldData = mediaEntries.remove(oldKey)!!
+                mediaEntries.put(key, oldData)
             }
-            loadMediaData(key, sbn)
+            loadMediaData(key, sbn, oldKey)
         } else {
             onNotificationRemoved(key)
         }
     }
 
-    private fun loadMediaData(key: String, sbn: StatusBarNotification) {
+    private fun addResumptionControls(
+        desc: MediaDescription,
+        action: Runnable,
+        token: MediaSession.Token,
+        appName: String,
+        appIntent: PendingIntent,
+        packageName: String
+    ) {
+        // Resume controls don't have a notification key, so store by package name instead
+        if (!mediaEntries.containsKey(packageName)) {
+            val resumeData = LOADING.copy(packageName = packageName, resumeAction = action)
+            mediaEntries.put(packageName, resumeData)
+        }
         backgroundExecutor.execute {
-            loadMediaDataInBg(key, sbn)
+            loadMediaDataInBg(desc, action, token, appName, appIntent, packageName)
+        }
+    }
+
+    /**
+     * Check if there is an existing entry that matches the key or package name.
+     * Returns the key that matches, or null if not found.
+     */
+    private fun findExistingEntry(key: String, packageName: String): String? {
+        if (mediaEntries.containsKey(key)) {
+            return key
+        }
+        // Check if we already had a resume player
+        if (mediaEntries.containsKey(packageName)) {
+            return packageName
+        }
+        return null
+    }
+
+    private fun loadMediaData(
+        key: String,
+        sbn: StatusBarNotification,
+        oldKey: String?
+    ) {
+        backgroundExecutor.execute {
+            loadMediaDataInBg(key, sbn, oldKey)
         }
     }
 
@@ -95,7 +184,60 @@ class MediaDataManager @Inject constructor(
      */
     fun removeListener(listener: Listener) = listeners.remove(listener)
 
-    private fun loadMediaDataInBg(key: String, sbn: StatusBarNotification) {
+    private fun setTimedOut(token: String, timedOut: Boolean) {
+        if (!timedOut) {
+            return
+        }
+        mediaEntries[token]?.let {
+            notificationEntryManager.removeNotification(it.notificationKey, null /* ranking */,
+                    UNDEFINED_DISMISS_REASON)
+        }
+    }
+
+    private fun loadMediaDataInBg(
+        desc: MediaDescription,
+        resumeAction: Runnable,
+        token: MediaSession.Token,
+        appName: String,
+        appIntent: PendingIntent,
+        packageName: String
+    ) {
+        if (resumeAction == null) {
+            Log.e(TAG, "Resume action cannot be null")
+            return
+        }
+
+        if (TextUtils.isEmpty(desc.title)) {
+            Log.e(TAG, "Description incomplete")
+            return
+        }
+
+        Log.d(TAG, "adding track from browser: $desc")
+
+        // Album art
+        var artworkBitmap = desc.iconBitmap
+        if (artworkBitmap == null && desc.iconUri != null) {
+            artworkBitmap = loadBitmapFromUri(desc.iconUri!!)
+        }
+        val artworkIcon = if (artworkBitmap != null) {
+            Icon.createWithBitmap(artworkBitmap)
+        } else {
+            null
+        }
+
+        val mediaAction = getResumeMediaAction(resumeAction)
+        foregroundExecutor.execute {
+            onMediaDataLoaded(packageName, null, MediaData(true, Color.DKGRAY, appName,
+                null, desc.subtitle, desc.title, artworkIcon, listOf(mediaAction), listOf(0),
+                packageName, token, appIntent, null, resumeAction, packageName))
+        }
+    }
+
+    private fun loadMediaDataInBg(
+        key: String,
+        sbn: StatusBarNotification,
+        oldKey: String?
+    ) {
         val token = sbn.notification.extras.getParcelable(Notification.EXTRA_MEDIA_SESSION)
                 as MediaSession.Token?
         val metadata = mediaControllerFactory.create(token).metadata
@@ -107,8 +249,7 @@ class MediaDataManager @Inject constructor(
 
         // Foreground and Background colors computed from album art
         val notif: Notification = sbn.notification
-        var fgColor = notif.color
-        var bgColor = -1
+        var bgColor = Color.WHITE
         var artworkBitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ART)
         if (artworkBitmap == null) {
             artworkBitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
@@ -142,13 +283,22 @@ class MediaDataManager @Inject constructor(
                     .generate()
             val swatch = MediaNotificationProcessor.findBackgroundSwatch(p)
             bgColor = swatch.rgb
-            fgColor = MediaNotificationProcessor.selectForegroundColor(bgColor, p)
         }
-        // Make sure colors will be legible
-        val isDark = !ContrastColorUtil.isColorLight(bgColor)
-        fgColor = ContrastColorUtil.resolveContrastColor(context, fgColor, bgColor,
-                isDark)
-        fgColor = ContrastColorUtil.ensureTextContrast(fgColor, bgColor, isDark)
+        // Adapt background color, so it's always subdued and text is legible
+        val tmpHsl = floatArrayOf(0f, 0f, 0f)
+        ColorUtils.colorToHSL(bgColor, tmpHsl)
+
+        val l = tmpHsl[2]
+        // Colors with very low luminosity can have any saturation. This means that changing the
+        // luminosity can make a black become red. Let's remove the saturation of very light or
+        // very dark colors to avoid this issue.
+        if (l < LUMINOSITY_THRESHOLD || l > 1f - LUMINOSITY_THRESHOLD) {
+            tmpHsl[1] = 0f
+        }
+        tmpHsl[1] *= SATURATION_MULTIPLIER
+        tmpHsl[2] = DEFAULT_LUMINOSITY
+
+        bgColor = ColorUtils.HSLToColor(tmpHsl)
 
         // App name
         val builder = Notification.Builder.recoverBuilder(context, notif)
@@ -176,22 +326,36 @@ class MediaDataManager @Inject constructor(
         val actionIcons: MutableList<MediaAction> = ArrayList()
         val actions = notif.actions
         val actionsToShowCollapsed = notif.extras.getIntArray(
-                Notification.EXTRA_COMPACT_ACTIONS)?.toList() ?: emptyList()
+                Notification.EXTRA_COMPACT_ACTIONS)?.toMutableList() ?: mutableListOf<Int>()
         // TODO: b/153736623 look into creating actions when this isn't a media style notification
 
         val packageContext: Context = sbn.getPackageContext(context)
-        for (action in actions) {
-            val mediaAction = MediaAction(
-                    action.getIcon().loadDrawable(packageContext),
-                    action.actionIntent,
-                    action.title)
-            actionIcons.add(mediaAction)
+        if (actions != null) {
+            for ((index, action) in actions.withIndex()) {
+                if (action.getIcon() == null) {
+                    Log.i(TAG, "No icon for action $index ${action.title}")
+                    actionsToShowCollapsed.remove(index)
+                    continue
+                }
+                val mediaAction = MediaAction(
+                        action.getIcon().loadDrawable(packageContext),
+                        Runnable {
+                            try {
+                                action.actionIntent.send()
+                            } catch (e: PendingIntent.CanceledException) {
+                                Log.d(TAG, "Intent canceled", e)
+                            }
+                        },
+                        action.title)
+                actionIcons.add(mediaAction)
+            }
         }
 
-        foregroundExcecutor.execute {
-            onMediaDataLoaded(key, MediaData(true, fgColor, bgColor, app, smallIconDrawable, artist,
+        val resumeAction: Runnable? = mediaEntries.get(key)?.resumeAction
+        foregroundExecutor.execute {
+            onMediaDataLoaded(key, oldKey, MediaData(true, bgColor, app, smallIconDrawable, artist,
                     song, artWorkIcon, actionIcons, actionsToShowCollapsed, sbn.packageName, token,
-                    notif.contentIntent))
+                    notif.contentIntent, null, resumeAction, key))
         }
     }
 
@@ -205,7 +369,7 @@ class MediaDataManager @Inject constructor(
                 val albumArt = loadBitmapFromUri(Uri.parse(uriString))
                 if (albumArt != null) {
                     Log.d(TAG, "loaded art from $uri")
-                    break
+                    return albumArt
                 }
             }
         }
@@ -231,63 +395,90 @@ class MediaDataManager @Inject constructor(
 
         val source = ImageDecoder.createSource(context.getContentResolver(), uri)
         return try {
-            ImageDecoder.decodeBitmap(source)
+            ImageDecoder.decodeBitmap(source) {
+                decoder, info, source -> decoder.isMutableRequired = true
+            }
         } catch (e: IOException) {
             e.printStackTrace()
             null
         }
     }
 
-    fun onMediaDataLoaded(key: String, data: MediaData) {
+    private fun getResumeMediaAction(action: Runnable): MediaAction {
+        return MediaAction(
+            context.getDrawable(R.drawable.lb_ic_play),
+            action,
+            context.getString(R.string.controls_media_resume)
+        )
+    }
+
+    fun onMediaDataLoaded(key: String, oldKey: String?, data: MediaData) {
+        Assert.isMainThread()
         if (mediaEntries.containsKey(key)) {
             // Otherwise this was removed already
             mediaEntries.put(key, data)
-            listeners.forEach {
-                it.onMediaDataLoaded(key, data)
+            val listenersCopy = listeners.toSet()
+            listenersCopy.forEach {
+                it.onMediaDataLoaded(key, oldKey, data)
             }
         }
     }
 
     fun onNotificationRemoved(key: String) {
+        Assert.isMainThread()
+        if (useMediaResumption && mediaEntries.get(key)?.resumeAction != null) {
+            Log.d(TAG, "Not removing $key because resumable")
+            // Move to resume key aka package name
+            val data = mediaEntries.remove(key)!!
+            val resumeAction = getResumeMediaAction(data.resumeAction!!)
+            val updated = data.copy(token = null, actions = listOf(resumeAction),
+                actionsToShowInCompact = listOf(0))
+            mediaEntries.put(data.packageName, updated)
+            // Notify listeners of "new" controls
+            val listenersCopy = listeners.toSet()
+            listenersCopy.forEach {
+                it.onMediaDataLoaded(data.packageName, key, updated)
+            }
+            return
+        }
         val removed = mediaEntries.remove(key)
         if (removed != null) {
-            listeners.forEach {
+            val listenersCopy = listeners.toSet()
+            listenersCopy.forEach {
                 it.onMediaDataRemoved(key)
             }
         }
     }
 
-    private fun isMediaNotification(sbn: StatusBarNotification): Boolean {
-        if (!Utils.useQsMediaPlayer(context)) {
-            return false
-        }
-        if (!sbn.notification.hasMediaSession()) {
-            return false
-        }
-        val notificationStyle = sbn.notification.notificationStyle
-        if (Notification.DecoratedMediaCustomViewStyle::class.java.equals(notificationStyle) ||
-                Notification.MediaStyle::class.java.equals(notificationStyle)) {
-            return true
-        }
-        return false
-    }
-
     /**
      * Are there any media notifications active?
      */
-    fun hasActiveMedia() = mediaEntries.size > 0
+    fun hasActiveMedia() = mediaEntries.any({ isActive(it.value) })
 
-    fun hasAnyMedia(): Boolean {
-        // TODO: implement this when we implemented resumption
-        return hasActiveMedia()
+    fun isActive(data: MediaData): Boolean {
+        if (data.token == null) {
+            return false
+        }
+        val controller = mediaControllerFactory.create(data.token)
+        val state = controller?.playbackState?.state
+        return state != null && NotificationMediaManager.isActiveState(state)
     }
+
+    /**
+     * Are there any media entries, including resume controls?
+     */
+    fun hasAnyMedia() = mediaEntries.isNotEmpty()
 
     interface Listener {
 
         /**
-         * Called whenever there's new MediaData Loaded for the consumption in views
+         * Called whenever there's new MediaData Loaded for the consumption in views.
+         *
+         * oldKey is provided to check whether the view has changed keys, which can happen when a
+         * player has gone from resume state (key is package name) to active state (key is
+         * notification key) or vice versa.
          */
-        fun onMediaDataLoaded(key: String, data: MediaData) {}
+        fun onMediaDataLoaded(key: String, oldKey: String?, data: MediaData) {}
 
         /**
          * Called whenever a previously existing Media notification was removed

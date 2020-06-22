@@ -25,12 +25,14 @@ import android.content.Context;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
 import android.os.Handler;
+import android.os.Message;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.internal.annotations.GuardedBy;
+import com.android.internal.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,6 +54,9 @@ import java.util.stream.Collectors;
 public final class MediaRouter2Manager {
     private static final String TAG = "MR2Manager";
     private static final Object sLock = new Object();
+    /** @hide */
+    @VisibleForTesting
+    public static final int TRANSFER_TIMEOUT_MS = 30_000;
 
     @GuardedBy("sLock")
     private static MediaRouter2Manager sInstance;
@@ -151,8 +156,6 @@ public final class MediaRouter2Manager {
         return null;
     }
 
-    //TODO: Use cache not to create array. For now, it's unclear when to purge the cache.
-    //Do this when we finalize how to set control categories.
     /**
      * Gets available routes for an application.
      *
@@ -339,30 +342,18 @@ public final class MediaRouter2Manager {
         Objects.requireNonNull(sessionInfo, "sessionInfo must not be null");
         Objects.requireNonNull(route, "route must not be null");
 
-        //TODO: Ignore unknown route.
+        synchronized (mRoutesLock) {
+            if (!mRoutes.containsKey(route.getId())) {
+                Log.w(TAG, "transfer: Ignoring an unknown route id=" + route.getId());
+                notifyTransferFailed(sessionInfo, route);
+                return;
+            }
+        }
+
         if (sessionInfo.getTransferableRoutes().contains(route.getId())) {
             transferToRoute(sessionInfo, route);
-            return;
-        }
-
-        if (TextUtils.isEmpty(sessionInfo.getClientPackageName())) {
-            Log.w(TAG, "transfer: Ignoring transfer without package name.");
-            notifyTransferFailed(sessionInfo, route);
-            return;
-        }
-
-        Client client = getOrCreateClient();
-        if (client != null) {
-            try {
-                int requestId = mNextRequestId.getAndIncrement();
-                //TODO: Ensure that every request is eventually removed.
-                mTransferRequests.add(new TransferRequest(requestId, sessionInfo, route));
-
-                mMediaRouterService.requestCreateSessionWithManager(
-                        client, requestId, sessionInfo.getClientPackageName(), route);
-            } catch (RemoteException ex) {
-                Log.e(TAG, "Unable to select media route", ex);
-            }
+        } else {
+            requestCreateSession(sessionInfo, route);
         }
     }
 
@@ -518,15 +509,15 @@ public final class MediaRouter2Manager {
         notifyRequestFailed(reason);
     }
 
-    void handleSessionsUpdated(RoutingSessionInfo sessionInfo) {
+    void handleSessionsUpdatedOnHandler(RoutingSessionInfo sessionInfo) {
         for (TransferRequest request : mTransferRequests) {
             String sessionId = request.mOldSessionInfo.getId();
             if (!TextUtils.equals(sessionId, sessionInfo.getId())) {
                 continue;
             }
             if (sessionInfo.getSelectedRoutes().contains(request.mTargetRoute.getId())) {
-                notifyTransferred(request.mOldSessionInfo, sessionInfo);
                 mTransferRequests.remove(request);
+                notifyTransferred(request.mOldSessionInfo, sessionInfo);
                 break;
             }
         }
@@ -557,6 +548,12 @@ public final class MediaRouter2Manager {
     void notifySessionUpdated(RoutingSessionInfo sessionInfo) {
         for (CallbackRecord record : mCallbackRecords) {
             record.mExecutor.execute(() -> record.mCallback.onSessionUpdated(sessionInfo));
+        }
+    }
+
+    void notifySessionReleased(RoutingSessionInfo session) {
+        for (CallbackRecord record : mCallbackRecords) {
+            record.mExecutor.execute(() -> record.mCallback.onSessionReleased(session));
         }
     }
 
@@ -597,7 +594,7 @@ public final class MediaRouter2Manager {
     public List<MediaRoute2Info> getSelectedRoutes(@NonNull RoutingSessionInfo sessionInfo) {
         Objects.requireNonNull(sessionInfo, "sessionInfo must not be null");
 
-        synchronized (sLock) {
+        synchronized (mRoutesLock) {
             return sessionInfo.getSelectedRoutes().stream().map(mRoutes::get)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
@@ -613,7 +610,7 @@ public final class MediaRouter2Manager {
 
         List<String> selectedRouteIds = sessionInfo.getSelectedRoutes();
 
-        synchronized (sLock) {
+        synchronized (mRoutesLock) {
             return sessionInfo.getSelectableRoutes().stream()
                     .filter(routeId -> !selectedRouteIds.contains(routeId))
                     .map(mRoutes::get)
@@ -631,7 +628,7 @@ public final class MediaRouter2Manager {
 
         List<String> selectedRouteIds = sessionInfo.getSelectedRoutes();
 
-        synchronized (sLock) {
+        synchronized (mRoutesLock) {
             return sessionInfo.getDeselectableRoutes().stream()
                     .filter(routeId -> selectedRouteIds.contains(routeId))
                     .map(mRoutes::get)
@@ -727,41 +724,6 @@ public final class MediaRouter2Manager {
     }
 
     /**
-     * Transfers to a given route for the remote session.
-     *
-     * @hide
-     */
-    void transferToRoute(@NonNull RoutingSessionInfo sessionInfo,
-            @NonNull MediaRoute2Info route) {
-        Objects.requireNonNull(sessionInfo, "sessionInfo must not be null");
-        Objects.requireNonNull(route, "route must not be null");
-
-        if (sessionInfo.getSelectedRoutes().contains(route.getId())) {
-            Log.w(TAG, "Ignoring transferring to a route that is already added. route="
-                    + route);
-            return;
-        }
-
-        if (!sessionInfo.getTransferableRoutes().contains(route.getId())) {
-            Log.w(TAG, "Ignoring transferring to a non-transferable route=" + route);
-            return;
-        }
-
-        int requestId = mNextRequestId.getAndIncrement();
-        mTransferRequests.add(new TransferRequest(requestId, sessionInfo, route));
-
-        Client client = getOrCreateClient();
-        if (client != null) {
-            try {
-                mMediaRouterService.transferToRouteWithManager(
-                        client, requestId, sessionInfo.getId(), route);
-            } catch (RemoteException ex) {
-                Log.e(TAG, "transferToRoute: Failed to send a request.", ex);
-            }
-        }
-    }
-
-    /**
      * Requests releasing a session.
      * <p>
      * If a session is released, any operation on the session will be ignored.
@@ -785,6 +747,65 @@ public final class MediaRouter2Manager {
             }
         }
     }
+
+    /**
+     * Transfers the remote session to the given route.
+     *
+     * @hide
+     */
+    private void transferToRoute(@NonNull RoutingSessionInfo session,
+            @NonNull MediaRoute2Info route) {
+        int requestId = createTransferRequest(session, route);
+
+        Client client = getOrCreateClient();
+        if (client != null) {
+            try {
+                mMediaRouterService.transferToRouteWithManager(
+                        client, requestId, session.getId(), route);
+            } catch (RemoteException ex) {
+                Log.e(TAG, "transferToRoute: Failed to send a request.", ex);
+            }
+        }
+    }
+
+    private void requestCreateSession(RoutingSessionInfo oldSession, MediaRoute2Info route) {
+        if (TextUtils.isEmpty(oldSession.getClientPackageName())) {
+            Log.w(TAG, "requestCreateSession: Can't create a session without package name.");
+            notifyTransferFailed(oldSession, route);
+            return;
+        }
+
+        int requestId = createTransferRequest(oldSession, route);
+
+        Client client = getOrCreateClient();
+        if (client != null) {
+            try {
+                mMediaRouterService.requestCreateSessionWithManager(
+                        client, requestId, oldSession.getClientPackageName(), route);
+            } catch (RemoteException ex) {
+                Log.e(TAG, "requestCreateSession: Failed to send a request", ex);
+            }
+        }
+    }
+
+    private int createTransferRequest(RoutingSessionInfo session, MediaRoute2Info route) {
+        int requestId = mNextRequestId.getAndIncrement();
+        TransferRequest transferRequest = new TransferRequest(requestId, session, route);
+        mTransferRequests.add(transferRequest);
+
+        Message timeoutMessage =
+                obtainMessage(MediaRouter2Manager::handleTransferTimeout, this, transferRequest);
+        mHandler.sendMessageDelayed(timeoutMessage, TRANSFER_TIMEOUT_MS);
+        return requestId;
+    }
+
+    private void handleTransferTimeout(TransferRequest request) {
+        boolean removed = mTransferRequests.remove(request);
+        if (removed) {
+            notifyTransferFailed(request.mOldSessionInfo, request.mTargetRoute);
+        }
+    }
+
 
     private boolean areSessionsMatched(MediaController mediaController,
             RoutingSessionInfo sessionInfo) {
@@ -849,9 +870,16 @@ public final class MediaRouter2Manager {
 
         /**
          * Called when a session is changed.
-         * @param sessionInfo the updated session
+         * @param session the updated session
          */
-        public void onSessionUpdated(@NonNull RoutingSessionInfo sessionInfo) {}
+        public void onSessionUpdated(@NonNull RoutingSessionInfo session) {}
+
+        /**
+         * Called when a session is released.
+         * @param session the released session.
+         * @see #releaseSession(RoutingSessionInfo)
+         */
+        public void onSessionReleased(@NonNull RoutingSessionInfo session) {}
 
         /**
          * Called when media is transferred.
@@ -907,7 +935,7 @@ public final class MediaRouter2Manager {
             if (!(obj instanceof CallbackRecord)) {
                 return false;
             }
-            return mCallback ==  ((CallbackRecord) obj).mCallback;
+            return mCallback == ((CallbackRecord) obj).mCallback;
         }
 
         @Override
@@ -931,15 +959,21 @@ public final class MediaRouter2Manager {
 
     class Client extends IMediaRouter2Manager.Stub {
         @Override
-        public void notifySessionCreated(int requestId, RoutingSessionInfo sessionInfo) {
+        public void notifySessionCreated(int requestId, RoutingSessionInfo session) {
             mHandler.sendMessage(obtainMessage(MediaRouter2Manager::createSessionOnHandler,
-                    MediaRouter2Manager.this, requestId, sessionInfo));
+                    MediaRouter2Manager.this, requestId, session));
         }
 
         @Override
-        public void notifySessionUpdated(RoutingSessionInfo sessionInfo) {
-            mHandler.sendMessage(obtainMessage(MediaRouter2Manager::handleSessionsUpdated,
-                    MediaRouter2Manager.this, sessionInfo));
+        public void notifySessionUpdated(RoutingSessionInfo session) {
+            mHandler.sendMessage(obtainMessage(MediaRouter2Manager::handleSessionsUpdatedOnHandler,
+                    MediaRouter2Manager.this, session));
+        }
+
+        @Override
+        public void notifySessionReleased(RoutingSessionInfo session) {
+            mHandler.sendMessage(obtainMessage(MediaRouter2Manager::notifySessionReleased,
+                    MediaRouter2Manager.this, session));
         }
 
         @Override

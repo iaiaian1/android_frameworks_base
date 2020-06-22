@@ -1497,7 +1497,6 @@ public final class ViewRootImpl implements ViewParent,
                         final int newScreenState = toViewScreenState(newDisplayState);
                         if (oldScreenState != newScreenState) {
                             mView.dispatchScreenStateChanged(newScreenState);
-                            mImeFocusController.onScreenStateChanged(newScreenState);
                         }
                         if (oldDisplayState == Display.STATE_OFF) {
                             // Draw was suppressed so we need to for it to happen here.
@@ -1978,6 +1977,11 @@ public final class ViewRootImpl implements ViewParent,
             mCompatibleVisibilityInfo.globalVisibility =
                     (mCompatibleVisibilityInfo.globalVisibility & ~View.SYSTEM_UI_FLAG_LOW_PROFILE)
                             | (mAttachInfo.mSystemUiVisibility & View.SYSTEM_UI_FLAG_LOW_PROFILE);
+            if (mDispatchedSystemUiVisibility != mCompatibleVisibilityInfo.globalVisibility) {
+                mHandler.removeMessages(MSG_DISPATCH_SYSTEM_UI_VISIBILITY);
+                mHandler.sendMessage(mHandler.obtainMessage(
+                        MSG_DISPATCH_SYSTEM_UI_VISIBILITY, mCompatibleVisibilityInfo));
+            }
             if (mAttachInfo.mKeepScreenOn != oldScreenOn
                     || mAttachInfo.mSystemUiVisibility != params.subtreeSystemUiVisibility
                     || mAttachInfo.mHasSystemUiListeners != params.hasSystemUiListeners) {
@@ -2029,9 +2033,11 @@ public final class ViewRootImpl implements ViewParent,
             }
         } else {
             info.globalVisibility |= systemUiFlag;
+            info.localChanges &= ~systemUiFlag;
         }
         if (mDispatchedSystemUiVisibility != info.globalVisibility) {
-            scheduleTraversals();
+            mHandler.removeMessages(MSG_DISPATCH_SYSTEM_UI_VISIBILITY);
+            mHandler.sendMessage(mHandler.obtainMessage(MSG_DISPATCH_SYSTEM_UI_VISIBILITY, info));
         }
     }
 
@@ -2478,9 +2484,6 @@ public final class ViewRootImpl implements ViewParent,
         if (mAttachInfo.mForceReportNewAttributes) {
             mAttachInfo.mForceReportNewAttributes = false;
             params = lp;
-        }
-        if (sNewInsetsMode == NEW_INSETS_MODE_FULL) {
-            handleDispatchSystemUiVisibilityChanged(mCompatibleVisibilityInfo);
         }
 
         if (mFirst || mAttachInfo.mViewVisibilityChanged) {
@@ -4988,6 +4991,11 @@ public final class ViewRootImpl implements ViewParent,
                     break;
                 }
                 case MSG_SHOW_INSETS: {
+                    if (mView == null) {
+                        Log.e(TAG,
+                                String.format("Calling showInsets(%d,%b) on window that no longer"
+                                        + " has views.", msg.arg1, msg.arg2 == 1));
+                    }
                     mInsetsController.show(msg.arg1, msg.arg2 == 1);
                     break;
                 }
