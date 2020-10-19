@@ -49,7 +49,7 @@ import com.android.internal.os.BackgroundThread;
 import com.android.internal.util.IndentingPrintWriter;
 import com.android.server.display.utils.AmbientFilter;
 import com.android.server.display.utils.AmbientFilterFactory;
-import com.android.server.wm.utils.DeviceConfigInterface;
+import com.android.server.utils.DeviceConfigInterface;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -110,7 +110,7 @@ public class DisplayModeDirector {
             @NonNull Injector injector) {
         mContext = context;
         mHandler = new DisplayModeDirectorHandler(handler.getLooper());
-		mInjector = injector;
+        mInjector = injector;
         mVotesByDisplay = new SparseArray<>();
         mSupportedModesByDisplay = new SparseArray<>();
         mDefaultModeByDisplay =  new SparseArray<>();
@@ -119,7 +119,7 @@ public class DisplayModeDirector {
         mDisplayObserver = new DisplayObserver(context, handler);
         mBrightnessObserver = new BrightnessObserver(context, handler);
         mDeviceConfigDisplaySettings = new DeviceConfigDisplaySettings();
-		mDeviceConfig = injector.getDeviceConfig();
+        mDeviceConfig = injector.getDeviceConfig();
     }
 
     /**
@@ -503,6 +503,7 @@ public class DisplayModeDirector {
     SettingsObserver getSettingsObserver() {
         return mSettingsObserver;
     }
+
 
     @VisibleForTesting
     DesiredDisplayModeSpecs getDesiredDisplayModeSpecsWithInjectedFpsSettings(
@@ -1089,7 +1090,7 @@ public class DisplayModeDirector {
         @Override
         public void onDisplayChanged(int displayId) {
             updateDisplayModes(displayId);
-			// TODO: Break the coupling between DisplayObserver and BrightnessObserver.
+            // TODO: Break the coupling between DisplayObserver and BrightnessObserver.
             mBrightnessObserver.onDisplayChanged(displayId);
         }
 
@@ -1145,14 +1146,16 @@ public class DisplayModeDirector {
         // Take it as low brightness before valid sensor data comes
         private float mAmbientLux = -1.0f;
         private AmbientFilter mAmbientFilter;
-		private int mBrightness = -1;
+
+        private int mBrightness = -1;
 
         private final Context mContext;
 
-        // Enable light sensor only when mShouldObserveAmbientChange is true, screen is on, peak
-        // refresh rate changeable and low power mode off. After initialization, these states will
+        // Enable light sensor only when mShouldObserveAmbientLowChange is true or
+        // mShouldObserveAmbientHighChange is true, screen is on, peak refresh rate
+        // changeable and low power mode off. After initialization, these states will
         // be updated from the same handler thread.
-        private boolean mScreenOn = false;
+        private boolean mDefaultDisplayOn = false;
         private boolean mRefreshRateChangeable = false;
         private boolean mLowPowerModeEnabled = false;
 
@@ -1414,7 +1417,6 @@ public class DisplayModeDirector {
 
                     mAmbientFilter = AmbientFilterFactory.createBrightnessFilter(TAG, res);
                     mLightSensor = lightSensor;
-
                 }
             } else {
                 mAmbientFilter = null;
@@ -1434,7 +1436,6 @@ public class DisplayModeDirector {
          * to value changes.
          */
         private boolean hasValidThreshold(int[] a) {
-
             for (int d: a) {
                 if (d >= 0) {
                     return true;
@@ -1466,6 +1467,7 @@ public class DisplayModeDirector {
 
             return false;
         }
+
         private boolean isInsideHighZone(int brightness, float lux) {
             for (int i = 0; i < mHighDisplayBrightnessThresholds.length; i++) {
                 int disp = mHighDisplayBrightnessThresholds[i];
@@ -1488,7 +1490,7 @@ public class DisplayModeDirector {
 
             return false;
         }
-		private void onBrightnessChangedLocked() {
+        private void onBrightnessChangedLocked() {
             Vote vote = null;
 
             if (mBrightness < 0) {
@@ -1810,4 +1812,5 @@ public class DisplayModeDirector {
             return ctx.getSystemService(PowerManager.class).isInteractive();
         }
     }
+
 }
