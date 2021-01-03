@@ -18,7 +18,7 @@ package com.android.internal.util.xpe;
 
 import android.annotation.SdkConstant;
 
-public final class CrConstants {
+public final class XPeConstants {
     /**
      * Features supported by XPerience.
      */
