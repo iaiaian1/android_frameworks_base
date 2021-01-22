@@ -724,10 +724,5 @@ public class DisplayModeDirectorTest {
             }
         }
 
-        @Override
-        public boolean isDeviceInteractive(@NonNull Context context) {
-            return true;
-        }
-
     }
 }
