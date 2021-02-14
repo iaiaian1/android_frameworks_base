@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.xpe.;
+package com.android.internal.util.xpe;
 
 import android.annotation.SdkConstant;
 
