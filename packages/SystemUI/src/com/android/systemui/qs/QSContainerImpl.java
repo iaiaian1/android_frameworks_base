@@ -163,6 +163,8 @@ public class QSContainerImpl extends FrameLayout implements
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+	setBackgroundGradientVisibility(newConfig);
+
         mLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
 
         updateResources();
@@ -247,6 +249,7 @@ public class QSContainerImpl extends FrameLayout implements
         final boolean disabled = (state2 & DISABLE2_QUICK_SETTINGS) != 0;
         if (disabled == mQsDisabled) return;
         mQsDisabled = disabled;
+	setBackgroundGradientVisibility(getResources().getConfiguration());
         mBackground.setVisibility(mQsDisabled ? View.GONE : View.VISIBLE);
         updateStatusbarVisibility();
     }
@@ -326,6 +329,16 @@ public class QSContainerImpl extends FrameLayout implements
         return mQSCustomizer.isCustomizing() ? mQSCustomizer.getHeight()
                 : Math.round(mQsExpansion * (heightOverride - mHeader.getHeight()))
                 + mHeader.getHeight();
+    }
+
+    private void setBackgroundGradientVisibility(Configuration newConfig) {
+        if (newConfig.orientation == ORIENTATION_LANDSCAPE) {
+            mBackgroundGradient.setVisibility(View.INVISIBLE);
+            mStatusBarBackground.setVisibility(View.INVISIBLE);
+        } else {
+            mBackgroundGradient.setVisibility(mQsDisabled ? View.INVISIBLE : View.VISIBLE);
+            mStatusBarBackground.setVisibility(View.VISIBLE);
+        }
     }
 
     public void setExpansion(float expansion) {
