@@ -69,6 +69,7 @@ import com.android.internal.logging.UiEvent;
 import com.android.internal.logging.UiEventLogger;
 import com.android.internal.logging.UiEventLoggerImpl;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
+import com.android.internal.util.xpe.XPeConstans;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardSecurityModel.SecurityMode;
 import com.android.settingslib.utils.ThreadUtils;
@@ -79,8 +80,6 @@ import com.android.systemui.SystemUIFactory;
 import com.android.systemui.shared.system.SysUiStatsLog;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
 import com.android.systemui.util.InjectionInflationController;
-
-import lineageos.app.LineageContextConstants;
 
 import java.util.List;
 
@@ -268,7 +267,7 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
 
         PackageManager packageManager = mContext.getPackageManager();
         mHasFod = packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT) &&
-                packageManager.hasSystemFeature(LineageContextConstants.Features.FOD);
+                packageManager.hasSystemFeature(XPeConstants.Features.FOD);
     }
 
     public void setSecurityCallback(SecurityCallback callback) {
