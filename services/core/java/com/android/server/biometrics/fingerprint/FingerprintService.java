@@ -80,7 +80,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.internal.util.xpe.XPeConstants;
+import com.android.internal.util.xpe.XpeConstants;
 
 import vendor.xperience.biometrics.fingerprint.inscreen.V1_0.IFingerprintInscreen;
 
@@ -895,7 +895,7 @@ public class FingerprintService extends BiometricServiceBase {
         mLockPatternUtils = new LockPatternUtils(context);
 
         PackageManager packageManager = context.getPackageManager();
-        mHasFod = packageManager.hasSystemFeature(XPeConstants.Features.FOD);
+        mHasFod = packageManager.hasSystemFeature(XpeConstants.Features.FOD);
     }
 
     @Override

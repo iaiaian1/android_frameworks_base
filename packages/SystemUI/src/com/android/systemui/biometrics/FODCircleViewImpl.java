@@ -24,7 +24,7 @@ import android.view.View;
 import com.android.systemui.SystemUI;
 import com.android.systemui.statusbar.CommandQueue;
 
-import com.android.internal.util.xpe.XPeConstants;
+import com.android.internal.util.xpe.XpeConstants;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -46,7 +46,7 @@ public class FODCircleViewImpl extends SystemUI implements CommandQueue.Callback
     public void start() {
         PackageManager packageManager = mContext.getPackageManager();
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT) ||
-                !packageManager.hasSystemFeature(XPeConstants.Features.FOD)) {
+                !packageManager.hasSystemFeature(XpeConstants.Features.FOD)) {
             return;
         }
         mCommandQueue.addCallback(this);
