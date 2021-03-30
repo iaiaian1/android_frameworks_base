@@ -46,4 +46,7 @@
 
     <!-- Now playing lockscreen music Ticker -->
     <string name="ambientmusic_songinfo" formatted="false">%s by %s</string>
+
+    <!-- Icon tuner -->
+    <string name="statusbar_items_title">Icon tuner</string>
 </resources>
