@@ -1,4 +1,4 @@
-//
+w//
 // Copyright (C) 2018 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,6 +70,7 @@ android_library {
         "SystemUI-proto",
         "dagger2-2.19",
         "jsr330",
+        "airbnb-lottie",
         "vendor.xperience.biometrics.fingerprint.inscreen-V1.0-java",
     ],
     manifest: "AndroidManifest.xml",
@@ -142,6 +143,7 @@ android_library {
         "truth-prebuilt",
         "dagger2-2.19",
         "jsr330",
+        "airbnb-lottie",
         "vendor.xperience.biometrics.fingerprint.inscreen-V1.0-java",
     ],
     libs: [
