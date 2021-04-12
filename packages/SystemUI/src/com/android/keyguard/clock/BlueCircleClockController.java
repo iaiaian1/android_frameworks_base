@@ -24,7 +24,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextClock;
 import android.content.Context;
-import com.android.internal.util.du.Utils;
 import android.text.Html;
 import com.airbnb.lottie.LottieAnimationView;
 
@@ -100,19 +99,11 @@ public class BlueCircleClockController implements ClockPlugin {
 
 
     private void setClockColors() {
-        int mAccentColor = mContext.getResources().getColor(R.color.lockscreen_clock_accent_color);
-        int mWhiteColor = mContext.getResources().getColor(R.color.lockscreen_clock_white_color);
+        int mAccentColor = mResources.getColor(R.color.typeClockAccentColor, null);
+        int mWhiteColor = mResources.getColor(R.color.typeClockWhiteColor, null);
 
-        if(Utils.useLockscreenClockMinuteAccentColor(mContext) && Utils.useLockscreenClockHourAccentColor(mContext)) {
-             mClock.setFormat12Hour(Html.fromHtml("<font color=" + mAccentColor + ">hh</font>:<font color=" + mAccentColor + ">mm</font>"));
-             mClock.setFormat24Hour(Html.fromHtml("<font color=" + mAccentColor + ">kk</font>:<font color=" + mAccentColor + ">mm</font>"));
-        } else if(Utils.useLockscreenClockHourAccentColor(mContext)) {
              mClock.setFormat12Hour(Html.fromHtml("<font color=" + mAccentColor + ">hh</font>:<font color=" + mWhiteColor + ">mm</font>"));
              mClock.setFormat24Hour(Html.fromHtml("<font color=" + mAccentColor + ">kk</font>:<font color=" + mWhiteColor + ">mm</font>"));
-        } else {
-             mClock.setFormat12Hour(Html.fromHtml("<font color=" + mWhiteColor + ">hh</font>:<font color=" + mWhiteColor + ">mm</font>"));
-             mClock.setFormat24Hour(Html.fromHtml("<font color=" + mWhiteColor + ">kk</font>:<font color=" + mWhiteColor + ">mm</font>"));
-        }
     }
 
     @Override
