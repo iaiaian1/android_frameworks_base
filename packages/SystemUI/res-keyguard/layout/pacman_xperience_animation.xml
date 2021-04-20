@@ -23,12 +23,12 @@
     android:paddingBottom="10dp">
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/atom_cirlce_lottie"
+        android:id="@+id/pacman_cirlce_lottie"
         android:layout_width="210dp"
         android:layout_height="210dp"
         android:layout_gravity="center"
         android:clickable="false"
-        app:lottie_rawRes="@raw/atom_xperience"
+        app:lottie_rawRes="@raw/pacman_xperience"
         app:lottie_loop="true"
         app:lottie_autoPlay="true" />
 
