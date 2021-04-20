@@ -16,9 +16,11 @@
 
 package com.android.keyguard.clock;
 
+import android.app.WallpaperManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Paint.Style;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -97,7 +99,6 @@ public class ExplosionCircleClockController implements ClockPlugin {
         mLogo = (LottieAnimationView) mView.findViewById(R.id.logo);
         setClockColors();
     }
-
 
     private void setClockColors() {
         int mAccentColor = mPalette.getPrimaryColor();
