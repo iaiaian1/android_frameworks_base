@@ -28,6 +28,7 @@ import android.text.Html;
 import com.airbnb.lottie.LottieAnimationView;
 
 import com.android.systemui.R;
+import com.android.internal.colorextraction.ColorExtractor;
 import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.plugins.ClockPlugin;
 
@@ -99,7 +100,7 @@ public class ExplosionCircleClockController implements ClockPlugin {
 
 
     private void setClockColors() {
-        int mAccentColor = mResources.getColor(R.color.typeClockAccentColor, null);
+        int mAccentColor = mPalette.getPrimaryColor();
         int mWhiteColor = mResources.getColor(R.color.typeClockWhiteColor, null);
              mClock.setFormat12Hour(Html.fromHtml("<font color=" + mAccentColor + ">hh</font>:<font color=" + mWhiteColor + ">mm</font>"));
              mClock.setFormat24Hour(Html.fromHtml("<font color=" + mAccentColor + ">kk</font>:<font color=" + mWhiteColor + ">mm</font>"));
