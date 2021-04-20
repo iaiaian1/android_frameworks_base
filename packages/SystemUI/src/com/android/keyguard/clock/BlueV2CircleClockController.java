@@ -28,7 +28,7 @@ import android.text.Html;
 import com.airbnb.lottie.LottieAnimationView;
 
 import com.android.systemui.R;
-import com.android.internal.colorextraction.ColorExtractor;
+
 import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.plugins.ClockPlugin;
 
