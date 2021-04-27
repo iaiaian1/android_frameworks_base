@@ -301,13 +301,6 @@ public class DownloadManager {
      */
     public final static int PAUSED_UNKNOWN = 4;
 
-   /**
-    * Value of {@link #COLUMN_REASON} when the download is paused manually.
-    *
-    * @hide
-    */
-    public final static int PAUSED_MANUAL = 5;
-
     /**
      * Value of {@link #COLUMN_REASON} when the download is paused manually.
      *
