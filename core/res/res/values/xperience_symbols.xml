@@ -51,4 +51,6 @@
 
     <!-- Enable face auth only when swiping security view -->
     <java-symbol type="bool" name="config_faceAuthOnlyOnSecurityView" />
+
+    <java-symbol type="bool" name="config_needCustomFODView" />
 </resources>
