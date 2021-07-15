@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-     Copyright 2015 The Android Open Source Project
+<!-- Copyright (C) 2007 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,10 +14,6 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- Description for the screen zoom level that makes interface elements smaller. [CHAR LIMIT=24] -->
-    <string name="screen_zoom_summary_smaller">Lebih kecil</string>
-    <!-- Description for the screen zoom level that makes interface elements smallest. [CHAR LIMIT=24] -->
-    <string name="screen_zoom_summary_smallest">Terkecil</string>
-    <!-- Deep sleep info -->
-    <string name="status_deep_sleep">(Tidur nyenyak: %1$d%2$s)</string>
+    <!-- Message for updating an existing app [CHAR LIMIT=NONE] -->
+    <!-- Message for updating an existing system app [CHAR LIMIT=NONE] -->
 </resources>
