@@ -252,7 +252,7 @@ public class FaceService extends SystemService {
         }
 
         @Override // Binder call
-        public void authenticate(final IBinder token, final long operationId, int userId,
+        public long authenticate(final IBinder token, final long operationId, int userId,
                 final IFaceServiceReceiver receiver, final String opPackageName,
                 boolean isKeyguardBypassEnabled) {
             Utils.checkPermission(getContext(), USE_BIOMETRIC_INTERNAL);
@@ -272,38 +272,38 @@ public class FaceService extends SystemService {
             final Pair<Integer, ServiceProvider> provider = getSingleProvider();
             if (provider == null) {
                 Slog.w(TAG, "Null provider for authenticate");
-                return;
+                return -1;
             }
 
-            provider.second.scheduleAuthenticate(provider.first, token, operationId, userId,
+            return provider.second.scheduleAuthenticate(provider.first, token, operationId, userId,
                     0 /* cookie */,
                     new ClientMonitorCallbackConverter(receiver), opPackageName, restricted,
                     statsClient, isKeyguard, isKeyguardBypassEnabled);
         }
 
         @Override // Binder call
-        public void detectFace(final IBinder token, final int userId,
+        public long detectFace(final IBinder token, final int userId,
                 final IFaceServiceReceiver receiver, final String opPackageName) {
             Utils.checkPermission(getContext(), USE_BIOMETRIC_INTERNAL);
             if (!Utils.isKeyguard(getContext(), opPackageName)) {
                 Slog.w(TAG, "detectFace called from non-sysui package: " + opPackageName);
-                return;
+                return -1;
             }
 
             if (!Utils.isUserEncryptedOrLockdown(mLockPatternUtils, userId)) {
                 // If this happens, something in KeyguardUpdateMonitor is wrong. This should only
                 // ever be invoked when the user is encrypted or lockdown.
                 Slog.e(TAG, "detectFace invoked when user is not encrypted or lockdown");
-                return;
+                return -1;
             }
 
             final Pair<Integer, ServiceProvider> provider = getSingleProvider();
             if (provider == null) {
                 Slog.w(TAG, "Null provider for detectFace");
-                return;
+                return -1;
             }
 
-            provider.second.scheduleFaceDetect(provider.first, token, userId,
+            return provider.second.scheduleFaceDetect(provider.first, token, userId,
                     new ClientMonitorCallbackConverter(receiver), opPackageName,
                     BiometricsProtoEnums.CLIENT_KEYGUARD);
         }
@@ -311,8 +311,8 @@ public class FaceService extends SystemService {
         @Override // Binder call
         public void prepareForAuthentication(int sensorId, boolean requireConfirmation,
                 IBinder token, long operationId, int userId,
-                IBiometricSensorReceiver sensorReceiver, String opPackageName, int cookie,
-                boolean allowBackgroundAuthentication) {
+                IBiometricSensorReceiver sensorReceiver, String opPackageName, long requestId,
+                int cookie, boolean allowBackgroundAuthentication) {
             Utils.checkPermission(getContext(), USE_BIOMETRIC_INTERNAL);
 
             final ServiceProvider provider = getProviderForSensor(sensorId);
@@ -324,9 +324,9 @@ public class FaceService extends SystemService {
             final boolean isKeyguardBypassEnabled = false; // only valid for keyguard clients
             final boolean restricted = true; // BiometricPrompt is always restricted
             provider.scheduleAuthenticate(sensorId, token, operationId, userId, cookie,
-                    new ClientMonitorCallbackConverter(sensorReceiver), opPackageName, restricted,
-                    BiometricsProtoEnums.CLIENT_BIOMETRIC_PROMPT, allowBackgroundAuthentication,
-                    isKeyguardBypassEnabled);
+                    new ClientMonitorCallbackConverter(sensorReceiver), opPackageName, requestId,
+                    restricted, BiometricsProtoEnums.CLIENT_BIOMETRIC_PROMPT,
+                    allowBackgroundAuthentication, isKeyguardBypassEnabled);
         }
 
         @Override // Binder call
@@ -343,7 +343,8 @@ public class FaceService extends SystemService {
         }
 
         @Override // Binder call
-        public void cancelAuthentication(final IBinder token, final String opPackageName) {
+        public void cancelAuthentication(final IBinder token, final String opPackageName,
+                final long requestId) {
             Utils.checkPermission(getContext(), USE_BIOMETRIC_INTERNAL);
 
             final Pair<Integer, ServiceProvider> provider = getSingleProvider();
@@ -352,11 +353,12 @@ public class FaceService extends SystemService {
                 return;
             }
 
-            provider.second.cancelAuthentication(provider.first, token);
+            provider.second.cancelAuthentication(provider.first, token, requestId);
         }
 
         @Override // Binder call
-        public void cancelFaceDetect(final IBinder token, final String opPackageName) {
+        public void cancelFaceDetect(final IBinder token, final String opPackageName,
+                final long requestId) {
             Utils.checkPermission(getContext(), USE_BIOMETRIC_INTERNAL);
             if (!Utils.isKeyguard(getContext(), opPackageName)) {
                 Slog.w(TAG, "cancelFaceDetect called from non-sysui package: "
@@ -370,12 +372,12 @@ public class FaceService extends SystemService {
                 return;
             }
 
-            provider.second.cancelFaceDetect(provider.first, token);
+            provider.second.cancelFaceDetect(provider.first, token, requestId);
         }
 
         @Override // Binder call
         public void cancelAuthenticationFromService(int sensorId, final IBinder token,
-                final String opPackageName) {
+                final String opPackageName, final long requestId) {
             Utils.checkPermission(getContext(), USE_BIOMETRIC_INTERNAL);
 
             final ServiceProvider provider = getProviderForSensor(sensorId);
@@ -384,7 +386,7 @@ public class FaceService extends SystemService {
                 return;
             }
 
-            provider.cancelAuthentication(sensorId, token);
+            provider.cancelAuthentication(sensorId, token, requestId);
         }
 
         @Override // Binder call
