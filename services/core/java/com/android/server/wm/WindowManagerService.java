@@ -8639,8 +8639,9 @@ public class WindowManagerService extends IWindowManager.Stub
             if (imeTargetWindowTask == null) {
                 return false;
             }
-            final TaskSnapshot snapshot = mAtmService.getTaskSnapshot(imeTargetWindowTask.mTaskId,
-                    false /* isLowResolution */);
+            final TaskSnapshot snapshot = getTaskSnapshot(imeTargetWindowTask.mTaskId,
+                    imeTargetWindowTask.mUserId, false /* isLowResolution */,
+                    false /* restoreFromDisk */);
             return snapshot != null && snapshot.hasImeSurface();
         }
     }
