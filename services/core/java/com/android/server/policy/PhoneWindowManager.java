@@ -989,9 +989,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         if (!mPowerKeyHandled) {
             if (!interactive) {
-               if (mTorchActionMode == 0) {
-                   wakeUpFromPowerKey(event.getDownTime());
-               }
+                if (mTorchActionMode == 0) {
+                    wakeUpFromPowerKey(event.getDownTime());
+                }
             }
         } else {
             // handled by another power key policy.
@@ -1027,7 +1027,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     private void powerPress(long eventTime, int count, boolean beganFromNonInteractive) {
-
         final boolean interactive = Display.isOnState(mDefaultDisplay.getState());
 
         Slog.d(TAG, "powerPress: eventTime=" + eventTime + " interactive=" + interactive
@@ -1183,7 +1182,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return 3;
         }
         if (mDoublePressOnPowerBehavior != MULTI_PRESS_POWER_NOTHING ||
-                 mTorchActionMode == 1) {
+                mTorchActionMode == 1) {
             return 2;
         }
         return 1;
@@ -2121,15 +2120,17 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         @Override
         void onLongPress(long eventTime) {
-             if (mSingleKeyGestureDetector.beganFromNonInteractive()) {
-                 if (handleTorchPress(true))
+            if (mSingleKeyGestureDetector.beganFromNonInteractive()) {
+                if (handleTorchPress(true))
                     return;
-                 if (!mSupportLongPressPowerWhenNonInteractive) {
+                if (!mSupportLongPressPowerWhenNonInteractive) {
                     Slog.v(TAG, "Not support long press power when device is not interactive.");
                     return;
-             }
-          }
-       }
+                }
+            }
+
+            powerLongPress(eventTime);
+        }
 
         @Override
         void onVeryLongPress(long eventTime) {
@@ -2139,11 +2140,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         @Override
         void onMultiPress(long downTime, int count) {
-             if (mSingleKeyGestureDetector.beganFromNonInteractive()) {
-                 if (handleTorchPress(false)) {
-                     mSingleKeyGestureDetector.reset();
-                     return;
-                 }
+            if (mSingleKeyGestureDetector.beganFromNonInteractive()) {
+                if (handleTorchPress(false)) {
+                    mSingleKeyGestureDetector.reset();
+                    return;
+                }
             }
             powerPress(downTime, count, mSingleKeyGestureDetector.beganFromNonInteractive());
         }
@@ -2317,7 +2318,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_CURRENT) == 1;
             mTorchActionMode = Settings.System.getIntForUser(resolver,
                     Settings.System.TORCH_POWER_BUTTON_GESTURE,
-                    0, UserHandle.USER_CURRENT);
+                            0, UserHandle.USER_CURRENT);
         }
         if (updateRotation) {
             updateRotation(true);
@@ -4118,7 +4119,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
 
         if (event.getKeyCode() == KEYCODE_POWER && event.getAction() == KeyEvent.ACTION_DOWN
-                  && mTorchActionMode != 1) {
+                && mTorchActionMode != 1) {
             mPowerKeyHandled = handleCameraGesture(event, interactive);
             if (mPowerKeyHandled) {
                 // handled by camera gesture.
