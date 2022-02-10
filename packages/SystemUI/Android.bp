@@ -101,6 +101,7 @@ android_library {
         "themelib",
         "tensorflowlite_java",
         "SystemUIGoogle-lib",
+        "faceunlock_framework",
     ],
     manifest: "AndroidManifest.xml",
     defaults: [
