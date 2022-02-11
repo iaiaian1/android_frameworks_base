@@ -1792,6 +1792,7 @@
 
     <!-- Array containing custom error messages from vendor.  Vendor is expected to add and translate these strings -->
     <string-array name="face_error_vendor">
+        <item>@string/face_unlock_disabled_idle</item>
     </string-array>
 
     <!-- Content description which should be used for the face icon. [CHAR LIMIT=10] -->
