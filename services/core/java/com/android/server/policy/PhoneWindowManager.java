@@ -200,6 +200,7 @@ import com.android.internal.app.AssistUtils;
 import com.android.internal.inputmethod.SoftInputShowHideReason;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.nano.MetricsProto;
+import com.android.internal.util.xperience.XPerienceUtils;
 import com.android.internal.os.DeviceKeyHandler;
 import com.android.internal.os.RoSystemProperties;
 import com.android.internal.policy.IKeyguardDismissCallback;
@@ -2140,7 +2141,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         void onMultiPress(long downTime, int count) {
              if (mSingleKeyGestureDetector.beganFromNonInteractive()) {
                  if (handleTorchPress(false)) {
-                     mSinglekeyGestureDetector.reset();
+                     mSingleKeyGestureDetector.reset();
                      return;
                  }
             }
