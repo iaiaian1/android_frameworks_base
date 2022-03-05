@@ -140,7 +140,7 @@ public class QSFactoryImplGoogle extends QSFactoryImpl {
                 ambientDisplayTileProvider,
                 usbTetherTileProvider,
                 headsUpTileProvider,
-                cpuInfoTileProvider);
+                CPUInfoTileProvider);
         this.mReverseChargingTileProvider = reverseChargingTileProvider;
         this.mBatterySaverTileGoogleProvider = batterySaverTileGoogleProvider;
         this.mOverlayToggleTileProvider = overlayToggleTileProvider;
