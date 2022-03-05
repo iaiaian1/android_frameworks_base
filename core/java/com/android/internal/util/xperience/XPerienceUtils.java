@@ -18,15 +18,18 @@ package com.android.internal.util.xperience;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
+import android.text.TextUtils;
 
 import com.android.internal.statusbar.IStatusBarService;
 
 import java.util.Locale;
 
+import com.android.internal.R;
 /**
  * Some custom utilities
  */

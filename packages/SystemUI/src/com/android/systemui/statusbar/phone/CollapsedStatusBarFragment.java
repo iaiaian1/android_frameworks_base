@@ -28,7 +28,11 @@ import static com.android.systemui.statusbar.events.SystemStatusAnimationSchedul
 import android.animation.ValueAnimator;
 import android.annotation.Nullable;
 import android.app.Fragment;
+import android.content.ContentResolver;
+import android.database.ContentObserver;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.UserHandle;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.SparseArray;
@@ -99,6 +103,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private final StatusBarIconController mStatusBarIconController;
 
     private View mCustomCarrierLabel;
+    private final Handler mHandler = new Handler();
     private int mShowCarrierLabel;
     private BatteryMeterView mBatteryMeterView;
     private StatusIconContainer mStatusIcons;
@@ -195,6 +200,8 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
                     savedInstanceState.getSparseParcelableArray(EXTRA_PANEL_STATE));
         }
         mDarkIconManager = new DarkIconManager(view.findViewById(R.id.statusIcons), mFeatureFlags);
+        mContentResolver = getContext().getContentResolver();
+        mSettingsObserver = new SettingsObserver(mHandler);
         mDarkIconManager.setShouldLog(true);
         mBlockedIcons.add(getString(com.android.internal.R.string.status_bar_alarm_clock));
         mBlockedIcons.add(getString(com.android.internal.R.string.status_bar_call_strength));
@@ -401,7 +408,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     }
 
     private void hideSystemIconArea(boolean animate) {
-        animateHide(mSystemIconArea, animate);
+        animateHide(mSystemIconArea, animate, true);
     }
 
     private void showSystemIconArea(boolean animate) {
@@ -443,8 +450,8 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     }
 
     public void hideNotificationIconArea(boolean animate) {
-        animateHide(mNotificationIconAreaInner, animate);
-        animateHide(mCenteredIconArea, animate);
+        animateHide(mNotificationIconAreaInner, animate, true);
+        animateHide(mCenteredIconArea, animate, true);
     }
 
     public void showNotificationIconArea(boolean animate) {
@@ -454,7 +461,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
 
     public void hideOperatorName(boolean animate) {
         if (mOperatorNameFrame != null) {
-            animateHide(mOperatorNameFrame, animate);
+            animateHide(mOperatorNameFrame, animate, true);
         }
     }
 
@@ -498,8 +505,20 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     /**
      * Hides a view.
      */
-    private void animateHide(final View v, boolean animate) {
-        animateHiddenState(v, View.INVISIBLE, animate);
+    private void animateHide(final View v, boolean animate, final boolean invisible) {
+        v.animate().cancel();
+        if (!animate) {
+            v.setAlpha(0f);
+            v.setVisibility(invisible ? View.INVISIBLE : View.GONE);
+            return;
+        }
+
+        v.animate()
+                .alpha(0f)
+                .setDuration(160)
+                .setStartDelay(0)
+                .setInterpolator(Interpolators.ALPHA_OUT)
+                .withEndAction(() -> v.setVisibility(invisible ? View.INVISIBLE : View.GONE));
     }
 
     /**

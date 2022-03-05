@@ -7437,5 +7437,6 @@ message MetricsEvent {
     // END OF AOSP CONSTANTS
     //Rainbow unicorn xpe
     RAINBOW_UNICORN = 3000;
+    RAINBOW_UNICORN_TILES = 3001;
   }
 }
