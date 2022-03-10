@@ -146,6 +146,7 @@ public class FingerprintManager implements BiometricAuthenticator, BiometricFing
     private CryptoObject mCryptoObject;
     @Nullable private RemoveTracker mRemoveTracker;
     private Handler mHandler;
+    @Nullable private float[] mEnrollStageThresholds;
 
     /**
      * Retrieves a list of properties for all fingerprint sensors on the device.
@@ -850,26 +851,6 @@ public class FingerprintManager implements BiometricAuthenticator, BiometricFing
     }
 
     /**
-     * Checks if the specified user has enrollments in any of the specified sensors.
-     * @hide
-     */
-    @RequiresPermission(USE_BIOMETRIC_INTERNAL)
-    public boolean hasEnrolledTemplatesForAnySensor(int userId,
-            @NonNull List<FingerprintSensorPropertiesInternal> sensors) {
-        if (mService == null) {
-            Slog.w(TAG, "hasEnrolledTemplatesForAnySensor: no fingerprint service");
-            return false;
-        }
-
-        try {
-            return mService.hasEnrolledTemplatesForAnySensor(userId, sensors,
-                    mContext.getOpPackageName());
-        } catch (RemoteException e) {
-            throw e.rethrowFromSystemServer();
-        }
-    }
-
-    /**
      * @hide
      */
     @RequiresPermission(USE_BIOMETRIC_INTERNAL)
@@ -1349,6 +1330,46 @@ public class FingerprintManager implements BiometricAuthenticator, BiometricFing
     /**
      * @hide
      */
+    public int getEnrollStageCount() {
+        if (mEnrollStageThresholds == null) {
+            mEnrollStageThresholds = createEnrollStageThresholds(mContext);
+        }
+        return mEnrollStageThresholds.length + 1;
+    }
+
+    /**
+     * @hide
+     */
+    public float getEnrollStageThreshold(int index) {
+        if (mEnrollStageThresholds == null) {
+            mEnrollStageThresholds = createEnrollStageThresholds(mContext);
+        }
+
+        if (index < 0 || index > mEnrollStageThresholds.length) {
+            Slog.w(TAG, "Unsupported enroll stage index: " + index);
+            return index < 0 ? 0f : 1f;
+        }
+
+        // The implicit threshold for the final stage is always 1.
+        return index == mEnrollStageThresholds.length ? 1f : mEnrollStageThresholds[index];
+    }
+
+    @NonNull
+    private static float[] createEnrollStageThresholds(@NonNull Context context) {
+        // TODO(b/200604947): Fetch this value from FingerprintService, rather than internal config
+        final String[] enrollStageThresholdStrings = context.getResources().getStringArray(
+                com.android.internal.R.array.config_udfps_enroll_stage_thresholds);
+
+        final float[] enrollStageThresholds = new float[enrollStageThresholdStrings.length];
+        for (int i = 0; i < enrollStageThresholds.length; i++) {
+            enrollStageThresholds[i] = Float.parseFloat(enrollStageThresholdStrings[i]);
+        }
+        return enrollStageThresholds;
+    }
+
+    /**
+     * @hide
+     */
     public static String getErrorString(Context context, int errMsg, int vendorCode) {
         switch (errMsg) {
             case FINGERPRINT_ERROR_HW_UNAVAILABLE:
@@ -1396,9 +1417,9 @@ public class FingerprintManager implements BiometricAuthenticator, BiometricFing
         // This is used as a last resort in case a vendor string is missing
         // It should not happen for anything other than FINGERPRINT_ERROR_VENDOR, but
         // warn and use the default if all else fails.
-        // TODO(b/196639965): update string
         Slog.w(TAG, "Invalid error message: " + errMsg + ", " + vendorCode);
-        return "";
+        return context.getString(
+                com.android.internal.R.string.fingerprint_error_vendor_unknown);
     }
 
     /**

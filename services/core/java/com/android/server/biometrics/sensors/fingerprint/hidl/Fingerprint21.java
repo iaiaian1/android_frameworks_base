@@ -102,6 +102,7 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
     private boolean mTestHalEnabled;
 
     final Context mContext;
+    @NonNull private final FingerprintStateCallback mFingerprintStateCallback;
     private final ActivityTaskManager mActivityTaskManager;
     @NonNull private final FingerprintSensorPropertiesInternal mSensorProperties;
     private final BiometricScheduler mScheduler;
@@ -317,11 +318,13 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
     }
 
     Fingerprint21(@NonNull Context context,
+            @NonNull FingerprintStateCallback fingerprintStateCallback,
             @NonNull FingerprintSensorPropertiesInternal sensorProps,
             @NonNull BiometricScheduler scheduler, @NonNull Handler handler,
             @NonNull LockoutResetDispatcher lockoutResetDispatcher,
             @NonNull HalResultController controller) {
         mContext = context;
+        mFingerprintStateCallback = fingerprintStateCallback;
 
         mSensorProperties = sensorProps;
         mSensorId = sensorProps.sensorId;
@@ -351,6 +354,7 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
     }
 
     public static Fingerprint21 newInstance(@NonNull Context context,
+            @NonNull FingerprintStateCallback fingerprintStateCallback,
             @NonNull FingerprintSensorPropertiesInternal sensorProps,
             @NonNull LockoutResetDispatcher lockoutResetDispatcher,
             @NonNull GestureAvailabilityDispatcher gestureAvailabilityDispatcher) {
@@ -362,8 +366,8 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
         final HalResultController controller = new HalResultController(sensorProps.sensorId,
                 context, handler,
                 scheduler);
-        return new Fingerprint21(context, sensorProps, scheduler, handler, lockoutResetDispatcher,
-                controller);
+        return new Fingerprint21(context, fingerprintStateCallback, sensorProps, scheduler, handler,
+                lockoutResetDispatcher, controller);
     }
 
     @Override
@@ -557,8 +561,7 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
     public void scheduleEnroll(int sensorId, @NonNull IBinder token,
             @NonNull byte[] hardwareAuthToken, int userId,
             @NonNull IFingerprintServiceReceiver receiver, @NonNull String opPackageName,
-            @FingerprintManager.EnrollReason int enrollReason,
-            @NonNull FingerprintStateCallback fingerprintStateCallback) {
+            @FingerprintManager.EnrollReason int enrollReason) {
         mHandler.post(() -> {
             scheduleUpdateActiveUserWithoutHandler(userId);
 
@@ -570,13 +573,13 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
             mScheduler.scheduleClientMonitor(client, new BaseClientMonitor.Callback() {
                 @Override
                 public void onClientStarted(@NonNull BaseClientMonitor clientMonitor) {
-                    fingerprintStateCallback.onClientStarted(clientMonitor);
+                    mFingerprintStateCallback.onClientStarted(clientMonitor);
                 }
 
                 @Override
                 public void onClientFinished(@NonNull BaseClientMonitor clientMonitor,
                         boolean success) {
-                    fingerprintStateCallback.onClientFinished(clientMonitor, success);
+                    mFingerprintStateCallback.onClientFinished(clientMonitor, success);
                     if (success) {
                         // Update authenticatorIds
                         scheduleUpdateActiveUserWithoutHandler(clientMonitor.getTargetUserId(),
@@ -609,7 +612,7 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
                     mLazyDaemon, token, id, listener, userId, opPackageName,
                     mSensorProperties.sensorId, mUdfpsOverlayController, isStrongBiometric,
                     statsClient);
-            mScheduler.scheduleClientMonitor(client, fingerprintStateCallback);
+            mScheduler.scheduleClientMonitor(client, mFingerprintStateCallback);
         });
 
         return id;
@@ -631,7 +634,7 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
                     mSensorProperties.sensorId, isStrongBiometric, statsClient,
                     mTaskStackListener, mLockoutTracker, mUdfpsOverlayController,
                     allowBackgroundAuthentication, mSensorProperties);
-            mScheduler.scheduleClientMonitor(client, fingerprintStateCallback);
+            mScheduler.scheduleClientMonitor(client, mFingerprintStateCallback);
         });
     }
 
@@ -672,7 +675,7 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
                     mLazyDaemon, token, new ClientMonitorCallbackConverter(receiver), fingerId,
                     userId, opPackageName, FingerprintUtils.getLegacyInstance(mSensorId),
                     mSensorProperties.sensorId, mAuthenticatorIds);
-            mScheduler.scheduleClientMonitor(client);
+            mScheduler.scheduleClientMonitor(client, mFingerprintStateCallback);
         });
     }
 
@@ -689,7 +692,7 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
                     0 /* fingerprintId */, userId, opPackageName,
                     FingerprintUtils.getLegacyInstance(mSensorId),
                     mSensorProperties.sensorId, mAuthenticatorIds);
-            mScheduler.scheduleClientMonitor(client);
+            mScheduler.scheduleClientMonitor(client, mFingerprintStateCallback);
         });
     }
 
@@ -711,7 +714,8 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
     @Override
     public void scheduleInternalCleanup(int sensorId, int userId,
             @Nullable BaseClientMonitor.Callback callback) {
-        scheduleInternalCleanup(userId, callback);
+        scheduleInternalCleanup(userId, new BaseClientMonitor.CompositeCallback(callback,
+                mFingerprintStateCallback));
     }
 
     @Override
@@ -919,9 +923,8 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
     @NonNull
     @Override
     public ITestSession createTestSession(int sensorId, @NonNull ITestSessionCallback callback,
-            @NonNull FingerprintStateCallback fingerprintStateCallback,
             @NonNull String opPackageName) {
         return new BiometricTestSessionImpl(mContext, mSensorProperties.sensorId, callback,
-                fingerprintStateCallback, this, mHalResultController);
+                mFingerprintStateCallback, this, mHalResultController);
     }
 }

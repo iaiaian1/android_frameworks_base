@@ -100,20 +100,6 @@ public class KeyguardIndicationRotateTextViewController extends
      */
     public void updateIndication(@IndicationType int type, KeyguardIndication newIndication,
             boolean updateImmediately) {
-        updateIndication(type, newIndication, updateImmediately, false);
-    }
-
-    /**
-     * Update the indication type with the given String.
-     * @param type of indication
-     * @param newIndication message to associate with this indication type
-     * @param showImmediately if true: shows this indication message immediately. Else, the text
-     *                        associated with this type is updated and will show when its turn in
-     *                        the IndicationQueue comes around.
-     * @param fixed if true: keep message appearing until it is explicitly hidden
-     */
-    public void updateIndication(@IndicationType int type, KeyguardIndication newIndication,
-            boolean updateImmediately, boolean fixed) {
         if (type == INDICATION_TYPE_NOW_PLAYING
                 || type == INDICATION_TYPE_REVERSE_CHARGING) {
             // temporarily don't show here, instead use AmbientContainer b/181049781
@@ -329,7 +315,6 @@ public class KeyguardIndicationRotateTextViewController extends
     public static final int INDICATION_TYPE_TRUST = 6;
     public static final int INDICATION_TYPE_RESTING = 7;
     public static final int INDICATION_TYPE_USER_LOCKED = 8;
-    public static final int INDICATION_TYPE_NOW_PLAYING = 9;
     public static final int INDICATION_TYPE_REVERSE_CHARGING = 10;
     public static final int INDICATION_TYPE_FACE_RECOGNITION_STARTED = 11;
 
@@ -344,7 +329,6 @@ public class KeyguardIndicationRotateTextViewController extends
             INDICATION_TYPE_TRUST,
             INDICATION_TYPE_RESTING,
             INDICATION_TYPE_USER_LOCKED,
-            INDICATION_TYPE_NOW_PLAYING,
             INDICATION_TYPE_REVERSE_CHARGING,
             INDICATION_TYPE_FACE_RECOGNITION_STARTED,
     })

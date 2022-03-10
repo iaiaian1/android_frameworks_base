@@ -226,6 +226,14 @@ public class WallpaperManager {
      */
     public static final String EXTRA_NEW_WALLPAPER_ID = "android.service.wallpaper.extra.ID";
 
+    /**
+     * Extra passed on {@link Intent.ACTION_WALLPAPER_CHANGED} indicating if wallpaper was set from
+     * a foreground app.
+     * @hide
+     */
+    public static final String EXTRA_FROM_FOREGROUND_APP =
+            "android.service.wallpaper.extra.FROM_FOREGROUND_APP";
+
     // flags for which kind of wallpaper to act on
 
     /** @hide */
@@ -557,6 +565,53 @@ public class WallpaperManager {
                 return defaultWallpaper;
             }
             return null;
+        }
+
+        public Rect peekWallpaperDimensions(Context context, boolean returnDefault, int userId) {
+            if (mService != null) {
+                try {
+                    if (!mService.isWallpaperSupported(context.getOpPackageName())) {
+                        return new Rect();
+                    }
+                } catch (RemoteException e) {
+                    throw e.rethrowFromSystemServer();
+                }
+            }
+
+            Rect dimensions = null;
+            synchronized (this) {
+                try {
+                    Bundle params = new Bundle();
+                    // Let's peek user wallpaper first.
+                    ParcelFileDescriptor pfd = mService.getWallpaperWithFeature(
+                            context.getOpPackageName(), context.getAttributionTag(), this,
+                            FLAG_SYSTEM, params, userId);
+                    if (pfd != null) {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(), null, options);
+                        dimensions = new Rect(0, 0, options.outWidth, options.outHeight);
+                    }
+                } catch (RemoteException ex) {
+                    Log.w(TAG, "peek wallpaper dimensions failed", ex);
+                }
+            }
+            // If user wallpaper is unavailable, may be the default one instead.
+            if ((dimensions == null || dimensions.width() == 0 || dimensions.height() == 0)
+                    && returnDefault) {
+                InputStream is = openDefaultWallpaper(context, FLAG_SYSTEM);
+                if (is != null) {
+                    try {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeStream(is, null, options);
+                        dimensions = new Rect(0, 0, options.outWidth, options.outHeight);
+                    } finally {
+                        IoUtils.closeQuietly(is);
+                    }
+                }
+            }
+            return dimensions;
         }
 
         void forgetLoadedWallpaper() {
@@ -1036,6 +1091,17 @@ public class WallpaperManager {
     public Bitmap getBitmapAsUser(int userId, boolean hardware) {
         final ColorManagementProxy cmProxy = getColorManagementProxy();
         return sGlobals.peekWallpaperBitmap(mContext, true, FLAG_SYSTEM, userId, hardware, cmProxy);
+    }
+
+    /**
+     * Peek the dimensions of system wallpaper of the user without decoding it.
+     *
+     * @return the dimensions of system wallpaper
+     * @hide
+     */
+    public Rect peekBitmapDimensions() {
+        return sGlobals.peekWallpaperDimensions(
+                mContext, true /* returnDefault */, mContext.getUserId());
     }
 
     /**
